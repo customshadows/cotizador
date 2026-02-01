@@ -10,9 +10,22 @@
     <style>
         body { font-family: 'Inter', sans-serif; }
         .discount-btn.active { background-color: #ef4444; color: white; border-color: #ef4444; }
+        
+        /* Reglas estrictas para el PDF/Impresión */
         @media print { 
-            .no-print { display: none !important; }
-            input, select, textarea { border: none !important; background: transparent !important; padding: 0 !important; }
+            .no-print, .discount-btn, #iva-toggle, label[for="iva-toggle"], .btn-action { 
+                display: none !important; 
+            }
+            body { background-color: white !important; padding: 0 !important; }
+            #cotizacion-completa { 
+                box-shadow: none !important; 
+                border: none !important; 
+                width: 100% !important; 
+                max-width: 100% !important;
+                padding: 0 !important;
+            }
+            input { border: none !important; background: transparent !important; }
+            .delete-col { display: none !important; }
         }
     </style>
 </head>
@@ -42,22 +55,22 @@
 
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4 bg-slate-50 p-6 rounded-2xl border border-slate-100">
             <div class="md:col-span-1">
-                <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-1">👤 Nombre del Cliente</label>
-                <input type="text" id="cliente" placeholder="Nombre completo" class="w-full p-2 bg-transparent border-b border-slate-300 outline-none focus:border-blue-600 font-bold">
+                <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-1">👤 Cliente</label>
+                <input type="text" id="cliente" placeholder="Nombre completo" class="w-full bg-transparent font-bold outline-none">
             </div>
             <div class="grid grid-cols-2 gap-4">
                 <div>
                     <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-1">📞 Teléfono</label>
-                    <input type="text" id="tel-cliente" placeholder="999 000 0000" class="w-full p-2 bg-transparent border-b border-slate-300 outline-none focus:border-blue-600 font-bold text-sm">
+                    <input type="text" id="tel-cliente" placeholder="---" class="w-full bg-transparent font-bold text-sm outline-none">
                 </div>
                 <div>
                     <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-1">📧 Email</label>
-                    <input type="email" id="email-cliente" placeholder="correo@ejemplo.com" class="w-full p-2 bg-transparent border-b border-slate-300 outline-none focus:border-blue-600 font-bold text-sm">
+                    <input type="email" id="email-cliente" placeholder="---" class="w-full bg-transparent font-bold text-sm outline-none">
                 </div>
             </div>
-            <div class="md:col-span-2 mt-2">
-                <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-1">📍 Dirección de Entrega / Instalación</label>
-                <input type="text" id="dir-cliente" placeholder="Calle, Número, Fraccionamiento / Ciudad" class="w-full p-2 bg-transparent border-b border-slate-300 outline-none focus:border-blue-600 font-bold text-sm">
+            <div class="md:col-span-2">
+                <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-1">📍 Dirección</label>
+                <input type="text" id="dir-cliente" placeholder="---" class="w-full bg-transparent font-bold text-sm outline-none">
             </div>
         </div>
         
@@ -74,48 +87,37 @@
                 <div>
                     <label class="text-[10px] font-bold text-blue-400 uppercase">Tela</label>
                     <select id="modelo" class="w-full p-2.5 bg-white border border-blue-200 rounded-xl font-bold text-sm outline-none">
-                        <option value="">-- Primero elige sistema --</option>
+                        <option value="">-- Elige sistema --</option>
                     </select>
                 </div>
                 <div>
                     <label class="text-[10px] font-bold text-blue-400 uppercase">Ambiente / Color</label>
                     <div class="flex gap-1">
                         <input type="text" id="ambiente" placeholder="Sala" class="w-1/2 p-2.5 bg-white border border-blue-200 rounded-xl font-bold">
-                        <input type="text" id="color" placeholder="Gris" class="w-1/2 p-2.5 bg-white border border-blue-200 rounded-xl font-bold">
+                        <input type="text" id="color" placeholder="Color" class="w-1/2 p-2.5 bg-white border border-blue-200 rounded-xl font-bold">
                     </div>
                 </div>
                 <div class="grid grid-cols-3 gap-1">
-                    <input type="number" id="ancho" step="0.01" placeholder="Ancho" class="w-full p-2.5 border border-blue-200 rounded-xl text-center font-bold text-blue-600">
-                    <input type="number" id="alto" step="0.01" placeholder="Alto" class="w-full p-2.5 border border-blue-200 rounded-xl text-center font-bold text-blue-600">
+                    <input type="number" id="ancho" step="0.01" placeholder="An" class="w-full p-2.5 border border-blue-200 rounded-xl text-center font-bold">
+                    <input type="number" id="alto" step="0.01" placeholder="Al" class="w-full p-2.5 border border-blue-200 rounded-xl text-center font-bold">
                     <input type="number" id="cantidad" value="1" class="w-full p-2.5 border border-blue-200 rounded-xl text-center font-bold">
                 </div>
             </div>
 
-            <div class="grid grid-cols-1 md:grid-cols-4 gap-4 border-t border-blue-100 pt-4">
-                <div>
-                    <label class="text-[10px] font-black text-orange-500 uppercase">Motorización ($)</label>
-                    <input type="number" id="motor-precio" placeholder="Precio motor" class="w-full p-2.5 bg-white border border-orange-200 rounded-xl font-bold text-orange-600 outline-none">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-4 pt-2">
+                <input type="number" id="motor-precio" placeholder="Precio Motor $" class="p-2.5 bg-white border border-blue-200 rounded-xl font-bold text-sm">
+                <div class="flex gap-1">
+                    <input type="text" id="extra-nombre" placeholder="Extra" class="w-2/3 p-2.5 border border-blue-200 rounded-xl text-xs">
+                    <input type="number" id="extra-precio" placeholder="$" class="w-1/3 p-2.5 border border-blue-200 rounded-xl text-xs">
                 </div>
-                <div>
-                    <label class="text-[10px] font-black text-slate-500 uppercase">Extra Personalizado</label>
-                    <div class="flex gap-1">
-                        <input type="text" id="extra-nombre" placeholder="Nombre (ej. Control)" class="w-2/3 p-2.5 bg-white border border-slate-200 rounded-xl font-bold text-xs outline-none">
-                        <input type="number" id="extra-precio" placeholder="$" class="w-1/3 p-2.5 bg-white border border-slate-200 rounded-xl font-bold text-xs outline-none">
-                    </div>
-                </div>
-                <div class="flex items-end pb-1">
-                    <label class="flex items-center gap-2 cursor-pointer bg-white p-2.5 rounded-xl border border-blue-200 w-full">
-                        <input type="checkbox" id="facia-toggle" class="w-5 h-5">
-                        <span class="text-[10px] font-black text-blue-700 uppercase leading-none">Agregar Facia de Alumin</span>
-                    </label>
-                </div>
-                <div>
-                    <label class="text-[10px] font-black text-blue-400 uppercase">Indicaciones</label>
-                    <input type="text" id="indicaciones" placeholder="Detalles..." class="w-full p-2.5 bg-white border border-blue-200 rounded-xl font-bold text-xs outline-none">
-                </div>
+                <label class="flex items-center gap-2 cursor-pointer bg-white p-2 rounded-xl border border-blue-200">
+                    <input type="checkbox" id="facia-toggle" class="w-4 h-4">
+                    <span class="text-[9px] font-black uppercase">Facia Aluminio</span>
+                </label>
+                <input type="text" id="indicaciones" placeholder="Indicaciones..." class="p-2.5 bg-white border border-blue-200 rounded-xl text-xs">
             </div>
 
-            <button onclick="agregar()" class="w-full bg-slate-900 text-white font-black rounded-xl hover:bg-blue-600 transition-all uppercase text-sm h-[46px] mt-2">Añadir a Cotización</button>
+            <button onclick="agregar()" class="w-full bg-slate-900 text-white font-black rounded-xl hover:bg-blue-600 transition-all uppercase text-sm h-10">Añadir a Cotización</button>
         </div>
 
         <div class="overflow-hidden border border-slate-200 rounded-2xl">
@@ -135,46 +137,46 @@
 
         <div class="pt-6 border-t border-slate-200">
             <div class="flex flex-col md:flex-row justify-between items-start gap-8">
-                <div class="w-full md:w-1/2 space-y-6 no-print">
-                    <div>
-                        <label class="text-[10px] text-slate-400 font-bold uppercase block mb-1 tracking-widest">Instalación ($)</label>
-                        <input type="number" id="inst" value="0" oninput="render()" class="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl font-bold outline-none">
-                    </div>
-                    <div>
-                        <label class="text-[10px] text-slate-400 font-bold uppercase block mb-2 tracking-widest">Descuento</label>
-                        <div class="flex flex-wrap gap-2">
-                            <button onclick="setDiscount(10)" id="btn-10" class="discount-btn px-4 py-2 border-2 border-slate-200 rounded-xl font-black text-xs transition-all">10%</button>
-                            <button onclick="setDiscount(15)" id="btn-15" class="discount-btn px-4 py-2 border-2 border-slate-200 rounded-xl font-black text-xs transition-all">15%</button>
-                            <button onclick="setDiscount(20)" id="btn-20" class="discount-btn px-4 py-2 border-2 border-slate-200 rounded-xl font-black text-xs transition-all">20%</button>
-                            <button onclick="setDiscount(0)" class="px-4 py-2 bg-slate-200 rounded-xl font-black text-[10px] uppercase">Limpiar</button>
+                <div class="w-full md:w-1/2 space-y-4">
+                    <div class="no-print">
+                        <label class="text-[10px] text-slate-400 font-bold uppercase block mb-1">Instalación ($)</label>
+                        <input type="number" id="inst" value="0" oninput="render()" class="w-full p-2 bg-slate-50 border border-slate-200 rounded-lg font-bold">
+                        
+                        <label class="text-[10px] text-slate-400 font-bold uppercase block mt-4 mb-2">Descuento</label>
+                        <div class="flex gap-2">
+                            <button onclick="setDiscount(10)" id="btn-10" class="discount-btn px-3 py-1 border border-slate-300 rounded-lg text-xs font-bold">10%</button>
+                            <button onclick="setDiscount(15)" id="btn-15" class="discount-btn px-3 py-1 border border-slate-300 rounded-lg text-xs font-bold">15%</button>
+                            <button onclick="setDiscount(20)" id="btn-20" class="discount-btn px-3 py-1 border border-slate-300 rounded-lg text-xs font-bold">20%</button>
+                            <button onclick="setDiscount(0)" class="px-3 py-1 bg-slate-200 rounded-lg text-[10px] uppercase font-bold">Limpiar</button>
                         </div>
-                    </div>
-                    <div class="flex items-center gap-3 bg-slate-100 p-3 rounded-xl border border-slate-200 inline-block w-auto">
-                        <input type="checkbox" id="iva-toggle" onchange="render()" class="w-5 h-5 cursor-pointer">
-                        <label for="iva-toggle" class="text-[10px] text-slate-700 font-black uppercase cursor-pointer">IVA (16%)</label>
+                        
+                        <div class="flex items-center gap-2 mt-4">
+                            <input type="checkbox" id="iva-toggle" onchange="render()" class="w-4 h-4">
+                            <label for="iva-toggle" class="text-[10px] font-black uppercase">Aplicar IVA (16%)</label>
+                        </div>
                     </div>
                 </div>
 
                 <div class="w-full md:w-72 space-y-2 text-right">
-                    <div class="flex justify-between text-slate-400 text-xs font-bold uppercase">
-                        <span>Subtotal:</span> <span id="val-subtotal" class="text-slate-600">$0.00</span>
+                    <div class="flex justify-between text-slate-400 text-xs font-bold">
+                        <span>SUBTOTAL:</span> <span id="val-subtotal">$0.00</span>
                     </div>
-                    <div id="desc-row" class="hidden flex justify-between text-red-500 text-xs font-bold uppercase">
-                        <span>Descuento (<span id="val-desc-perc">0</span>%):</span> <span id="val-desc-money">-$0.00</span>
+                    <div id="desc-row" class="hidden flex justify-between text-red-500 text-xs font-bold">
+                        <span>DESC. (<span id="val-desc-perc">0</span>%):</span> <span id="val-desc-money">-$0.00</span>
                     </div>
-                    <div id="iva-row" class="hidden flex justify-between text-blue-500 text-xs font-bold uppercase">
+                    <div id="iva-row" class="hidden flex justify-between text-blue-500 text-xs font-bold">
                         <span>IVA (16%):</span> <span id="val-iva">$0.00</span>
                     </div>
                     <div class="bg-slate-900 text-white p-4 rounded-2xl mt-4">
-                        <p class="text-[10px] font-bold uppercase tracking-widest opacity-60">Total a Pagar</p>
-                        <h3 id="granTotal" class="text-4xl font-black tracking-tighter mt-1">$0.00</h3>
+                        <p class="text-[10px] font-bold uppercase opacity-60">Total a Pagar</p>
+                        <h3 id="granTotal" class="text-4xl font-black tracking-tighter">$0.00</h3>
                     </div>
                 </div>
             </div>
             
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-8 no-print">
-                <button onclick="enviarWA()" class="w-full bg-[#25D366] text-white py-4 rounded-xl font-black flex items-center justify-center gap-2 uppercase text-sm">WhatsApp</button>
-                <button onclick="generarPDF()" class="w-full bg-slate-800 text-white py-4 rounded-xl font-black flex items-center justify-center gap-2 uppercase text-sm">Descargar PDF</button>
+                <button onclick="enviarWA()" class="w-full bg-[#25D366] text-white py-3 rounded-xl font-black uppercase text-xs">Enviar por WhatsApp</button>
+                <button onclick="generarPDF()" class="w-full bg-slate-800 text-white py-3 rounded-xl font-black uppercase text-xs">Descargar Cotización PDF</button>
             </div>
         </div>
     </div>
@@ -199,12 +201,11 @@ const DATA_SHEER = {
 function cargarTelas() {
     const sistema = document.getElementById('categoria').value;
     const select = document.getElementById('modelo');
-    select.innerHTML = '<option value="">-- Selecciona Tela --</option>';
+    select.innerHTML = '<option value="">-- Elige Tela --</option>';
     let fuente = sistema === "ENROLLABLES" ? DATA_ENROLLABLES : (sistema === "SHEER" ? DATA_SHEER : null);
     if (fuente) {
         for (const subgrupo in fuente) {
-            const optgroup = document.createElement('optgroup');
-            optgroup.label = subgrupo;
+            const optgroup = document.createElement('optgroup'); optgroup.label = subgrupo;
             for (const tela in fuente[subgrupo]) {
                 const option = document.createElement('option');
                 option.value = fuente[subgrupo][tela];
@@ -219,36 +220,28 @@ function cargarTelas() {
 
 function agregar() {
     const mod = document.getElementById('modelo');
-    if (!mod.value) return alert("Selecciona una tela.");
-    const ancho = parseFloat(document.getElementById('ancho').value);
-    const alto = parseFloat(document.getElementById('alto').value);
-    if (!ancho || !alto) return alert("Ingresa medidas.");
-    
+    if (!mod.value) return;
+    const ancho = parseFloat(document.getElementById('ancho').value) || 0;
+    const alto = parseFloat(document.getElementById('alto').value) || 0;
     const cant = parseInt(document.getElementById('cantidad').value) || 1;
-    const motorPrecio = parseFloat(document.getElementById('motor-precio').value) || 0;
-    const extraPrecio = parseFloat(document.getElementById('extra-precio').value) || 0;
-    const extraNombre = document.getElementById('extra-nombre').value;
-    const conFacia = document.getElementById('facia-toggle').checked;
-    const indic = document.getElementById('indicaciones').value;
-
+    const motor = parseFloat(document.getElementById('motor-precio').value) || 0;
+    const extraP = parseFloat(document.getElementById('extra-precio').value) || 0;
+    const extraN = document.getElementById('extra-nombre').value;
+    const facia = document.getElementById('facia-toggle').checked;
+    
     let m2 = (ancho * alto) < 1 ? 1 : (ancho * alto);
-    let costoFacia = conFacia ? (ancho * 280) : 0;
-    let subtotalItem = ( (m2 * parseFloat(mod.value)) + motorPrecio + costoFacia + extraPrecio ) * cant;
+    let costoFacia = facia ? (ancho * 280) : 0;
+    let sub = ( (m2 * parseFloat(mod.value)) + motor + costoFacia + extraP ) * cant;
     
     carrito.push({
         nombre: mod.options[mod.selectedIndex].getAttribute('data-full'),
-        ambiente: document.getElementById('ambiente').value || "Gral",
-        color: document.getElementById('color').value || "N/A",
+        ambiente: document.getElementById('ambiente').value || "Persiana",
+        color: document.getElementById('color').value || "---",
         medidas: `${ancho}x${alto}m`,
-        cant, sub: subtotalItem, motor: motorPrecio, hasFacia: conFacia,
-        extraNombre, extraPrecio, indic
+        cant, sub, motor, hasFacia: facia, extraN, extraP,
+        indic: document.getElementById('indicaciones').value
     });
-    
     render();
-    document.getElementById('motor-precio').value = ""; document.getElementById('extra-nombre').value = "";
-    document.getElementById('extra-precio').value = ""; document.getElementById('facia-toggle').checked = false;
-    document.getElementById('indicaciones').value = ""; document.getElementById('ancho').value = ""; 
-    document.getElementById('alto').value = "";
 }
 
 function setDiscount(val) {
@@ -261,56 +254,54 @@ function setDiscount(val) {
 function render() {
     const lista = document.getElementById('lista');
     lista.innerHTML = "";
-    let subtotalProductos = 0;
-
+    let subtotalP = 0;
     carrito.forEach((p, i) => {
-        subtotalProductos += p.sub;
+        subtotalP += p.sub;
         lista.innerHTML += `<tr>
             <td class="p-4">
                 <div class="font-bold text-slate-800">${p.ambiente}</div>
-                <div class="text-[10px] text-slate-400 uppercase font-black">${p.nombre} - ${p.color}</div>
-                <div class="flex flex-wrap gap-1 mt-1">
-                    ${p.motor > 0 ? `<span class="text-[9px] bg-orange-100 text-orange-600 px-2 py-0.5 rounded-full font-bold uppercase">Motorizada</span>` : ''}
-                    ${p.hasFacia ? `<span class="text-[9px] bg-blue-100 text-blue-600 px-2 py-0.5 rounded-full font-bold uppercase">Facia de Aluminio</span>` : ''}
-                    ${p.extraPrecio > 0 ? `<span class="text-[9px] bg-slate-100 text-slate-600 px-2 py-0.5 rounded-full font-bold uppercase">${p.extraNombre || 'Extra'}</span>` : ''}
+                <div class="text-[9px] text-slate-400 uppercase font-black">${p.nombre} | ${p.color}</div>
+                <div class="flex gap-1 mt-1">
+                    ${p.motor > 0 ? `<span class="text-[8px] bg-orange-100 px-1 rounded font-bold">MOTOR</span>` : ''}
+                    ${p.hasFacia ? `<span class="text-[8px] bg-blue-100 px-1 rounded font-bold">FACIA</span>` : ''}
+                    ${p.extraP > 0 ? `<span class="text-[8px] bg-slate-100 px-1 rounded font-bold">${p.extraN || 'EXTRA'}</span>` : ''}
                 </div>
-                ${p.indic ? `<div class="text-[10px] text-slate-500 italic mt-1 font-medium border-l-2 border-slate-200 pl-2">Nota: ${p.indic}</div>` : ''}
             </td>
-            <td class="p-4 text-center font-mono text-xs">${p.medidas}</td>
+            <td class="p-4 text-center text-xs font-mono">${p.medidas}</td>
             <td class="p-4 text-center font-bold">${p.cant}</td>
-            <td class="p-4 text-right font-bold text-blue-600">$${p.sub.toFixed(2)}</td>
-            <td class="p-4 text-center no-print"><button onclick="carrito.splice(${i},1);render()" class="text-red-400 font-bold">✕</button></td>
+            <td class="p-4 text-right font-bold text-blue-600">$${p.sub.toLocaleString()}</td>
+            <td class="p-4 text-center no-print"><button onclick="carrito.splice(${i},1);render()" class="text-red-400">✕</button></td>
         </tr>`;
     });
-
     const inst = parseFloat(document.getElementById('inst').value) || 0;
     const conIva = document.getElementById('iva-toggle').checked;
-    let subTotalBase = subtotalProductos + inst;
-    let ahorroDescuento = subTotalBase * (descuentoActual / 100);
-    let subTotalDescontado = subTotalBase - ahorroDescuento;
-    let iva = conIva ? subTotalDescontado * 0.16 : 0;
-    let totalFinal = subTotalDescontado + iva;
-
-    document.getElementById('val-subtotal').innerText = "$" + subTotalBase.toLocaleString('es-MX', {minimumFractionDigits:2});
+    let base = subtotalP + inst;
+    let descMoney = base * (descuentoActual / 100);
+    let conDesc = base - descMoney;
+    let iva = conIva ? conDesc * 0.16 : 0;
+    document.getElementById('val-subtotal').innerText = "$" + base.toLocaleString();
     document.getElementById('desc-row').classList.toggle('hidden', descuentoActual === 0);
-    document.getElementById('val-desc-perc').innerText = descuentoActual;
-    document.getElementById('val-desc-money').innerText = "-$" + ahorroDescuento.toLocaleString('es-MX', {minimumFractionDigits:2});
+    document.getElementById('val-desc-money').innerText = "-$" + descMoney.toLocaleString();
     document.getElementById('iva-row').classList.toggle('hidden', !conIva);
-    document.getElementById('val-iva').innerText = "$" + iva.toLocaleString('es-MX', {minimumFractionDigits:2});
-    document.getElementById('granTotal').innerText = "$" + totalFinal.toLocaleString('es-MX', {minimumFractionDigits:2});
+    document.getElementById('val-iva').innerText = "$" + iva.toLocaleString();
+    document.getElementById('granTotal').innerText = "$" + (conDesc + iva).toLocaleString();
 }
 
 function generarPDF() {
-    const cli = document.getElementById('cliente').value || "Cliente";
-    html2pdf().set({ margin: 0.3, filename: `CS_#${folioActual}_${cli}.pdf`, image: { type: 'jpeg', quality: 0.98 }, html2canvas: { scale: 3 }, jsPDF: { unit: 'in', format: 'letter' } }).from(document.getElementById('cotizacion-completa')).save();
+    const element = document.getElementById('cotizacion-completa');
+    const opt = {
+        margin: 0.5,
+        filename: `Cotizacion_CS_${document.getElementById('cliente').value || 'SinNombre'}.pdf`,
+        image: { type: 'jpeg', quality: 0.98 },
+        html2canvas: { scale: 2, useCORS: true },
+        jsPDF: { unit: 'in', format: 'letter', orientation: 'portrait' }
+    };
+    html2pdf().set(opt).from(element).save();
     folioActual++; localStorage.setItem('folio_shadows', folioActual);
-    document.getElementById('folio-display').innerText = '#' + String(folioActual).padStart(3, '0');
 }
 
 function enviarWA() {
-    const cli = document.getElementById('cliente').value;
-    if(!cli) return alert("Ingresa el nombre del cliente.");
-    let msg = `*CUSTOM SHADOWS*%0AFolio: ${document.getElementById('folio-display').innerText}%0ACliente: ${cli.toUpperCase()}%0ATotal: ${document.getElementById('granTotal').innerText}`;
+    const msg = `*CUSTOM SHADOWS*%0AFolio: ${document.getElementById('folio-display').innerText}%0ACliente: ${document.getElementById('cliente').value}%0ATotal: ${document.getElementById('granTotal').innerText}`;
     window.open(`https://wa.me/?text=${msg}`, '_blank');
 }
 </script>
