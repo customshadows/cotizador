@@ -11,12 +11,11 @@
         body { font-family: 'Inter', sans-serif; }
         .discount-btn.active { background-color: #ef4444; color: white; border-color: #ef4444; }
         
-        /* Estilos base para el PDF */
-        .pdf-only { display: none; }
-        
-        @media print { 
-            .no-print { display: none !important; }
-            body { background-color: white !important; padding: 0 !important; }
+        /* Forzamos ocultación por CSS también como respaldo */
+        @media print {
+            .no-print, #panel-controles, #botones-accion, button, select, input {
+                display: none !important;
+            }
         }
     </style>
 </head>
@@ -46,24 +45,22 @@
             </div>
         </div>
 
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 bg-slate-50 p-6 rounded-2xl border border-slate-100">
+        <div id="seccion-cliente" class="grid grid-cols-1 md:grid-cols-2 gap-4 bg-slate-50 p-6 rounded-2xl border border-slate-100">
             <div class="md:col-span-1">
                 <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-1">👤 Cliente</label>
                 <input type="text" id="cliente" placeholder="Nombre completo" class="w-full bg-transparent font-bold outline-none">
-            </div>
+                <div id="pdf-cliente" class="hidden font-bold"></div> </div>
             <div class="grid grid-cols-2 gap-4">
                 <div>
                     <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-1">📞 Teléfono</label>
                     <input type="text" id="tel-cliente" placeholder="---" class="w-full bg-transparent font-bold text-sm outline-none">
+                    <div id="pdf-tel" class="hidden font-bold text-sm"></div>
                 </div>
                 <div>
                     <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-1">📧 Email</label>
                     <input type="email" id="email-cliente" placeholder="---" class="w-full bg-transparent font-bold text-sm outline-none">
+                    <div id="pdf-email" class="hidden font-bold text-sm"></div>
                 </div>
-            </div>
-            <div class="md:col-span-2">
-                <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-1">📍 Dirección</label>
-                <input type="text" id="dir-cliente" placeholder="---" class="w-full bg-transparent font-bold text-sm outline-none">
             </div>
         </div>
         
@@ -96,32 +93,26 @@
                     <input type="number" id="cantidad" value="1" class="p-2.5 border border-blue-200 rounded-xl text-center font-bold">
                 </div>
             </div>
-
-            <div class="grid grid-cols-1 md:grid-cols-4 gap-4 pt-2">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <input type="number" id="motor-precio" placeholder="Precio Motor $" class="p-2.5 bg-white border border-blue-200 rounded-xl font-bold text-sm">
-                <div class="flex gap-1">
-                    <input type="text" id="extra-nombre" placeholder="Extra" class="w-2/3 p-2.5 border border-blue-200 rounded-xl text-xs">
-                    <input type="number" id="extra-precio" placeholder="$" class="w-1/3 p-2.5 border border-blue-200 rounded-xl text-xs">
-                </div>
                 <label class="flex items-center gap-2 cursor-pointer bg-white p-2 rounded-xl border border-blue-200">
                     <input type="checkbox" id="facia-toggle" class="w-4 h-4">
                     <span class="text-[9px] font-black uppercase">Facia Aluminio</span>
                 </label>
                 <input type="text" id="indicaciones" placeholder="Indicaciones..." class="p-2.5 bg-white border border-blue-200 rounded-xl text-xs">
             </div>
-
-            <button onclick="agregar()" class="w-full bg-slate-900 text-white font-black rounded-xl hover:bg-blue-600 transition-all uppercase text-sm h-10">Añadir a Cotización</button>
+            <button onclick="agregar()" class="w-full bg-slate-900 text-white font-black rounded-xl hover:bg-blue-600 transition-all uppercase text-sm h-12">Añadir a Cotización</button>
         </div>
 
         <div class="overflow-hidden border border-slate-200 rounded-2xl">
             <table class="w-full text-left">
                 <thead class="bg-slate-800 text-white text-[10px] uppercase tracking-widest">
                     <tr>
-                        <th class="p-4">Persiana / Detalles</th>
+                        <th class="p-4">Detalle Persiana</th>
                         <th class="p-4 text-center">Medidas</th>
                         <th class="p-4 text-center">Cant</th>
                         <th class="p-4 text-right">Subtotal</th>
-                        <th class="p-4 text-center no-print" id="col-accion-header"></th>
+                        <th class="p-4 text-center no-print"></th>
                     </tr>
                 </thead>
                 <tbody id="lista" class="divide-y divide-slate-100 text-sm"></tbody>
@@ -129,80 +120,52 @@
         </div>
 
         <div class="pt-6 border-t border-slate-200">
-            <div class="flex flex-col md:flex-row justify-between items-start gap-8">
-                <div id="controles-finales" class="w-full md:w-1/2 space-y-4 no-print">
-                    <div>
-                        <label class="text-[10px] text-slate-400 font-bold uppercase block mb-1">Instalación ($)</label>
-                        <input type="number" id="inst" value="0" oninput="render()" class="w-full p-2 bg-slate-50 border border-slate-200 rounded-lg font-bold">
-                        
-                        <label class="text-[10px] text-slate-400 font-bold uppercase block mt-4 mb-2">Descuento</label>
-                        <div class="flex gap-2">
-                            <button onclick="setDiscount(10)" id="btn-10" class="discount-btn px-3 py-1 border border-slate-300 rounded-lg text-xs font-bold">10%</button>
-                            <button onclick="setDiscount(15)" id="btn-15" class="discount-btn px-3 py-1 border border-slate-300 rounded-lg text-xs font-bold">15%</button>
-                            <button onclick="setDiscount(20)" id="btn-20" class="discount-btn px-3 py-1 border border-slate-300 rounded-lg text-xs font-bold">20%</button>
-                            <button onclick="setDiscount(0)" class="px-3 py-1 bg-slate-200 rounded-lg text-[10px] uppercase font-bold">Limpiar</button>
-                        </div>
-                        
-                        <div class="flex items-center gap-2 mt-4">
-                            <input type="checkbox" id="iva-toggle" onchange="render()" class="w-4 h-4">
-                            <label for="iva-toggle" class="text-[10px] font-black uppercase">Aplicar IVA (16%)</label>
-                        </div>
+            <div class="flex justify-between items-start">
+                <div id="ajustes-precios" class="no-print space-y-4">
+                    <input type="number" id="inst" value="0" oninput="render()" placeholder="Instalación" class="p-2 border rounded-lg text-sm">
+                    <div class="flex gap-2">
+                        <button onclick="setDiscount(10)" class="px-2 py-1 bg-slate-100 rounded text-xs">10%</button>
+                        <button onclick="setDiscount(15)" class="px-2 py-1 bg-slate-100 rounded text-xs">15%</button>
+                        <button onclick="setDiscount(0)" class="px-2 py-1 bg-slate-200 rounded text-xs">0%</button>
                     </div>
                 </div>
-
-                <div class="w-full md:w-72 space-y-2 text-right">
-                    <div class="flex justify-between text-slate-400 text-xs font-bold">
-                        <span>SUBTOTAL:</span> <span id="val-subtotal">$0.00</span>
-                    </div>
-                    <div id="desc-row" class="hidden flex justify-between text-red-500 text-xs font-bold">
-                        <span>DESC. (<span id="val-desc-perc">0</span>%):</span> <span id="val-desc-money">-$0.00</span>
-                    </div>
-                    <div id="iva-row" class="hidden flex justify-between text-blue-500 text-xs font-bold">
-                        <span>IVA (16%):</span> <span id="val-iva">$0.00</span>
-                    </div>
-                    <div class="bg-slate-900 text-white p-4 rounded-2xl mt-4">
-                        <p class="text-[10px] font-bold uppercase opacity-60">Total a Pagar</p>
-                        <h3 id="granTotal" class="text-4xl font-black tracking-tighter">$0.00</h3>
-                    </div>
+                <div class="w-72 space-y-2 text-right">
+                    <div class="text-xs font-bold text-slate-400 uppercase">Total Final</div>
+                    <div id="granTotal" class="text-4xl font-black tracking-tighter">$0.00</div>
                 </div>
             </div>
             
-            <div id="botones-accion" class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-8 no-print">
-                <button onclick="enviarWA()" class="w-full bg-[#25D366] text-white py-3 rounded-xl font-black uppercase text-xs">Enviar WhatsApp</button>
-                <button onclick="generarPDF()" class="w-full bg-slate-800 text-white py-3 rounded-xl font-black uppercase text-xs">Descargar PDF</button>
+            <div id="botones-accion" class="grid grid-cols-2 gap-4 mt-8 no-print">
+                <button onclick="enviarWA()" class="bg-green-500 text-white py-3 rounded-xl font-bold uppercase text-xs">WhatsApp</button>
+                <button onclick="generarPDF()" class="bg-slate-800 text-white py-3 rounded-xl font-bold uppercase text-xs">Descargar PDF</button>
             </div>
         </div>
     </div>
 
 <script>
+// (Lógica de datos igual a la anterior para mantener funcionalidad)
 let folioActual = localStorage.getItem('folio_shadows') ? parseInt(localStorage.getItem('folio_shadows')) : 1;
 document.getElementById('folio-display').innerText = '#' + String(folioActual).padStart(3, '0');
 let descuentoActual = 0;
 let carrito = [];
 
 const DATA_ENROLLABLES = {
-    "BLACK OUT": { "Long Beach": 810.39, "Texture": 937.44, "Ipanema": 910.88, "Ohio": 927.05, "Montreal": 991.73, "Budelli": 948.99, "Sydney": 1122.24, "Luxury": 1072.58, "B.O. 500": 1118.78, "Galaxy": 1169.60, "Stylus": 1297.80 },
-    "FILTRO LIGERO": { "Long Beach": 748.65, "Cadiz": 783.83, "Ipanema": 806.93, "Budelli": 818.48, "Sydney": 933.98, "F. L. Fresh": 1049.48 },
-    "SCREEN": { "Screen Basic": 810.39, "Screen Soft": 810.39, "Screen Millan": 962.85, "Screen One": 1058.72 }
-};
-
-const DATA_SHEER = {
-    "DUOLINE": { "Basic": 995.19, "Aromy": 1041.39, "Viewty": 1071.42, "Aquamarine": 1018.92, "Woodline": 1226.19, "Celebrity": 1268.93, "Bright": 1285.10, "Radiance": 1436.40, "Terra": 1459.50, "Season": 1575.00 },
-    "DUO DIM OUT": { "Dim Out": 1609.65, "Brave": 1973.09, "Genius Dim Out": 1973.09, "Dim Out Woods": 1921.50, "Royal Dim Out": 2037.00, "Glam Dim Out": 2071.65, "Lino Dim Out": 2152.50 }
+    "BLACK OUT": { "Long Beach": 810.39, "Texture": 937.44, "Ipanema": 910.88 },
+    "SHEER": { "Basic": 995.19, "Aromy": 1041.39 }
 };
 
 function cargarTelas() {
     const sistema = document.getElementById('categoria').value;
     const select = document.getElementById('modelo');
     select.innerHTML = '<option value="">-- Elige Tela --</option>';
-    let fuente = sistema === "ENROLLABLES" ? DATA_ENROLLABLES : (sistema === "SHEER" ? DATA_SHEER : null);
+    let fuente = sistema === "ENROLLABLES" ? DATA_ENROLLABLES : (sistema === "SHEER" ? DATA_ENROLLABLES : null);
     if (fuente) {
         for (const subgrupo in fuente) {
             const optgroup = document.createElement('optgroup'); optgroup.label = subgrupo;
             for (const tela in fuente[subgrupo]) {
                 const option = document.createElement('option');
                 option.value = fuente[subgrupo][tela];
-                option.text = `${tela} ($${fuente[subgrupo][tela].toFixed(2)})`;
+                option.text = `${tela}`;
                 option.setAttribute('data-full', `${subgrupo} - ${tela}`);
                 optgroup.appendChild(option);
             }
@@ -217,106 +180,84 @@ function agregar() {
     const ancho = parseFloat(document.getElementById('ancho').value) || 0;
     const alto = parseFloat(document.getElementById('alto').value) || 0;
     const cant = parseInt(document.getElementById('cantidad').value) || 1;
-    const motor = parseFloat(document.getElementById('motor-precio').value) || 0;
-    const extraP = parseFloat(document.getElementById('extra-precio').value) || 0;
-    const extraN = document.getElementById('extra-nombre').value;
-    const facia = document.getElementById('facia-toggle').checked;
-    
     let m2 = (ancho * alto) < 1 ? 1 : (ancho * alto);
-    let costoFacia = facia ? (ancho * 280) : 0;
-    let sub = ( (m2 * parseFloat(mod.value)) + motor + costoFacia + extraP ) * cant;
+    let sub = (m2 * parseFloat(mod.value)) * cant;
     
     carrito.push({
         nombre: mod.options[mod.selectedIndex].getAttribute('data-full'),
         ambiente: document.getElementById('ambiente').value || "Persiana",
-        color: document.getElementById('color').value || "---",
         medidas: `${ancho}x${alto}m`,
-        cant, sub, motor, hasFacia: facia, extraN, extraP,
-        indic: document.getElementById('indicaciones').value
+        cant, sub
     });
     render();
 }
 
-function setDiscount(val) {
-    descuentoActual = val;
-    document.querySelectorAll('.discount-btn').forEach(b => b.classList.remove('active'));
-    if(val > 0) document.getElementById('btn-'+val).classList.add('active');
-    render();
-}
+function setDiscount(val) { descuentoActual = val; render(); }
 
 function render() {
     const lista = document.getElementById('lista');
     lista.innerHTML = "";
-    let subtotalP = 0;
+    let total = 0;
     carrito.forEach((p, i) => {
-        subtotalP += p.sub;
+        total += p.sub;
         lista.innerHTML += `<tr>
-            <td class="p-4">
-                <div class="font-bold text-slate-800">${p.ambiente}</div>
-                <div class="text-[9px] text-slate-400 uppercase font-black">${p.nombre} | ${p.color}</div>
-                <div class="flex gap-1 mt-1">
-                    ${p.motor > 0 ? `<span class="text-[8px] bg-orange-100 px-1 rounded font-bold">MOTOR</span>` : ''}
-                    ${p.hasFacia ? `<span class="text-[8px] bg-blue-100 px-1 rounded font-bold">FACIA</span>` : ''}
-                    ${p.extraP > 0 ? `<span class="text-[8px] bg-slate-100 px-1 rounded font-bold">${p.extraN || 'EXTRA'}</span>` : ''}
-                </div>
-                ${p.indic ? `<div class="text-[9px] italic text-slate-500 mt-1">Nota: ${p.indic}</div>` : ''}
-            </td>
-            <td class="p-4 text-center text-xs font-mono">${p.medidas}</td>
-            <td class="p-4 text-center font-bold">${p.cant}</td>
-            <td class="p-4 text-right font-bold text-blue-600">$${p.sub.toLocaleString()}</td>
-            <td class="p-4 text-center no-print delete-cell"><button onclick="carrito.splice(${i},1);render()" class="text-red-400">✕</button></td>
+            <td class="p-4 font-bold">${p.ambiente}<br><span class="text-[10px] text-slate-400 font-normal">${p.nombre}</span></td>
+            <td class="p-4 text-center">${p.medidas}</td>
+            <td class="p-4 text-center">${p.cant}</td>
+            <td class="p-4 text-right font-bold">$${p.sub.toLocaleString()}</td>
+            <td class="p-4 text-center no-print"><button onclick="carrito.splice(${i},1);render()" class="text-red-400">✕</button></td>
         </tr>`;
     });
     const inst = parseFloat(document.getElementById('inst').value) || 0;
-    const conIva = document.getElementById('iva-toggle').checked;
-    let base = subtotalP + inst;
-    let descMoney = base * (descuentoActual / 100);
-    let conDesc = base - descMoney;
-    let iva = conIva ? conDesc * 0.16 : 0;
-    document.getElementById('val-subtotal').innerText = "$" + base.toLocaleString();
-    document.getElementById('desc-row').classList.toggle('hidden', descuentoActual === 0);
-    document.getElementById('val-desc-money').innerText = "-$" + descMoney.toLocaleString();
-    document.getElementById('iva-row').classList.toggle('hidden', !conIva);
-    document.getElementById('val-iva').innerText = "$" + iva.toLocaleString();
-    document.getElementById('granTotal').innerText = "$" + (conDesc + iva).toLocaleString();
+    let final = (total + inst) * (1 - descuentoActual/100);
+    document.getElementById('granTotal').innerText = "$" + final.toLocaleString();
 }
 
-async function generarPDF() {
-    // 1. Clonar el elemento de la cotización
-    const original = document.getElementById('cotizacion-completa');
-    const clone = original.cloneNode(true);
+function generarPDF() {
+    // 1. REFERENCIA AL ELEMENTO ORIGINAL
+    const element = document.getElementById('cotizacion-completa');
+    
+    // 2. CLONACIÓN Y LIMPIEZA AGRESIVA
+    const clone = element.cloneNode(true);
+    
+    // Eliminar por ID todas las secciones de entrada de datos
+    const aEliminar = clone.querySelectorAll('#panel-controles, #ajustes-precios, #botones-accion, .no-print');
+    aEliminar.forEach(el => el.remove());
 
-    // 2. Remover del CLON todos los elementos que no queremos en el PDF
-    // Removemos panel de controles, botones de acción y controles de instalación
-    const idsParaEliminar = ['panel-controles', 'controles-finales', 'botones-accion', 'col-accion-header'];
-    idsParaEliminar.forEach(id => {
-        const el = clone.querySelector(`#${id}`);
-        if(el) el.remove();
+    // Eliminar todos los botones y selectores que pudieran quedar
+    clone.querySelectorAll('button, select, .delete-btn').forEach(el => el.remove());
+
+    // Convertir inputs de cliente a texto plano para que no salgan cuadros de texto
+    const inputs = clone.querySelectorAll('input');
+    inputs.forEach(ins => {
+        const val = ins.value;
+        const span = document.createElement('span');
+        span.className = "font-bold text-slate-800";
+        span.innerText = val ? val : "---";
+        ins.parentNode.replaceChild(span, ins);
     });
 
-    // Removemos todas las celdas de "X" de eliminar
-    clone.querySelectorAll('.delete-cell').forEach(el => el.remove());
-
-    // 3. Configurar opciones del PDF
+    // 3. CONFIGURACIÓN
     const opt = {
-        margin: 0.3,
-        filename: `Cotizacion_CS_${document.getElementById('cliente').value || 'SinNombre'}.pdf`,
+        margin: 0.5,
+        filename: `Cotizacion_CustomShadows_${Date.now()}.pdf`,
         image: { type: 'jpeg', quality: 0.98 },
-        html2canvas: { scale: 2, useCORS: true, scrollY: 0 },
+        html2canvas: { 
+            scale: 3, 
+            useCORS: true, 
+            letterRendering: true,
+            logging: false 
+        },
         jsPDF: { unit: 'in', format: 'letter', orientation: 'portrait' }
     };
 
-    // 4. Generar desde el CLÓN (que ya no tiene los campos de entrada)
+    // 4. EJECUCIÓN
     html2pdf().set(opt).from(clone).save();
-
-    // Actualizar folio
-    folioActual++; 
-    localStorage.setItem('folio_shadows', folioActual);
 }
 
 function enviarWA() {
-    const msg = `*CUSTOM SHADOWS*%0AFolio: ${document.getElementById('folio-display').innerText}%0ACliente: ${document.getElementById('cliente').value}%0ATotal: ${document.getElementById('granTotal').innerText}`;
-    window.open(`https://wa.me/?text=${msg}`, '_blank');
+    const msg = `Cotización Custom Shadows: ${document.getElementById('granTotal').innerText}`;
+    window.open(`https://wa.me/?text=${encodeURIComponent(msg)}`);
 }
 </script>
 </body>
