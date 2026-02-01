@@ -11,10 +11,18 @@
         body { font-family: 'Inter', sans-serif; }
         .discount-btn.active { background-color: #ef4444; color: white; border-color: #ef4444; }
         
-        /* Reglas para el PDF */
+        /* REGLAS PARA EL PDF */
         @media print { 
-            .no-print { display: none !important; }
+            /* Ocultamos el panel de selección, botones de eliminar y controles de descuento en el PDF */
+            .no-print, 
+            #panel-controles, 
+            .delete-col, 
+            .controles-adicionales { 
+                display: none !important; 
+            }
+            
             body { background-color: white !important; padding: 0 !important; margin: 0 !important; }
+            
             #cotizacion-completa { 
                 box-shadow: none !important; 
                 border: none !important; 
@@ -23,8 +31,6 @@
                 padding: 0 !important;
                 margin: 0 !important;
             }
-            /* Ocultar la columna de eliminar en el PDF */
-            .delete-col { display: none !important; }
         }
     </style>
 </head>
@@ -34,9 +40,11 @@
         
         <div class="flex flex-col md:flex-row justify-between items-start gap-6 border-b pb-6">
             <div class="flex gap-4">
-                <div class="w-20 h-20 bg-slate-900 rounded-2xl flex items-center justify-center shrink-0 overflow-hidden text-white font-black">
-                    <img src="https://i.ibb.co/Lz0D7mF/logo-custom-shadows.jpg" alt="Logo" class="object-cover w-full h-full" onerror="this.style.display='none'">
-                    <span>CS</span>
+                <div class="w-20 h-20 bg-white rounded-2xl flex items-center justify-center shrink-0 overflow-hidden border border-slate-100">
+                    <img src="https://raw.githubusercontent.com/customshadows/cotizador/main/logo%20custom%20shadows.jpg" 
+                         alt="Logo" 
+                         class="object-contain w-full h-full"
+                         crossorigin="anonymous">
                 </div>
                 <div>
                     <h1 class="text-2xl font-black tracking-tighter uppercase leading-none mb-1">Custom Shadows</h1>
@@ -73,7 +81,7 @@
             </div>
         </div>
         
-        <div class="no-print bg-blue-50 p-6 rounded-2xl border border-blue-100 space-y-4">
+        <div id="panel-controles" class="no-print bg-blue-50 p-6 rounded-2xl border border-blue-100 space-y-4">
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
                 <div>
                     <label class="text-[10px] font-bold text-blue-400 uppercase">Sistema</label>
@@ -97,9 +105,9 @@
                     </div>
                 </div>
                 <div class="grid grid-cols-3 gap-1">
-                    <input type="number" id="ancho" step="0.01" placeholder="An" class="w-full p-2.5 border border-blue-200 rounded-xl text-center font-bold">
-                    <input type="number" id="alto" step="0.01" placeholder="Al" class="w-full p-2.5 border border-blue-200 rounded-xl text-center font-bold">
-                    <input type="number" id="cantidad" value="1" class="w-full p-2.5 border border-blue-200 rounded-xl text-center font-bold">
+                    <input type="number" id="ancho" step="0.01" placeholder="An" class="p-2.5 border border-blue-200 rounded-xl text-center font-bold">
+                    <input type="number" id="alto" step="0.01" placeholder="Al" class="p-2.5 border border-blue-200 rounded-xl text-center font-bold">
+                    <input type="number" id="cantidad" value="1" class="p-2.5 border border-blue-200 rounded-xl text-center font-bold">
                 </div>
             </div>
 
@@ -136,7 +144,7 @@
 
         <div class="pt-6 border-t border-slate-200">
             <div class="flex flex-col md:flex-row justify-between items-start gap-8">
-                <div class="w-full md:w-1/2 space-y-4">
+                <div class="w-full md:w-1/2 space-y-4 controles-adicionales">
                     <div class="no-print">
                         <label class="text-[10px] text-slate-400 font-bold uppercase block mb-1">Instalación ($)</label>
                         <input type="number" id="inst" value="0" oninput="render()" class="w-full p-2 bg-slate-50 border border-slate-200 rounded-lg font-bold">
@@ -174,8 +182,8 @@
             </div>
             
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-8 no-print">
-                <button onclick="enviarWA()" class="w-full bg-[#25D366] text-white py-3 rounded-xl font-black uppercase text-xs">Enviar por WhatsApp</button>
-                <button onclick="generarPDF()" class="w-full bg-slate-800 text-white py-3 rounded-xl font-black uppercase text-xs">Descargar Cotización PDF</button>
+                <button onclick="enviarWA()" class="w-full bg-[#25D366] text-white py-3 rounded-xl font-black uppercase text-xs">Enviar WhatsApp</button>
+                <button onclick="generarPDF()" class="w-full bg-slate-800 text-white py-3 rounded-xl font-black uppercase text-xs">Descargar PDF</button>
             </div>
         </div>
     </div>
@@ -265,6 +273,7 @@ function render() {
                     ${p.hasFacia ? `<span class="text-[8px] bg-blue-100 px-1 rounded font-bold">FACIA</span>` : ''}
                     ${p.extraP > 0 ? `<span class="text-[8px] bg-slate-100 px-1 rounded font-bold">${p.extraN || 'EXTRA'}</span>` : ''}
                 </div>
+                ${p.indic ? `<div class="text-[9px] italic text-slate-500 mt-1">Nota: ${p.indic}</div>` : ''}
             </td>
             <td class="p-4 text-center text-xs font-mono">${p.medidas}</td>
             <td class="p-4 text-center font-bold">${p.cant}</td>
@@ -287,28 +296,15 @@ function render() {
 }
 
 function generarPDF() {
-    // 1. Seleccionamos el elemento
     const element = document.getElementById('cotizacion-completa');
-    
-    // 2. Configuramos el PDF
     const opt = {
-        margin: 0, // Quitamos márgenes de jsPDF para que mande el estilo del HTML
+        margin: [0, 0, 0, 0],
         filename: `Cotizacion_CS_${document.getElementById('cliente').value || 'SinNombre'}.pdf`,
         image: { type: 'jpeg', quality: 0.98 },
-        html2canvas: { 
-            scale: 2, 
-            useCORS: true,
-            logging: false,
-            scrollY: 0 // Importante: evita que el scroll mueva el contenido en el PDF
-        },
+        html2canvas: { scale: 2, useCORS: true, scrollY: 0 },
         jsPDF: { unit: 'in', format: 'letter', orientation: 'portrait' }
     };
-
-    // 3. Ejecutamos la generación
-    html2pdf().set(opt).from(element).toPdf().get('pdf').then(function (pdf) {
-        // Esto asegura que todo el contenido se trate como un bloque
-    }).save();
-
+    html2pdf().set(opt).from(element).save();
     folioActual++; 
     localStorage.setItem('folio_shadows', folioActual);
 }
