@@ -11,26 +11,12 @@
         body { font-family: 'Inter', sans-serif; }
         .discount-btn.active { background-color: #ef4444; color: white; border-color: #ef4444; }
         
-        /* REGLAS PARA EL PDF */
+        /* Estilos base para el PDF */
+        .pdf-only { display: none; }
+        
         @media print { 
-            /* Ocultamos el panel de selección, botones de eliminar y controles de descuento en el PDF */
-            .no-print, 
-            #panel-controles, 
-            .delete-col, 
-            .controles-adicionales { 
-                display: none !important; 
-            }
-            
-            body { background-color: white !important; padding: 0 !important; margin: 0 !important; }
-            
-            #cotizacion-completa { 
-                box-shadow: none !important; 
-                border: none !important; 
-                width: 100% !important; 
-                max-width: 100% !important;
-                padding: 0 !important;
-                margin: 0 !important;
-            }
+            .no-print { display: none !important; }
+            body { background-color: white !important; padding: 0 !important; }
         }
     </style>
 </head>
@@ -135,7 +121,7 @@
                         <th class="p-4 text-center">Medidas</th>
                         <th class="p-4 text-center">Cant</th>
                         <th class="p-4 text-right">Subtotal</th>
-                        <th class="p-4 text-center no-print"></th>
+                        <th class="p-4 text-center no-print" id="col-accion-header"></th>
                     </tr>
                 </thead>
                 <tbody id="lista" class="divide-y divide-slate-100 text-sm"></tbody>
@@ -144,8 +130,8 @@
 
         <div class="pt-6 border-t border-slate-200">
             <div class="flex flex-col md:flex-row justify-between items-start gap-8">
-                <div class="w-full md:w-1/2 space-y-4 controles-adicionales">
-                    <div class="no-print">
+                <div id="controles-finales" class="w-full md:w-1/2 space-y-4 no-print">
+                    <div>
                         <label class="text-[10px] text-slate-400 font-bold uppercase block mb-1">Instalación ($)</label>
                         <input type="number" id="inst" value="0" oninput="render()" class="w-full p-2 bg-slate-50 border border-slate-200 rounded-lg font-bold">
                         
@@ -181,7 +167,7 @@
                 </div>
             </div>
             
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-8 no-print">
+            <div id="botones-accion" class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-8 no-print">
                 <button onclick="enviarWA()" class="w-full bg-[#25D366] text-white py-3 rounded-xl font-black uppercase text-xs">Enviar WhatsApp</button>
                 <button onclick="generarPDF()" class="w-full bg-slate-800 text-white py-3 rounded-xl font-black uppercase text-xs">Descargar PDF</button>
             </div>
@@ -278,7 +264,7 @@ function render() {
             <td class="p-4 text-center text-xs font-mono">${p.medidas}</td>
             <td class="p-4 text-center font-bold">${p.cant}</td>
             <td class="p-4 text-right font-bold text-blue-600">$${p.sub.toLocaleString()}</td>
-            <td class="p-4 text-center no-print delete-col"><button onclick="carrito.splice(${i},1);render()" class="text-red-400">✕</button></td>
+            <td class="p-4 text-center no-print delete-cell"><button onclick="carrito.splice(${i},1);render()" class="text-red-400">✕</button></td>
         </tr>`;
     });
     const inst = parseFloat(document.getElementById('inst').value) || 0;
@@ -295,16 +281,35 @@ function render() {
     document.getElementById('granTotal').innerText = "$" + (conDesc + iva).toLocaleString();
 }
 
-function generarPDF() {
-    const element = document.getElementById('cotizacion-completa');
+async function generarPDF() {
+    // 1. Clonar el elemento de la cotización
+    const original = document.getElementById('cotizacion-completa');
+    const clone = original.cloneNode(true);
+
+    // 2. Remover del CLON todos los elementos que no queremos en el PDF
+    // Removemos panel de controles, botones de acción y controles de instalación
+    const idsParaEliminar = ['panel-controles', 'controles-finales', 'botones-accion', 'col-accion-header'];
+    idsParaEliminar.forEach(id => {
+        const el = clone.querySelector(`#${id}`);
+        if(el) el.remove();
+    });
+
+    // Removemos todas las celdas de "X" de eliminar
+    clone.querySelectorAll('.delete-cell').forEach(el => el.remove());
+
+    // 3. Configurar opciones del PDF
     const opt = {
-        margin: [0, 0, 0, 0],
+        margin: 0.3,
         filename: `Cotizacion_CS_${document.getElementById('cliente').value || 'SinNombre'}.pdf`,
         image: { type: 'jpeg', quality: 0.98 },
         html2canvas: { scale: 2, useCORS: true, scrollY: 0 },
         jsPDF: { unit: 'in', format: 'letter', orientation: 'portrait' }
     };
-    html2pdf().set(opt).from(element).save();
+
+    // 4. Generar desde el CLÓN (que ya no tiene los campos de entrada)
+    html2pdf().set(opt).from(clone).save();
+
+    // Actualizar folio
     folioActual++; 
     localStorage.setItem('folio_shadows', folioActual);
 }
