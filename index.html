@@ -14,6 +14,7 @@
         @media print {
             .no-print { display: none !important; }
             .print-only { display: block !important; }
+            .hide-on-pdf { display: none !important; }
         }
         .pdf-card { border: 1px solid #e2e8f0; border-radius: 12px; padding: 15px; background: #f8fafc; }
     </style>
@@ -22,22 +23,22 @@
 
     <div id="cotizacion-completa" class="max-w-4xl mx-auto bg-white p-10 rounded-[2rem] shadow-2xl border border-slate-200">
         
-        <div class="flex justify-between items-start border-b-2 border-slate-100 pb-8 mb-8">
+        <div id="section-header" class="flex justify-between items-start border-b-2 border-slate-100 pb-8 mb-8">
             <div class="flex gap-6">
-                <div class="w-24 h-24 bg-white rounded-2xl flex items-center justify-center shrink-0 overflow-hidden shadow-sm border border-slate-100">
+                <div id="section-logo" class="w-24 h-24 bg-white rounded-2xl flex items-center justify-center shrink-0 overflow-hidden shadow-sm border border-slate-100">
                     <img src="https://raw.githubusercontent.com/customshadows/cotizador/main/logo%20custom%20shadows.jpg" 
                          alt="Logo" class="object-contain w-full h-full" crossorigin="anonymous">
                 </div>
                 <div>
                     <h1 class="text-3xl font-black tracking-tighter uppercase leading-none mb-2 text-slate-800">Custom Shadows</h1>
                     <p class="text-sm font-bold text-blue-600">Porfirio Góngora | Especialista en Persianas</p>
-                    <div class="text-xs text-slate-500 mt-2 space-y-1">
+                    <div id="section-contacto" class="text-xs text-slate-500 mt-2 space-y-1">
                         <p class="flex items-center gap-2"><span>📞</span> 9993702007</p>
                         <p class="flex items-center gap-2"><span>📍</span> C. 41 693B Ciudad Caucel, Mérida, Yuc.</p>
                     </div>
                 </div>
             </div>
-            <div class="text-right">
+            <div id="section-folio" class="text-right">
                 <div class="bg-slate-900 text-white px-4 py-2 rounded-lg inline-block mb-2">
                     <span class="text-[10px] font-bold uppercase tracking-widest block opacity-70">Folio de Cotización</span>
                     <span id="folio-display" class="text-2xl font-black">#001</span>
@@ -46,21 +47,48 @@
             </div>
         </div>
 
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-4">
             <div class="pdf-card">
                 <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-1">👤 Cliente</label>
                 <input type="text" id="cliente" placeholder="Nombre completo" class="w-full bg-transparent font-bold outline-none no-print text-slate-800">
                 <div id="pdf-cliente" class="print-only font-bold text-slate-800"></div>
             </div>
-            <div class="pdf-card">
+            <div id="section-tel-cliente" class="pdf-card">
                 <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-1">📞 Teléfono</label>
                 <input type="text" id="tel-cliente" placeholder="WhatsApp / Celular" class="w-full bg-transparent font-bold text-sm outline-none no-print text-slate-800">
                 <div id="pdf-tel" class="print-only font-bold text-sm text-slate-800"></div>
             </div>
-            <div class="pdf-card">
+            <div id="section-dir-cliente" class="pdf-card">
                 <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-1">📍 Dirección de Obra</label>
                 <input type="text" id="direccion" placeholder="Calle, Colonia, Ciudad" class="w-full bg-transparent font-bold text-[11px] outline-none no-print text-slate-800">
                 <div id="pdf-direccion" class="print-only font-bold text-[11px] text-slate-700"></div>
+            </div>
+        </div>
+
+        <div class="no-print bg-slate-50 border border-slate-200 rounded-xl p-4 mb-8">
+            <h3 class="text-[10px] font-black uppercase text-slate-400 mb-3 tracking-widest">¿Qué mostrar en el PDF?</h3>
+            <div class="flex flex-wrap gap-4">
+                <label class="flex items-center gap-2 cursor-pointer text-[11px] font-bold text-slate-600">
+                    <input type="checkbox" checked onchange="togglePdfSection('section-logo', this.checked)" class="w-3 h-3"> Logo
+                </label>
+                <label class="flex items-center gap-2 cursor-pointer text-[11px] font-bold text-slate-600">
+                    <input type="checkbox" checked onchange="togglePdfSection('section-contacto', this.checked)" class="w-3 h-3"> Datos Contacto
+                </label>
+                <label class="flex items-center gap-2 cursor-pointer text-[11px] font-bold text-slate-600">
+                    <input type="checkbox" checked onchange="togglePdfSection('section-tel-cliente', this.checked)" class="w-3 h-3"> Tel. Cliente
+                </label>
+                <label class="flex items-center gap-2 cursor-pointer text-[11px] font-bold text-slate-600">
+                    <input type="checkbox" checked onchange="togglePdfSection('section-dir-cliente', this.checked)" class="w-3 h-3"> Dirección
+                </label>
+                <label class="flex items-center gap-2 cursor-pointer text-[11px] font-bold text-slate-600">
+                    <input type="checkbox" checked onchange="togglePdfSection('col-medidas', this.checked)" class="w-3 h-3"> Col. Medidas
+                </label>
+                <label class="flex items-center gap-2 cursor-pointer text-[11px] font-bold text-slate-600">
+                    <input type="checkbox" checked onchange="togglePdfSection('section-politicas', this.checked)" class="w-3 h-3"> Políticas
+                </label>
+                <label class="flex items-center gap-2 cursor-pointer text-[11px] font-bold text-slate-600">
+                    <input type="checkbox" checked onchange="togglePdfSection('section-firmas', this.checked)" class="w-3 h-3"> Firmas
+                </label>
             </div>
         </div>
         
@@ -104,7 +132,7 @@
                     <input type="checkbox" id="facia-toggle" class="w-4 h-4">
                     <span class="text-[9px] font-black uppercase">Facia Aluminio</span>
                 </label>
-                <input type="text" id="indicaciones" placeholder="Indicaciones..." class="p-2 bg-white border border-blue-200 rounded-lg text-xs">
+                <input type="text" id="indicaciones" placeholder="Notas..." class="p-2 bg-white border border-blue-200 rounded-lg text-xs">
             </div>
             <button onclick="agregar()" class="w-full bg-blue-600 text-white font-black rounded-xl uppercase text-sm h-12">Añadir a Cotización</button>
         </div>
@@ -115,7 +143,7 @@
                     <tr>
                         <th class="p-4">Ambiente</th>
                         <th class="p-4">Descripción / Color</th>
-                        <th class="p-4 text-center">Medidas</th>
+                        <th class="p-4 text-center col-medidas">Medidas</th>
                         <th class="p-4 text-center">Cant</th>
                         <th class="p-4 text-right">Importe</th>
                         <th class="p-4 text-center no-print" id="col-borrar"></th>
@@ -127,24 +155,24 @@
 
         <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mb-10">
             <div class="space-y-4">
-                <div class="no-print">
+                <div class="no-print bg-white p-4 rounded-xl border border-slate-200">
                     <label class="text-[10px] text-slate-400 font-bold uppercase block mb-2">Descuento e Instalación</label>
                     <div class="flex gap-2 mb-3">
-                        <button onclick="setDiscount(10)" id="btn-10" class="discount-btn px-4 py-2 border border-slate-300 rounded-lg text-xs font-bold">10%</button>
-                        <button onclick="setDiscount(15)" id="btn-15" class="discount-btn px-4 py-2 border border-slate-300 rounded-lg text-xs font-bold">15%</button>
-                        <button onclick="setDiscount(20)" id="btn-20" class="discount-btn px-4 py-2 border border-slate-300 rounded-lg text-xs font-bold">20%</button>
-                        <button onclick="setDiscount(0)" class="px-4 py-2 bg-slate-100 rounded-lg text-xs font-bold">0%</button>
+                        <button onclick="setDiscount(10)" id="btn-10" class="discount-btn flex-1 py-2 border border-slate-300 rounded-lg text-xs font-bold">10%</button>
+                        <button onclick="setDiscount(15)" id="btn-15" class="discount-btn flex-1 py-2 border border-slate-300 rounded-lg text-xs font-bold">15%</button>
+                        <button onclick="setDiscount(20)" id="btn-20" class="discount-btn flex-1 py-2 border border-slate-300 rounded-lg text-xs font-bold">20%</button>
+                        <button onclick="setDiscount(0)" class="flex-1 py-2 bg-slate-100 rounded-lg text-xs font-bold">0%</button>
                     </div>
                     <input type="number" id="inst" value="0" oninput="render()" class="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl font-bold" placeholder="Costo Instalación">
                 </div>
                 
-                <div class="bg-slate-50 p-5 rounded-2xl border border-slate-100">
+                <div id="section-politicas" class="bg-slate-50 p-5 rounded-2xl border border-slate-100">
                     <h4 class="text-[10px] font-black uppercase text-slate-400 mb-2 tracking-widest">Información de Pago</h4>
                     <p class="text-[11px] font-bold text-slate-700 mb-2">Para iniciar el pedido se requiere el 50% de anticipo.</p>
                     <ul class="text-[9px] text-slate-500 space-y-1">
-                        <li>• Tiempo de entrega: 8 a 12 días hábiles.</li>
+                        <li>• Tiempo de entrega: 8 a 12 días hábiles tras anticipo.</li>
                         <li>• Garantía: 1 año por defectos de fábrica.</li>
-                        <li>• Precios sujetos a cambios sin previo aviso.</li>
+                        <li>• Presupuesto vigente por 15 días naturales.</li>
                     </ul>
                 </div>
             </div>
@@ -155,19 +183,15 @@
                         <span>Subtotal Neto:</span> <span id="val-subtotal">$0.00</span>
                     </div>
                     <div id="desc-row" class="hidden flex justify-between text-red-400 text-xs font-bold uppercase">
-                        <span>Descuento:</span> <span id="val-desc-money">-$0.00</span>
+                        <span>Descuento aplicado:</span> <span id="val-desc-money">-$0.00</span>
                     </div>
                     <div class="pt-3 border-t border-white/10">
-                        <div class="flex justify-between items-end">
-                            <div>
-                                <p class="text-[10px] font-bold uppercase opacity-60">Total Cotizado</p>
-                                <h3 id="granTotal" class="text-4xl font-black tracking-tighter">$0.00</h3>
-                            </div>
-                        </div>
+                        <p class="text-[10px] font-bold uppercase opacity-60 mb-1">Total Cotizado</p>
+                        <h3 id="granTotal" class="text-4xl font-black tracking-tighter">$0.00</h3>
                     </div>
                     <div class="mt-4 pt-4 border-t border-white/20 bg-white/5 p-4 rounded-2xl">
                         <div class="flex justify-between items-center mb-1 text-blue-400">
-                            <span class="text-[11px] font-black uppercase">Anticipo Requerido (50%)</span>
+                            <span class="text-[11px] font-black uppercase">Anticipo 50%</span>
                             <span id="val-anticipo" class="text-xl font-black">$0.00</span>
                         </div>
                         <div class="flex justify-between items-center opacity-70">
@@ -179,21 +203,17 @@
             </div>
         </div>
 
-        <div class="print-only mt-12">
-            <div class="flex justify-around gap-20 text-center">
-                <div class="flex-1 border-t border-slate-300 pt-2">
-                    <p class="text-[10px] font-black uppercase text-slate-800">Firma del Cliente</p>
-                    <p class="text-[8px] text-slate-400">Aceptación de presupuesto y términos</p>
-                </div>
-                <div class="flex-1 border-t border-slate-300 pt-2">
-                    <p class="text-[10px] font-black uppercase text-slate-800">Custom Shadows</p>
-                    <p class="text-[8px] text-slate-400">Autorización</p>
-                </div>
+        <div id="section-firmas" class="print-only mt-12 grid grid-cols-2 gap-20 text-center">
+            <div class="border-t border-slate-300 pt-2">
+                <p class="text-[10px] font-black uppercase">Firma del Cliente</p>
+            </div>
+            <div class="border-t border-slate-300 pt-2">
+                <p class="text-[10px] font-black uppercase">Custom Shadows</p>
             </div>
         </div>
 
         <div id="botones-accion" class="mt-8 no-print">
-            <button onclick="generarPDF()" class="w-full bg-slate-900 text-white py-5 rounded-2xl font-black uppercase text-sm tracking-widest hover:bg-blue-600 transition-all">Generar PDF Oficial</button>
+            <button onclick="generarPDF()" class="w-full bg-slate-900 text-white py-5 rounded-2xl font-black uppercase text-sm tracking-widest hover:bg-blue-600 transition-all shadow-lg">Descargar Cotización PDF</button>
         </div>
     </div>
 
@@ -215,6 +235,16 @@ const DATA_SHEER = {
     "DUOLINE": { "Basic": 995.19, "Aromy": 1041.39, "Viewty": 1071.42, "Aquamarine": 1018.92, "Woodline": 1226.19, "Celebrity": 1268.93, "Bright": 1285.10, "Radiance": 1436.40, "Terra": 1459.50, "Season": 1575.00 },
     "DUO DIM OUT": { "Dim Out": 1609.65, "Brave": 1973.09, "Genius Dim Out": 1973.09, "Dim Out Woods": 1921.50, "Royal Dim Out": 2037.00, "Glam Dim Out": 2071.65, "Lino Dim Out": 2152.50 }
 };
+
+// Control de visibilidad para el PDF
+function togglePdfSection(id, isVisible) {
+    const el = document.getElementById(id) || document.querySelectorAll('.' + id);
+    if (el instanceof NodeList) {
+        el.forEach(e => e.classList.toggle('hide-on-pdf', !isVisible));
+    } else if (el) {
+        el.classList.toggle('hide-on-pdf', !isVisible);
+    }
+}
 
 function cargarTelas() {
     const sistema = document.getElementById('categoria').value;
@@ -248,8 +278,8 @@ function agregar() {
     const extraP = parseFloat(document.getElementById('extra-precio').value) || 0;
     const extraN = document.getElementById('extra-nombre').value || "Extra";
     const facia = document.getElementById('facia-toggle').checked;
-    const amb = document.getElementById('ambiente').value || "Persiana";
-    const col = document.getElementById('color').value || "S/N";
+    const amb = document.getElementById('ambiente').value || "General";
+    const col = document.getElementById('color').value || "N/A";
     
     let m2 = (ancho * alto) < 1 ? 1 : (ancho * alto);
     let costoFacia = facia ? (ancho * 280) : 0;
@@ -293,7 +323,7 @@ function render() {
                 </div>
                 ${p.indic ? `<div class="text-[8px] italic text-slate-400 mt-1">Nota: ${p.indic}</div>` : ''}
             </td>
-            <td class="p-4 text-center text-xs font-mono align-top">${p.medidas}</td>
+            <td class="p-4 text-center text-xs font-mono align-top col-medidas">${p.medidas}</td>
             <td class="p-4 text-center font-black align-top">${p.cant}</td>
             <td class="p-4 text-right font-black align-top">$${p.sub.toLocaleString(undefined, {minimumFractionDigits: 2})}</td>
             <td class="p-4 text-center no-print delete-cell align-top"><button onclick="carrito.splice(${i},1);render()" class="text-red-300 hover:text-red-600">✕</button></td>
@@ -310,20 +340,25 @@ function render() {
     document.getElementById('desc-row').classList.toggle('hidden', descuentoActual === 0);
     document.getElementById('val-desc-money').innerText = "-$" + descMoney.toLocaleString(undefined, {minimumFractionDigits: 2});
     document.getElementById('granTotal').innerText = "$" + totalFinal.toLocaleString(undefined, {minimumFractionDigits: 2});
-    
     document.getElementById('val-anticipo').innerText = "$" + anticipo.toLocaleString(undefined, {minimumFractionDigits: 2});
     document.getElementById('val-saldo').innerText = "$" + (totalFinal - anticipo).toLocaleString(undefined, {minimumFractionDigits: 2});
 }
 
 async function generarPDF() {
+    // Sincronizar inputs a divs para el PDF
     document.getElementById('pdf-cliente').innerText = document.getElementById('cliente').value || "---";
     document.getElementById('pdf-tel').innerText = document.getElementById('tel-cliente').value || "---";
     document.getElementById('pdf-direccion').innerText = document.getElementById('direccion').value || "---";
 
     const original = document.getElementById('cotizacion-completa');
     const clone = original.cloneNode(true);
-    const borrar = ['#panel-controles', '#controles-finales', '#botones-accion', '#col-borrar', '.no-print', '.delete-cell', 'button', 'select', 'input'];
-    borrar.forEach(sel => { clone.querySelectorAll(sel).forEach(el => el.remove()); });
+
+    // Limpieza de elementos que nunca deben ir en el PDF
+    const forzarBorrado = ['#panel-controles', '#botones-accion', '#col-borrar', '.no-print', '.delete-cell', 'button', 'select', 'input', '.no-print'];
+    forzarBorrado.forEach(sel => { clone.querySelectorAll(sel).forEach(el => el.remove()); });
+    
+    // Respetar las selecciones del usuario (clase hide-on-pdf)
+    clone.querySelectorAll('.hide-on-pdf').forEach(el => el.remove());
 
     const opt = {
         margin: [0.3, 0.3],
