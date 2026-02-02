@@ -3,219 +3,240 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Custom Shadows | Cotizador Pro</title>
+    <title>Custom Shadows | Business Suite</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
-        body { font-family: 'Inter', sans-serif; }
-        .discount-btn.active { background-color: #ef4444 !important; color: white !important; border-color: #ef4444 !important; }
+        body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #f8fafc; color: #1e293b; }
+        .discount-btn { transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); border: 1px solid #e2e8f0; background: white; }
+        .discount-btn.active { background-color: #0284c7 !important; color: white !important; border-color: #0284c7 !important; transform: translateY(-1px); box-shadow: 0 4px 12px rgba(2, 132, 199, 0.3); }
         .print-only { display: none; }
-        @media print {
-            .no-print { display: none !important; }
-            .print-only { display: block !important; }
-            .hide-on-pdf { display: none !important; }
-        }
-        .pdf-card { border: 1px solid #e2e8f0; border-radius: 12px; padding: 15px; background: #f8fafc; }
-        .config-chip { cursor: pointer; transition: all 0.2s; border: 1px solid #e2e8f0; font-size: 10px; font-weight: 800; text-transform: uppercase; padding: 4px 10px; border-radius: 20px; display: flex; align-items: center; gap: 5px; }
-        .config-chip input { cursor: pointer; accent-color: #2563eb; }
-        .config-chip:hover { border-color: #2563eb; background: #f0f7ff; }
+        @media print { .no-print { display: none !important; } .print-only { display: block !important; } }
+        #pdf-area { background-color: white; width: 100%; margin: 0 auto; }
+        .input-premium { transition: all 0.2s; border: 1px solid #e2e8f0; }
+        .input-premium:focus { border-color: #0284c7; ring: 2px; ring-color: #0284c7; background: white; }
     </style>
 </head>
-<body class="bg-slate-100 py-8 px-4 text-slate-900">
+<body class="py-12 px-6">
 
-    <div id="cotizacion-completa" class="max-w-4xl mx-auto bg-white p-10 rounded-[2rem] shadow-2xl border border-slate-200">
+    <div class="max-w-5xl mx-auto">
         
-        <div id="section-header" class="flex justify-between items-start border-b-2 border-slate-100 pb-8 mb-8">
-            <div class="flex gap-6">
-                <div id="section-logo" class="w-24 h-24 bg-white rounded-2xl flex items-center justify-center shrink-0 overflow-hidden shadow-sm border border-slate-100">
-                    <img src="https://raw.githubusercontent.com/customshadows/cotizador/main/logo%20custom%20shadows.jpg" 
-                         alt="Logo" class="object-contain w-full h-full" crossorigin="anonymous">
+        <div class="no-print bg-white/70 backdrop-blur-md p-8 rounded-[2.5rem] shadow-2xl shadow-blue-900/5 border border-white mb-12">
+            <div class="flex items-center gap-3 mb-8">
+                <div class="w-10 h-10 bg-blue-600 rounded-xl flex items-center justify-center text-white shadow-lg shadow-blue-600/30">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6V4m0 2a2 2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4" />
+                    </svg>
                 </div>
-                <div>
-                    <h1 class="text-3xl font-black tracking-tighter uppercase leading-none mb-2 text-slate-800">Custom Shadows</h1>
-                    <p class="text-sm font-bold text-blue-600">Porfirio Góngora | Especialista en Persianas</p>
-                    <div id="section-contacto" class="text-xs text-slate-500 mt-2 space-y-1">
-                        <p class="flex items-center gap-2 text-emerald-600 font-bold"><span>🟢 WhatsApp:</span> <span class="text-slate-500 font-normal">9993702007</span></p>
-                        <p class="flex items-center gap-2"><span>✉️</span> customshadowsmx@gmail.com</p>
-                        <p class="flex items-center gap-2"><span>📍</span> C. 41 693B Ciudad Caucel, Mérida, Yuc.</p>
+                <h2 class="text-2xl font-extrabold tracking-tight text-slate-800">Panel de Cotización</h2>
+            </div>
+            
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+                <div class="space-y-1">
+                    <label class="text-[11px] font-bold text-slate-500 uppercase ml-1">Cliente</label>
+                    <input type="text" id="cliente" oninput="render()" placeholder="Nombre del cliente" class="w-full p-4 bg-slate-50 rounded-2xl input-premium font-semibold">
+                </div>
+                <div class="space-y-1">
+                    <label class="text-[11px] font-bold text-slate-500 uppercase ml-1">WhatsApp</label>
+                    <input type="text" id="tel-cliente" oninput="render()" placeholder="999 000 0000" class="w-full p-4 bg-slate-50 rounded-2xl input-premium font-semibold">
+                </div>
+                <div class="space-y-1">
+                    <label class="text-[11px] font-bold text-slate-500 uppercase ml-1">Dirección</label>
+                    <input type="text" id="direccion" oninput="render()" placeholder="Ubicación de obra" class="w-full p-4 bg-slate-50 rounded-2xl input-premium font-semibold">
+                </div>
+            </div>
+
+            <div class="bg-blue-50/50 p-6 rounded-[2rem] border border-blue-100/50 space-y-6">
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
+                    <div class="lg:col-span-1">
+                        <label class="text-[10px] font-bold text-blue-600 uppercase ml-1">Sistema</label>
+                        <select id="categoria" onchange="cargarTelas()" class="w-full p-3 bg-white rounded-xl border-blue-100 font-bold text-sm">
+                            <option value="">Seleccionar</option>
+                            <option value="ENROLLABLES">ENROLLABLES</option>
+                            <option value="SHEER">SHEER ELEGANCE</option>
+                        </select>
+                    </div>
+                    <div class="lg:col-span-1">
+                        <label class="text-[10px] font-bold text-blue-600 uppercase ml-1">Tela / Modelo</label>
+                        <select id="modelo" class="w-full p-3 bg-white rounded-xl border-blue-100 font-bold text-xs">
+                            <option value="">Elegir tela</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="text-[10px] font-bold text-blue-600 uppercase ml-1">Ambiente</label>
+                        <input type="text" id="ambiente" placeholder="Ej: Recámara" class="w-full p-3 bg-white rounded-xl border-blue-100 text-sm">
+                    </div>
+                    <div>
+                        <label class="text-[10px] font-bold text-blue-600 uppercase ml-1">Color</label>
+                        <input type="text" id="color" placeholder="Ej: Gris" class="w-full p-3 bg-white rounded-xl border-blue-100 text-sm">
+                    </div>
+                    <div class="grid grid-cols-3 gap-2">
+                        <div>
+                            <label class="text-[9px] font-bold text-blue-600 uppercase block text-center">An</label>
+                            <input type="number" id="ancho" step="0.01" class="w-full p-3 bg-white rounded-xl border-blue-100 text-center text-sm font-bold">
+                        </div>
+                        <div>
+                            <label class="text-[9px] font-bold text-blue-600 uppercase block text-center">Al</label>
+                            <input type="number" id="alto" step="0.01" class="w-full p-3 bg-white rounded-xl border-blue-100 text-center text-sm font-bold">
+                        </div>
+                        <div>
+                            <label class="text-[9px] font-bold text-blue-600 uppercase block text-center">Cant</label>
+                            <input type="number" id="cantidad" value="1" class="w-full p-3 bg-white rounded-xl border-blue-100 text-center text-sm font-bold">
+                        </div>
                     </div>
                 </div>
-            </div>
-            <div id="section-folio" class="text-right">
-                <div class="bg-slate-900 text-white px-4 py-2 rounded-lg inline-block mb-2">
-                    <span class="text-[10px] font-bold uppercase tracking-widest block opacity-70">Folio de Cotización</span>
-                    <span id="folio-display" class="text-2xl font-black">#001</span>
-                </div>
-                <p class="text-[10px] text-slate-400 font-bold uppercase" id="fecha-actual"></p>
-            </div>
-        </div>
 
-        <div class="no-print mb-6 p-4 bg-slate-50 rounded-2xl border border-slate-200">
-            <p class="text-[10px] font-black uppercase text-slate-400 mb-3 tracking-widest flex items-center gap-2">
-                ⚙️ Configuración del PDF
-            </p>
-            <div class="flex flex-wrap gap-2">
-                <label class="config-chip"><input type="checkbox" checked onchange="togglePdfSection('section-logo', this.checked)"> Logo</label>
-                <label class="config-chip"><input type="checkbox" checked onchange="togglePdfSection('section-contacto', this.checked)"> Contacto</label>
-                <label class="config-chip"><input type="checkbox" checked onchange="togglePdfSection('section-tel-cliente', this.checked)"> Tel. Cliente</label>
-                <label class="config-chip"><input type="checkbox" checked onchange="togglePdfSection('section-dir-cliente', this.checked)"> Dirección</label>
-                <label class="config-chip"><input type="checkbox" checked onchange="togglePdfSection('col-medidas', this.checked)"> Medidas</label>
-                <label class="config-chip"><input type="checkbox" checked onchange="togglePdfSection('section-politicas', this.checked)"> Políticas</label>
-                <label class="config-chip"><input type="checkbox" checked onchange="togglePdfSection('section-firmas', this.checked)"> Firma</label>
-            </div>
-        </div>
-
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-            <div class="pdf-card" id="section-nom-cliente">
-                <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-1">👤 Cliente</label>
-                <input type="text" id="cliente" placeholder="Nombre completo" class="w-full bg-transparent font-bold outline-none no-print text-slate-800">
-                <div id="pdf-cliente" class="print-only font-bold text-slate-800"></div>
-            </div>
-            <div class="pdf-card" id="section-tel-cliente">
-                <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-1">📞 Teléfono</label>
-                <input type="text" id="tel-cliente" placeholder="WhatsApp / Celular" class="w-full bg-transparent font-bold text-sm outline-none no-print text-slate-800">
-                <div id="pdf-tel" class="print-only font-bold text-sm text-slate-800"></div>
-            </div>
-            <div class="pdf-card" id="section-dir-cliente">
-                <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-1">📍 Dirección de Obra</label>
-                <input type="text" id="direccion" placeholder="Calle, Colonia, Ciudad" class="w-full bg-transparent font-bold text-[11px] outline-none no-print text-slate-800">
-                <div id="pdf-direccion" class="print-only font-bold text-[11px] text-slate-700"></div>
-            </div>
-        </div>
-        
-        <div id="panel-controles" class="no-print bg-blue-50 p-6 rounded-2xl border border-blue-100 space-y-4 mb-8">
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-3">
-                <div>
-                    <label class="text-[10px] font-bold text-blue-500 uppercase">Sistema</label>
-                    <select id="categoria" onchange="cargarTelas()" class="w-full p-2 bg-white border border-blue-200 rounded-lg font-bold outline-none text-sm">
-                        <option value="">-- Elige --</option>
-                        <option value="ENROLLABLES">ENROLLABLES</option>
-                        <option value="SHEER">SHEER ELEGANCE</option>
-                    </select>
-                </div>
-                <div>
-                    <label class="text-[10px] font-bold text-blue-500 uppercase">Tela</label>
-                    <select id="modelo" class="w-full p-2 bg-white border border-blue-200 rounded-lg font-bold text-xs outline-none">
-                        <option value="">-- Elige --</option>
-                    </select>
-                </div>
-                <div>
-                    <label class="text-[10px] font-bold text-blue-500 uppercase">Ambiente</label>
-                    <input type="text" id="ambiente" placeholder="Ej: Sala" class="w-full p-2 bg-white border border-blue-200 rounded-lg font-bold text-sm">
-                </div>
-                <div>
-                    <label class="text-[10px] font-bold text-blue-500 uppercase">Color</label>
-                    <input type="text" id="color" placeholder="Ej: Blanco" class="w-full p-2 bg-white border border-blue-200 rounded-lg font-bold text-sm">
-                </div>
-                <div class="grid grid-cols-3 gap-1">
-                    <input type="number" id="ancho" step="0.01" placeholder="An" class="p-2 border border-blue-200 rounded-lg text-center font-bold text-sm">
-                    <input type="number" id="alto" step="0.01" placeholder="Al" class="p-2 border border-blue-200 rounded-lg text-center font-bold text-sm">
-                    <input type="number" id="cantidad" value="1" class="p-2 border border-blue-200 rounded-lg text-center font-bold text-sm">
-                </div>
-            </div>
-            <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
-                <input type="number" id="motor-precio" placeholder="Precio Motor $" class="p-2 bg-white border border-blue-200 rounded-lg font-bold text-sm">
-                <div class="flex gap-1">
-                    <input type="text" id="extra-nombre" placeholder="Extra" class="w-2/3 p-2 border border-blue-200 rounded-lg text-xs">
-                    <input type="number" id="extra-precio" placeholder="$" class="w-1/3 p-2 border border-blue-200 rounded-lg text-xs">
-                </div>
-                <label class="flex items-center gap-2 cursor-pointer bg-white p-2 rounded-lg border border-blue-200">
-                    <input type="checkbox" id="facia-toggle" class="w-4 h-4">
-                    <span class="text-[9px] font-black uppercase">Facia Aluminio</span>
-                </label>
-                <input type="text" id="indicaciones" placeholder="Indicaciones..." class="p-2 bg-white border border-blue-200 rounded-lg text-xs">
-            </div>
-            <button onclick="agregar()" class="w-full bg-blue-600 text-white font-black rounded-xl uppercase text-sm h-12">Añadir a Cotización</button>
-        </div>
-
-        <div id="seccion-tabla" class="overflow-hidden border border-slate-200 rounded-2xl mb-8">
-            <table class="w-full text-left">
-                <thead class="bg-slate-800 text-white text-[10px] uppercase tracking-widest">
-                    <tr>
-                        <th class="p-4">Ambiente</th>
-                        <th class="p-4">Descripción / Color</th>
-                        <th class="p-4 text-center col-medidas">Medidas</th>
-                        <th class="p-4 text-center">Cant</th>
-                        <th class="p-4 text-right">Importe</th>
-                        <th class="p-4 text-center no-print" id="col-borrar"></th>
-                    </tr>
-                </thead>
-                <tbody id="lista" class="divide-y divide-slate-100 text-[11px]"></tbody>
-            </table>
-        </div>
-
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mb-10">
-            <div class="space-y-4">
-                <div class="no-print p-4 bg-slate-50 rounded-2xl border border-slate-200">
-                    <label class="text-[10px] text-slate-400 font-bold uppercase block mb-2">Descuento, Instalación e IVA</label>
-                    <div class="flex gap-2 mb-3">
-                        <button onclick="setDiscount(10)" id="btn-10" class="discount-btn px-4 py-2 border border-slate-300 rounded-lg text-xs font-bold">10%</button>
-                        <button onclick="setDiscount(15)" id="btn-15" class="discount-btn px-4 py-2 border border-slate-300 rounded-lg text-xs font-bold">15%</button>
-                        <button onclick="setDiscount(20)" id="btn-20" class="discount-btn px-4 py-2 border border-slate-300 rounded-lg text-xs font-bold">20%</button>
-                        <button onclick="setDiscount(0)" class="px-4 py-2 bg-slate-100 rounded-lg text-xs font-bold">0%</button>
+                <div class="grid grid-cols-1 md:grid-cols-4 gap-4 items-end">
+                    <input type="number" id="motor-precio" placeholder="Precio Motor $" class="p-3 bg-white rounded-xl border-blue-100 text-sm">
+                    <div class="flex gap-2">
+                        <input type="text" id="extra-nombre" placeholder="Extra" class="w-2/3 p-3 bg-white rounded-xl border-blue-100 text-xs">
+                        <input type="number" id="extra-precio" placeholder="$" class="w-1/3 p-3 bg-white rounded-xl border-blue-100 text-xs text-center">
                     </div>
-                    <div class="grid grid-cols-2 gap-3 mb-3">
-                        <input type="number" id="inst" value="0" oninput="render()" class="w-full p-3 bg-white border border-slate-200 rounded-xl font-bold text-sm" placeholder="Instalación $">
-                        <label class="flex items-center justify-center gap-2 cursor-pointer bg-white p-3 rounded-xl border border-slate-200">
-                            <input type="checkbox" id="iva-toggle" onchange="render()" class="w-4 h-4">
-                            <span class="text-[10px] font-black uppercase">Aplicar IVA 16%</span>
-                        </label>
+                    <label class="flex items-center justify-center gap-3 cursor-pointer bg-white p-3 rounded-xl border border-blue-100 hover:bg-blue-100/30 transition-colors">
+                        <input type="checkbox" id="facia-toggle" class="w-4 h-4 rounded text-blue-600">
+                        <span class="text-[10px] font-bold uppercase text-blue-700">Facia Aluminio</span>
+                    </label>
+                    <button onclick="agregar()" class="bg-blue-600 text-white font-bold rounded-xl uppercase text-xs py-4 shadow-lg shadow-blue-600/20 hover:bg-blue-700 transition-all">Añadir Concepto</button>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8 pt-8 items-center">
+                <div class="space-y-2">
+                    <p class="text-[11px] font-bold text-slate-400 uppercase ml-1 tracking-widest">Estrategia de Descuento</p>
+                    <div class="flex gap-3">
+                        <button onclick="setDiscount(10)" id="btn-10" class="discount-btn flex-1 py-3 rounded-xl text-xs font-bold">10%</button>
+                        <button onclick="setDiscount(15)" id="btn-15" class="discount-btn flex-1 py-3 rounded-xl text-xs font-bold">15%</button>
+                        <button onclick="setDiscount(20)" id="btn-20" class="discount-btn flex-1 py-3 rounded-xl text-xs font-bold">20%</button>
+                        <button onclick="setDiscount(0)" id="btn-0" class="flex-1 py-3 bg-slate-100 text-slate-500 rounded-xl text-xs font-bold hover:bg-slate-200">Sin Desc.</button>
                     </div>
                 </div>
+                <div class="flex gap-4 items-end">
+                    <div class="flex-1">
+                        <label class="text-[11px] font-bold text-slate-400 uppercase ml-1 block mb-1">Costo de Instalación</label>
+                        <input type="number" id="inst" oninput="render()" class="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl text-sm font-bold focus:ring-2 focus:ring-blue-500 outline-none" placeholder="$ 0.00">
+                    </div>
+                    <label class="flex-1 flex items-center justify-center gap-3 border border-slate-200 rounded-xl p-3.5 text-xs font-bold cursor-pointer hover:bg-white transition-colors">
+                        <input type="checkbox" id="iva-toggle" onchange="render()" class="w-4 h-4 text-blue-600"> Aplicar IVA 16%
+                    </label>
+                </div>
+            </div>
+
+            <button onclick="generarPDF()" class="w-full mt-10 bg-slate-900 text-white py-5 rounded-[1.5rem] font-bold uppercase text-sm tracking-[0.2em] hover:bg-blue-600 shadow-2xl transition-all flex items-center justify-center gap-3">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                </svg>
+                Generar Documento PDF
+            </button>
+        </div>
+
+        <div id="pdf-area" class="shadow-[0_0_50px_rgba(0,0,0,0.05)] border border-slate-100 rounded-sm">
+            <div id="cotizacion-completa" class="p-16">
                 
-                <div id="section-politicas" class="bg-slate-50 p-5 rounded-2xl border border-slate-100">
-                    <h4 class="text-[10px] font-black uppercase text-slate-400 mb-2 tracking-widest">Información de Pago</h4>
-                    <p class="text-[11px] font-bold text-slate-700 mb-2">Anticipo del 50% para procesar pedido.</p>
-                    <ul class="text-[9px] text-slate-500 space-y-1">
-                        <li>• Entrega: 8 a 12 días hábiles tras anticipo.</li>
-                        <li>• Garantía: 1 año por defectos de fábrica.</li>
-                        <li>• Presupuesto vigente por 15 días naturales.</li>
-                    </ul>
-                </div>
-            </div>
-
-            <div class="bg-slate-900 text-white p-8 rounded-[2rem] shadow-xl">
-                <div class="space-y-3">
-                    <div class="flex justify-between text-xs font-bold uppercase opacity-60">
-                        <span>Suma de Artículos:</span> <span id="val-subtotal">$0.00</span>
-                    </div>
-                    <div id="inst-row" class="hidden flex justify-between text-xs font-bold uppercase opacity-60">
-                        <span>Instalación:</span> <span id="val-inst-display">$0.00</span>
-                    </div>
-                    <div id="desc-row" class="hidden flex justify-between text-red-400 text-xs font-bold uppercase">
-                        <span>Descuento Aplicado:</span> <span id="val-desc-money">-$0.00</span>
-                    </div>
-                    <div id="iva-row" class="hidden flex justify-between text-xs font-bold uppercase opacity-60">
-                        <span>IVA (16%):</span> <span id="val-iva">$0.00</span>
-                    </div>
-                    <div class="pt-3 border-t border-white/10">
-                        <p class="text-[10px] font-bold uppercase opacity-60 mb-1">Total Final</p>
-                        <h3 id="granTotal" class="text-4xl font-black tracking-tighter">$0.00</h3>
-                    </div>
-                    <div class="mt-4 pt-4 border-t border-white/20 bg-white/5 p-4 rounded-2xl">
-                        <div class="flex justify-between items-center mb-1 text-blue-400">
-                            <span class="text-[11px] font-black uppercase">Anticipo (50%)</span>
-                            <span id="val-anticipo" class="text-xl font-black">$0.00</span>
+                <div class="flex justify-between items-start border-b-4 border-slate-900 pb-10 mb-10">
+                    <div class="flex gap-8">
+                        <div class="w-28 h-28 flex items-center justify-center bg-white border border-slate-100 p-2">
+                            <img src="https://raw.githubusercontent.com/customshadows/cotizador/main/logo%20custom%20shadows.jpg" alt="Logo" class="object-contain w-full h-full">
                         </div>
-                        <div class="flex justify-between items-center opacity-70">
-                            <span class="text-[10px] font-bold uppercase">Saldo Restante</span>
-                            <span id="val-saldo" class="text-sm font-bold">$0.00</span>
+                        <div>
+                            <h1 class="text-4xl font-[900] tracking-tighter uppercase mb-2 text-slate-900">Custom Shadows</h1>
+                            <p class="text-xs font-extrabold text-blue-600 tracking-[0.3em] uppercase mb-4">Especialista en Persianas & Control Solar</p>
+                            <div class="grid grid-cols-2 gap-x-8 gap-y-1 text-[11px] text-slate-500 font-medium italic">
+                                <p>📱 <b>WhatsApp:</b> 9993702007</p>
+                                <p>✉️ customshadowsmx@gmail.com</p>
+                                <p class="col-span-2 text-slate-400">📍 Ciudad Caucel, Mérida, Yuc.</p>
+                            </div>
                         </div>
                     </div>
+                    <div class="text-right">
+                        <div class="border-2 border-slate-900 p-4 rounded-none inline-block">
+                            <span class="text-[10px] font-black uppercase block text-slate-400 mb-1">Folio Cotización</span>
+                            <span id="folio-display" class="text-3xl font-black text-slate-900 leading-none">#001</span>
+                        </div>
+                        <p class="text-[11px] text-slate-500 font-bold mt-4 uppercase tracking-widest" id="fecha-actual"></p>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-5 gap-6 mb-12 items-end">
+                    <div class="col-span-3 border-l-4 border-slate-900 pl-6">
+                        <span class="text-[10px] font-black uppercase text-slate-400 block tracking-[0.2em] mb-2">Preparado para</span>
+                        <div id="pdf-cliente" class="text-2xl font-extrabold text-slate-900 uppercase">Público General</div>
+                        <div id="pdf-direccion" class="text-sm font-medium text-slate-500 mt-1">--</div>
+                    </div>
+                    <div class="col-span-2 bg-slate-50 p-4 border-t border-slate-100">
+                        <span class="text-[10px] font-black uppercase text-slate-400 block tracking-[0.1em] mb-1">Contacto Directo</span>
+                        <div id="pdf-tel" class="text-lg font-bold text-slate-800 tracking-tighter">--</div>
+                    </div>
+                </div>
+
+                <div class="mb-10">
+                    <table class="w-full">
+                        <thead class="bg-slate-900 text-white text-[10px] font-bold uppercase tracking-[0.2em]">
+                            <tr>
+                                <th class="py-5 px-4 text-left">Espacio / Ambiente</th>
+                                <th class="py-5 px-4 text-left">Especificaciones</th>
+                                <th class="py-5 px-4 text-center">Dimensiones</th>
+                                <th class="py-5 px-4 text-center">Cant</th>
+                                <th class="py-5 px-4 text-right">Subtotal</th>
+                                <th class="no-print p-4"></th>
+                            </tr>
+                        </thead>
+                        <tbody id="lista" class="text-[11px] text-slate-700 divide-y divide-slate-100">
+                            </tbody>
+                    </table>
+                </div>
+
+                <div class="grid grid-cols-2 gap-16">
+                    <div class="space-y-8">
+                        <div class="p-6 border border-slate-100 bg-slate-50/50">
+                            <h4 class="text-[11px] font-black uppercase text-slate-900 mb-4 tracking-widest border-b border-slate-200 pb-2">Términos y Condiciones</h4>
+                            <ul class="text-[10px] text-slate-500 space-y-2.5 leading-relaxed">
+                                <li class="flex gap-2"><span>•</span> <p><b>Anticipo:</b> Requiere 50% para inicio de producción.</p></li>
+                                <li class="flex gap-2"><span>•</span> <p><b>Entrega:</b> Periodo estimado de 8 a 12 días hábiles.</p></li>
+                                <li class="flex gap-2"><span>•</span> <p><b>Calidad:</b> Garantía extendida de 12 meses contra defectos.</p></li>
+                                <li class="flex gap-2"><span>•</span> <p>Vigencia del presupuesto: 15 días naturales.</p></li>
+                            </ul>
+                        </div>
+                        <div class="text-center pt-8">
+                            <div class="w-56 mx-auto border-t-2 border-slate-900 pt-3">
+                                <p class="text-[10px] font-black uppercase text-slate-900 tracking-[0.2em]">Firma de Aceptación</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="bg-slate-900 text-white p-10 rounded-none relative overflow-hidden">
+                        <div class="absolute top-0 right-0 w-32 h-32 bg-blue-600/10 rounded-full -mr-16 -mt-16"></div>
+                        <div class="space-y-4 relative z-10">
+                            <div class="flex justify-between text-[11px] font-bold uppercase tracking-widest opacity-60">
+                                <span>Subtotal</span> <span id="val-subtotal">$0.00</span>
+                            </div>
+                            <div id="desc-row" class="hidden flex justify-between text-[11px] font-bold text-blue-400 uppercase tracking-widest">
+                                <span>Descuento</span> <span id="val-desc-money">-$0.00</span>
+                            </div>
+                            <div id="inst-row" class="hidden flex justify-between text-[11px] font-bold text-blue-300 uppercase tracking-widest">
+                                <span>Instalación</span> <span id="val-inst-money">$0.00</span>
+                            </div>
+                            <div id="iva-row" class="hidden flex justify-between text-[11px] font-bold uppercase tracking-widest opacity-60">
+                                <span>IVA (16%)</span> <span id="val-iva">$0.00</span>
+                            </div>
+                            <div class="pt-6 border-t border-white/20 flex justify-between items-end">
+                                <span class="text-[13px] font-black uppercase tracking-[0.3em]">Total Neto</span>
+                                <span id="granTotal" class="text-4xl font-black tracking-tighter">$0.00</span>
+                            </div>
+                            <div class="mt-8 grid grid-cols-2 gap-6 border-t border-white/10 pt-6">
+                                <div>
+                                    <p class="text-[9px] font-black uppercase opacity-40 mb-1">Pago Inicial</p>
+                                    <p id="val-anticipo" class="text-xl font-bold text-blue-400">$0.00</p>
+                                </div>
+                                <div class="text-right border-l border-white/10 pl-6">
+                                    <p class="text-[9px] font-black uppercase opacity-40 mb-1">Pendiente</p>
+                                    <p id="val-saldo" class="text-xl font-bold">$0.00</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
-        </div>
-
-        <div id="section-firmas" class="print-only mt-16 text-center">
-            <div class="max-w-[250px] mx-auto border-t border-slate-300 pt-3">
-                <p class="text-[10px] font-black uppercase text-slate-800">Firma de Conformidad Cliente</p>
-                <p class="text-[8px] text-slate-400 italic">Al firmar acepta términos y condiciones</p>
-            </div>
-        </div>
-
-        <div id="botones-accion" class="mt-8 no-print">
-            <button onclick="generarPDF()" class="w-full bg-slate-900 text-white py-5 rounded-2xl font-black uppercase text-sm tracking-widest hover:bg-blue-600 transition-all">Generar PDF Oficial</button>
         </div>
     </div>
 
@@ -226,13 +247,7 @@ document.getElementById('fecha-actual').innerText = new Date().toLocaleDateStrin
 
 let descuentoActual = 0;
 let carrito = [];
-
-// Formateador de moneda (Comas y 2 decimales)
-const formatter = new Intl.NumberFormat('en-US', {
-    style: 'currency',
-    currency: 'USD',
-    minimumFractionDigits: 2
-});
+const formatter = new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' });
 
 const DATA_ENROLLABLES = {
     "BLACK OUT": { "Long Beach": 810.39, "Texture": 937.44, "Ipanema": 910.88, "Ohio": 927.05, "Montreal": 991.73, "Budelli": 948.99, "Sydney": 1122.24, "Luxury": 1072.58, "B.O. 500": 1118.78, "Galaxy": 1169.60, "Stylus": 1297.80 },
@@ -245,23 +260,10 @@ const DATA_SHEER = {
     "DUO DIM OUT": { "Dim Out": 1609.65, "Brave": 1973.09, "Genius Dim Out": 1973.09, "Dim Out Woods": 1921.50, "Royal Dim Out": 2037.00, "Glam Dim Out": 2071.65, "Lino Dim Out": 2152.50 }
 };
 
-function togglePdfSection(id, isVisible) {
-    const el = document.getElementById(id) || document.querySelectorAll('.' + id);
-    if (el instanceof NodeList) {
-        el.forEach(e => {
-            if (!isVisible) e.classList.add('hide-on-pdf');
-            else e.classList.remove('hide-on-pdf');
-        });
-    } else if (el) {
-        if (!isVisible) el.classList.add('hide-on-pdf');
-        else el.classList.remove('hide-on-pdf');
-    }
-}
-
 function cargarTelas() {
     const sistema = document.getElementById('categoria').value;
     const select = document.getElementById('modelo');
-    select.innerHTML = '<option value="">-- Elige Tela --</option>';
+    select.innerHTML = '<option value="">Elegir tela</option>';
     let fuente = sistema === "ENROLLABLES" ? DATA_ENROLLABLES : (sistema === "SHEER" ? DATA_SHEER : null);
     if (fuente) {
         for (const grupo in fuente) {
@@ -288,7 +290,6 @@ function agregar() {
     const cant = parseInt(document.getElementById('cantidad').value) || 1;
     const motor = parseFloat(document.getElementById('motor-precio').value) || 0;
     const extraP = parseFloat(document.getElementById('extra-precio').value) || 0;
-    const extraN = document.getElementById('extra-nombre').value || "Extra";
     const facia = document.getElementById('facia-toggle').checked;
     
     let m2 = (ancho * alto) < 1 ? 1 : (ancho * alto);
@@ -296,101 +297,75 @@ function agregar() {
     let sub = ( (m2 * parseFloat(mod.value)) + motor + costoFacia + extraP ) * cant;
     
     carrito.push({
+        ambiente: document.getElementById('ambiente').value || "General",
         nombre: mod.options[mod.selectedIndex].getAttribute('data-full'),
-        ambiente: document.getElementById('ambiente').value || "Persiana",
-        color: document.getElementById('color').value || "S/N",
-        medidas: `${ancho.toFixed(2)} x ${alto.toFixed(2)} m`,
-        cant, sub: parseFloat(sub.toFixed(2)), motor, hasFacia: facia, extraP, extraN,
-        indic: document.getElementById('indicaciones').value
+        color: document.getElementById('color').value || "No especificado",
+        medidas: `${ancho.toFixed(2)} x ${alto.toFixed(2)}`,
+        cant, sub,
+        detalles: `${facia ? '[Facia]' : ''} ${motor > 0 ? '[Motor]' : ''}`
     });
-    render();
-}
-
-function setDiscount(val) {
-    descuentoActual = val;
-    document.querySelectorAll('.discount-btn').forEach(b => b.classList.remove('active'));
-    if(val > 0 && document.getElementById('btn-'+val)) document.getElementById('btn-'+val).classList.add('active');
     render();
 }
 
 function render() {
+    document.getElementById('pdf-cliente').innerText = document.getElementById('cliente').value || "PÚBLICO GENERAL";
+    document.getElementById('pdf-tel').innerText = document.getElementById('tel-cliente').value || "--";
+    document.getElementById('pdf-direccion').innerText = document.getElementById('direccion').value || "--";
+
     const lista = document.getElementById('lista');
-    lista.innerHTML = "";
-    let subtotalItems = 0;
-    carrito.forEach((p, i) => {
-        subtotalItems += p.sub;
-        lista.innerHTML += `<tr>
-            <td class="p-4 align-top font-black uppercase text-slate-800">${p.ambiente}</td>
-            <td class="p-4 align-top">
-                <div class="text-blue-600 font-bold uppercase">${p.nombre}</div>
-                <div class="text-[9px] font-bold text-slate-500 uppercase mb-1">Color: ${p.color}</div>
-                <div class="flex flex-wrap gap-1 mt-1">
-                    ${p.motor > 0 ? `<span class="text-[7px] bg-orange-50 text-orange-600 border border-orange-100 px-1 rounded font-black">MOTOR: ${formatter.format(p.motor)}</span>` : ''}
-                    ${p.hasFacia ? `<span class="text-[7px] bg-blue-50 text-blue-600 border border-blue-100 px-1 rounded font-black">FACIA</span>` : ''}
-                    ${p.extraP > 0 ? `<span class="text-[7px] bg-slate-100 text-slate-600 px-1 rounded font-black">${p.extraN.toUpperCase()}: ${formatter.format(p.extraP)}</span>` : ''}
-                </div>
-                ${p.indic ? `<div class="text-[8px] italic text-slate-400 mt-1">Nota: ${p.indic}</div>` : ''}
-            </td>
-            <td class="p-4 text-center text-xs font-mono align-top col-medidas">${p.medidas}</td>
-            <td class="p-4 text-center font-black align-top">${p.cant}</td>
-            <td class="p-4 text-right font-black align-top">${formatter.format(p.sub)}</td>
-            <td class="p-4 text-center no-print delete-cell align-top"><button onclick="carrito.splice(${i},1);render()" class="text-red-300 hover:text-red-600">✕</button></td>
-        </tr>`;
+    lista.innerHTML = '';
+    let subtotalArticulos = 0;
+
+    carrito.forEach((item, index) => {
+        subtotalArticulos += item.sub;
+        lista.innerHTML += `
+            <tr class="hover:bg-slate-50 transition-colors">
+                <td class="py-5 px-4 font-bold text-slate-900">${item.ambiente}</td>
+                <td class="py-5 px-4"><div class="font-bold">${item.nombre}</div><div class="text-[9px] text-slate-400 uppercase font-black tracking-tighter">${item.color} ${item.detalles}</div></td>
+                <td class="py-5 px-4 text-center font-medium">${item.medidas}m</td>
+                <td class="py-5 px-4 text-center font-bold text-slate-900">${item.cant}</td>
+                <td class="py-5 px-4 text-right font-bold text-slate-900">${formatter.format(item.sub)}</td>
+                <td class="no-print p-4 text-center"><button onclick="eliminar(${index})" class="text-red-300 hover:text-red-600 transition-colors">✕</button></td>
+            </tr>`;
     });
-    
+
     const inst = parseFloat(document.getElementById('inst').value) || 0;
-    const conIva = document.getElementById('iva-toggle').checked;
-    
-    let subNeto = subtotalItems + inst;
-    let descMoney = subNeto * (descuentoActual / 100);
-    let totalParcial = subNeto - descMoney;
-    
-    let ivaMoney = conIva ? (totalParcial * 0.16) : 0;
-    let totalFinal = totalParcial + ivaMoney;
-    let anticipo = totalFinal * 0.5;
-    
-    document.getElementById('val-subtotal').innerText = formatter.format(subtotalItems);
-    
-    const instRow = document.getElementById('inst-row');
-    if(inst > 0) {
-        instRow.classList.remove('hidden');
-        document.getElementById('val-inst-display').innerText = formatter.format(inst);
-    } else { instRow.classList.add('hidden'); }
+    const montoDesc = subtotalArticulos * (descuentoActual / 100);
+    const subconDescEInst = (subtotalArticulos - montoDesc) + inst;
+    const iva = document.getElementById('iva-toggle').checked ? subconDescEInst * 0.16 : 0;
+    const total = subconDescEInst + iva;
 
-    document.getElementById('desc-row').classList.toggle('hidden', descuentoActual === 0);
-    document.getElementById('val-desc-money').innerText = "-" + formatter.format(descMoney);
+    document.getElementById('val-subtotal').innerText = formatter.format(subtotalArticulos);
+    document.getElementById('desc-row').classList.toggle('hidden', montoDesc <= 0);
+    document.getElementById('val-desc-money').innerText = `-${formatter.format(montoDesc)}`;
+    document.getElementById('inst-row').classList.toggle('hidden', inst <= 0);
+    document.getElementById('val-inst-money').innerText = formatter.format(inst);
+    document.getElementById('iva-row').classList.toggle('hidden', iva <= 0);
+    document.getElementById('val-iva').innerText = formatter.format(iva);
+    document.getElementById('granTotal').innerText = formatter.format(total);
+    document.getElementById('val-anticipo').innerText = formatter.format(total / 2);
+    document.getElementById('val-saldo').innerText = formatter.format(total / 2);
+}
 
-    const ivaRow = document.getElementById('iva-row');
-    if(conIva) {
-        ivaRow.classList.remove('hidden');
-        document.getElementById('val-iva').innerText = formatter.format(ivaMoney);
-    } else { ivaRow.classList.add('hidden'); }
-
-    document.getElementById('granTotal').innerText = formatter.format(totalFinal);
-    document.getElementById('val-anticipo').innerText = formatter.format(anticipo);
-    document.getElementById('val-saldo').innerText = formatter.format(totalFinal - anticipo);
+function eliminar(index) { carrito.splice(index, 1); render(); }
+function setDiscount(val) { 
+    descuentoActual = val; 
+    document.querySelectorAll('.discount-btn').forEach(b => b.classList.remove('active'));
+    if(val > 0) document.getElementById('btn-'+val).classList.add('active');
+    render(); 
 }
 
 function generarPDF() {
-    document.getElementById('pdf-cliente').innerText = document.getElementById('cliente').value || "---";
-    document.getElementById('pdf-tel').innerText = document.getElementById('tel-cliente').value || "---";
-    document.getElementById('pdf-direccion').innerText = document.getElementById('direccion').value || "---";
-
-    const original = document.getElementById('cotizacion-completa');
-    const clone = original.cloneNode(true);
-    
-    const elementsToRemove = ['#panel-controles', '#botones-accion', '#col-borrar', '.no-print', '.delete-cell', 'button', 'select', 'input', '.hide-on-pdf'];
-    elementsToRemove.forEach(sel => { clone.querySelectorAll(sel).forEach(el => el.remove()); });
-
+    render();
+    const element = document.getElementById('pdf-area');
     const opt = {
-        margin: [0.4, 0.4],
-        filename: `Cotizacion_Shadows_${document.getElementById('cliente').value || 'Cliente'}.pdf`,
-        image: { type: 'jpeg', quality: 0.98 },
-        html2canvas: { scale: 2, useCORS: true, letterRendering: true, scrollX: 0, scrollY: 0 },
+        margin: 0,
+        filename: `CS_Cotizacion_${document.getElementById('cliente').value || 'Cliente'}.pdf`,
+        image: { type: 'jpeg', quality: 1 },
+        html2canvas: { scale: 3, useCORS: true, scrollY: 0 },
         jsPDF: { unit: 'in', format: 'letter', orientation: 'portrait' }
     };
-
-    html2pdf().set(opt).from(clone).save().then(() => {
+    html2pdf().set(opt).from(element).save().then(() => {
         folioActual++;
         localStorage.setItem('folio_shadows', folioActual);
         document.getElementById('folio-display').innerText = '#' + String(folioActual).padStart(3, '0');
