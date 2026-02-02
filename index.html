@@ -56,13 +56,13 @@
         <div class="no-print card bg-slate-850 p-4 mb-6 flex flex-col md:flex-row items-center justify-between gap-4 border-none shadow-xl">
             <div class="flex items-center gap-3">
                 <div class="h-8 w-8 bg-brand-500 rounded-lg flex items-center justify-center text-white font-black text-xs">CS</div>
-                <h2 class="text-white font-bold text-xs tracking-widest uppercase">Cloud Control Panel</h2>
+                <h2 class="text-white font-bold text-xs tracking-tighter uppercase">Cloud Manager / Porfirio Góngora</h2>
             </div>
             <div class="flex gap-2 w-full md:w-auto">
                 <select id="historial-select" onchange="cargarDesdeDB(this.value)" class="bg-slate-800 text-white text-[10px] p-2 rounded-lg border border-slate-700 w-full outline-none">
                     <option value="">Cargando historial...</option>
                 </select>
-                <button onclick="nuevaCotizacion()" class="bg-white/10 hover:bg-white/20 text-white text-[10px] px-4 rounded-lg font-bold">LIMPIAR</button>
+                <button onclick="nuevaCotizacion()" class="bg-white/10 hover:bg-white/20 text-white text-[10px] px-4 rounded-lg font-bold">LIMPIAR TODO</button>
             </div>
         </div>
 
@@ -71,18 +71,18 @@
             <div class="lg:col-span-4 space-y-4 no-print">
                 <div class="card p-5">
                     <h3 class="text-slate-900 text-xs font-black uppercase tracking-widest mb-4 flex items-center gap-2">
-                        <span class="w-1 h-3 bg-brand-500 rounded-full"></span> Proyecto
+                        <span class="w-1 h-3 bg-brand-500 rounded-full"></span> Cliente
                     </h3>
                     <div class="grid grid-cols-1 gap-3">
-                        <input type="text" id="cliente" oninput="render()" class="modern-input" placeholder="Nombre del Cliente">
-                        <input type="text" id="tel-cliente" oninput="render()" class="modern-input" placeholder="WhatsApp / Tel">
-                        <input type="text" id="direccion" oninput="render()" class="modern-input" placeholder="Ubicación de Obra">
+                        <input type="text" id="cliente" oninput="render()" class="modern-input" placeholder="Nombre">
+                        <input type="text" id="tel-cliente" oninput="render()" class="modern-input" placeholder="WhatsApp">
+                        <input type="text" id="direccion" oninput="render()" class="modern-input" placeholder="Dirección de Obra">
                     </div>
                 </div>
 
                 <div class="card p-5">
                     <h3 class="text-slate-900 text-xs font-black uppercase tracking-widest mb-4 flex items-center gap-2">
-                        <span class="w-1 h-3 bg-brand-500 rounded-full"></span> Añadir Ítem
+                        <span class="w-1 h-3 bg-brand-500 rounded-full"></span> Ítem
                     </h3>
                     <div class="space-y-3">
                         <select id="categoria" onchange="cargarTelas()" class="modern-input">
@@ -100,25 +100,24 @@
                             <input type="number" id="alto" step="0.01" placeholder="Alto" class="modern-input text-center font-bold text-brand-700">
                             <input type="number" id="cantidad" value="1" class="modern-input text-center font-bold">
                         </div>
-                        
                         <div class="bg-slate-50 p-3 rounded-lg border border-slate-100 space-y-2">
                             <input type="number" id="motor-precio" placeholder="Precio Motor $" class="modern-input">
                             <div class="flex gap-2">
-                                <input type="text" id="extra-nombre" placeholder="Concepto Extra" class="modern-input w-2/3">
+                                <input type="text" id="extra-nombre" placeholder="Extra" class="modern-input w-2/3">
                                 <input type="number" id="extra-precio" placeholder="$" class="modern-input w-1/3 text-center">
                             </div>
                             <label class="flex items-center gap-2 text-[10px] font-bold text-slate-500 uppercase cursor-pointer py-1">
-                                <input type="checkbox" id="facia-toggle" class="w-4 h-4 accent-brand-500"> Agregar Facia
+                                <input type="checkbox" id="facia-toggle" class="w-4 h-4 accent-brand-500"> Con Facia
                             </label>
                         </div>
-                        <button onclick="agregar()" class="w-full btn-primary py-3 text-[10px]">Añadir a la lista</button>
+                        <button onclick="agregar()" class="w-full btn-primary py-3 text-[10px]">Añadir a lista</button>
                     </div>
                 </div>
 
                 <div class="card p-5">
                     <div class="space-y-4">
                         <div>
-                            <label class="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-2 block">Descuento Global</label>
+                            <label class="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-2 block text-center">Descuento Global</label>
                             <div class="grid grid-cols-4 gap-1">
                                 <button onclick="setDiscount(0)" id="btn-0" class="discount-btn active">0%</button>
                                 <button onclick="setDiscount(10)" id="btn-10" class="discount-btn">10%</button>
@@ -129,7 +128,7 @@
                         <div class="flex gap-3 items-end">
                             <div class="flex-1">
                                 <label class="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-1 block">Instalación $</label>
-                                <input type="number" id="inst" oninput="render()" class="modern-input font-bold" placeholder="0.00">
+                                <input type="number" id="inst" oninput="render()" class="modern-input font-bold" placeholder="Escribir monto...">
                             </div>
                             <label class="flex-1 border-2 border-slate-100 rounded-lg p-2 text-center text-[10px] font-bold uppercase cursor-pointer hover:bg-slate-50">
                                 <input type="checkbox" id="iva-toggle" onchange="render()" class="accent-brand-500"> + IVA
@@ -143,21 +142,20 @@
                 
                 <div class="no-print flex gap-4">
                     <button onclick="guardarEnDB()" class="flex-1 bg-emerald-600 hover:bg-emerald-700 text-white p-3 rounded-xl font-bold text-[10px] uppercase shadow-lg transition-all">Sincronizar Nube</button>
-                    <button onclick="generarPDF()" class="flex-1 bg-brand-800 hover:bg-brand-900 text-white p-3 rounded-xl font-bold text-[10px] uppercase shadow-lg transition-all">Descargar PDF</button>
+                    <button onclick="generarPDF()" class="flex-1 bg-brand-800 hover:bg-brand-900 text-white p-3 rounded-xl font-bold text-[10px] uppercase shadow-lg transition-all">Generar PDF</button>
                 </div>
 
                 <div id="pdf-area" class="card bg-white p-10 md:p-14 border-none shadow-2xl relative">
-                    <div class="absolute top-0 right-0 w-32 h-32 bg-slate-50 rounded-bl-full -z-0 opacity-50"></div>
-
                     <div class="relative flex justify-between items-start mb-12 border-b-2 border-slate-100 pb-8">
                         <div class="flex gap-5">
                             <img src="https://raw.githubusercontent.com/customshadows/cotizador/main/logo%20custom%20shadows.jpg" class="h-16 w-16 object-contain rounded-full shadow-sm">
                             <div>
                                 <h1 class="text-2xl font-black text-slate-900 tracking-tighter uppercase leading-none">Custom Shadows</h1>
-                                <p class="text-[9px] font-bold text-slate-400 uppercase tracking-[0.3em] mt-2">Cortinas y Persianas de Alta Gama</p>
-                                <div class="mt-4 text-[8px] font-bold text-slate-400 space-y-0.5">
+                                <p class="text-[11px] font-black text-brand-600 uppercase tracking-[0.2em] mt-1">Porfirio Góngora</p>
+                                <div class="mt-4 text-[8px] font-bold text-slate-400 space-y-0.5 uppercase tracking-wider">
                                     <p>WhatsApp: 999 370 2007</p>
                                     <p>Email: customshadowsmx@gmail.com</p>
+                                    <p class="text-slate-500">C. 41 693B Ciudad Caucel, Mérida, Yuc.</p>
                                 </div>
                             </div>
                         </div>
@@ -170,22 +168,22 @@
 
                     <div class="grid grid-cols-2 gap-8 mb-10">
                         <div class="border-l-4 border-slate-900 pl-4">
-                            <span class="text-[8px] font-black text-slate-400 uppercase tracking-widest">Cliente / Solicitante</span>
+                            <span class="text-[8px] font-black text-slate-400 uppercase tracking-widest">Cliente / Proyecto</span>
                             <p id="pdf-cliente" class="text-lg font-black text-slate-800 uppercase leading-tight">Público General</p>
                         </div>
                         <div class="text-right">
-                            <span class="text-[8px] font-black text-slate-400 uppercase tracking-widest">Ubicación del Proyecto</span>
-                            <p id="pdf-direccion" class="text-xs font-bold text-slate-600 uppercase italic">Mérida, Yucatán</p>
-                            <p id="pdf-tel" class="text-[9px] text-slate-400 font-bold"></p>
+                            <span class="text-[8px] font-black text-slate-400 uppercase tracking-widest">Ubicación Obra</span>
+                            <p id="pdf-direccion" class="text-xs font-bold text-slate-600 uppercase italic">--</p>
+                            <p id="pdf-tel" class="text-[9px] text-slate-400 font-bold mt-1"></p>
                         </div>
                     </div>
 
                     <table class="w-full mb-10">
                         <thead class="bg-slate-900 text-white">
-                            <tr class="text-[9px] uppercase tracking-widest font-black">
-                                <th class="text-left p-3 rounded-l-lg">Descripción del Producto</th>
-                                <th class="text-center p-3">Medidas</th>
-                                <th class="text-center p-3">Cant</th>
+                            <tr class="text-[9px] uppercase tracking-widest font-black text-center">
+                                <th class="text-left p-3 rounded-l-lg">Descripción</th>
+                                <th class="p-3">Medidas</th>
+                                <th class="p-3">Cant</th>
                                 <th class="text-right p-3 rounded-r-lg">Subtotal</th>
                             </tr>
                         </thead>
@@ -195,10 +193,10 @@
                     <div class="grid grid-cols-5 gap-8">
                         <div class="col-span-3">
                             <div class="p-4 bg-slate-50 rounded-xl">
-                                <h4 class="text-[9px] font-black text-slate-900 uppercase mb-3 border-b border-slate-200 pb-2">Condiciones Comerciales</h4>
+                                <h4 class="text-[9px] font-black text-slate-900 uppercase mb-3 border-b border-slate-200 pb-2">Condiciones</h4>
                                 <ul class="text-[8px] font-bold text-slate-500 uppercase space-y-2 tracking-widest">
                                     <li class="flex items-center gap-2"><span class="w-1.5 h-1.5 bg-brand-500 rounded-full"></span> Pago: 50% Anticipo / 50% Contra Entrega</li>
-                                    <li class="flex items-center gap-2"><span class="w-1.5 h-1.5 bg-brand-500 rounded-full"></span> Tiempo: 8 a 12 días hábiles</li>
+                                    <li class="flex items-center gap-2"><span class="w-1.5 h-1.5 bg-brand-500 rounded-full"></span> Entrega: 8 a 12 días hábiles</li>
                                     <li class="flex items-center gap-2"><span class="w-1.5 h-1.5 bg-brand-500 rounded-full"></span> Garantía: 1 año por escrito</li>
                                 </ul>
                             </div>
@@ -222,11 +220,11 @@
                             </div>
                             <div class="mt-4 pt-4 border-t border-dashed border-slate-200 grid grid-cols-2 text-[8px] font-black uppercase text-center gap-2">
                                 <div class="bg-slate-50 p-2 rounded">
-                                    <p class="text-slate-400 mb-1">Anticipo</p>
+                                    <p class="text-slate-400 mb-1 text-[7px]">Anticipo</p>
                                     <p id="val-anticipo" class="text-xs text-brand-700">$0.00</p>
                                 </div>
                                 <div class="bg-slate-50 p-2 rounded">
-                                    <p class="text-slate-400 mb-1">Saldo</p>
+                                    <p class="text-slate-400 mb-1 text-[7px]">Saldo</p>
                                     <p id="val-saldo" class="text-xs text-slate-700">$0.00</p>
                                 </div>
                             </div>
@@ -271,16 +269,14 @@ function agregar() {
     const extraN = document.getElementById('extra-nombre').value;
     const extraP = parseFloat(document.getElementById('extra-precio').value) || 0;
     const fc = document.getElementById('facia-toggle').checked;
-    
     let m2 = (an * al) < 1 ? 1 : (an * al), cf = fc ? (an * 280) : 0;
     let sub = ((m2 * parseFloat(m.value)) + mot + cf + extraP) * ct;
-    
     carrito.push({
         amb: document.getElementById('ambiente').value || "Gral",
         nom: m.options[m.selectedIndex].getAttribute('data-full'),
         col: document.getElementById('color').value || "S/C",
         med: `${an.toFixed(2)}x${al.toFixed(2)}`, ct, sub, 
-        det: `${fc ? '[Facia]' : ''} ${mot>0 ? '[Motor]' : ''} ${extraN ? '['+extraN+']' : ''}`
+        det: `${fc ? '[Facia]' : ''} ${mot>0 ? '[Mot]' : ''} ${extraN ? '['+extraN+']' : ''}`
     });
     render();
 }
@@ -295,22 +291,19 @@ function setDiscount(val) {
 function render() {
     document.getElementById('pdf-cliente').innerText = document.getElementById('cliente').value || "PÚBLICO GENERAL";
     document.getElementById('pdf-tel').innerText = document.getElementById('tel-cliente').value ? 'Tel: ' + document.getElementById('tel-cliente').value : "";
-    document.getElementById('pdf-direccion').innerText = document.getElementById('direccion').value || "Mérida, Yucatán";
+    document.getElementById('pdf-direccion').innerText = document.getElementById('direccion').value || "--";
     document.getElementById('folio-display').innerText = '#' + String(folioActual).padStart(3, '0');
     document.getElementById('fecha-actual').innerText = new Date().toLocaleDateString('es-MX', { day: 'numeric', month: 'long', year: 'numeric' });
-    
     const l = document.getElementById('lista'); l.innerHTML = ''; let sum = 0;
     carrito.forEach((it, i) => {
         sum += it.sub;
         l.innerHTML += `<tr><td class="p-3"><b>${it.amb}</b><br><span class="text-[9px] text-slate-400 uppercase font-black">${it.nom} | ${it.col} ${it.det}</span></td><td class="text-center font-bold">${it.med}</td><td class="text-center font-bold">${it.ct}</td><td class="text-right font-black text-slate-900">${formatter.format(it.sub)} <button onclick="eliminar(${i})" class="no-print ml-2 text-red-300 hover:text-red-500">✕</button></td></tr>`;
     });
-
     let mDesc = sum * (descuentoActual / 100);
     let subConDesc = sum - mDesc;
     let inst = parseFloat(document.getElementById('inst').value) || 0;
     let iva = document.getElementById('iva-toggle').checked ? (subConDesc + inst) * 0.16 : 0;
     let total = subConDesc + inst + iva;
-
     document.getElementById('val-subtotal').innerText = formatter.format(sum);
     document.getElementById('val-desc-money').innerText = `-${formatter.format(mDesc)}`;
     document.getElementById('desc-row').style.display = descuentoActual > 0 ? 'flex' : 'none';
@@ -328,33 +321,28 @@ function eliminar(i) { carrito.splice(i, 1); render(); }
 async function guardarEnDB() {
     if(carrito.length===0) return alert("Añade productos.");
     const doc = { 
-        folio: folioActual, 
-        cliente: document.getElementById('cliente').value || "PÚBLICO GENERAL",
-        tel: document.getElementById('tel-cliente').value,
-        dir: document.getElementById('direccion').value,
-        inst: parseFloat(document.getElementById('inst').value) || 0,
-        desc: descuentoActual,
-        iva: document.getElementById('iva-toggle').checked,
-        carrito, 
-        fecha: new Date().toISOString() 
+        folio: folioActual, cliente: document.getElementById('cliente').value || "PÚBLICO GENERAL",
+        tel: document.getElementById('tel-cliente').value, dir: document.getElementById('direccion').value,
+        inst: parseFloat(document.getElementById('inst').value) || 0, desc: descuentoActual,
+        iva: document.getElementById('iva-toggle').checked, carrito, fecha: new Date().toISOString() 
     };
     try {
         if(idDocumentoActual) await db.collection("cotizaciones").doc(idDocumentoActual).set(doc);
         else { const r = await db.collection("cotizaciones").add(doc); idDocumentoActual = r.id; }
-        alert("Sincronizado con la nube"); listarHistorial();
-    } catch(e) { alert("Error al guardar: Revisa reglas en Firebase"); }
+        alert("¡Guardado en la nube!"); listarHistorial();
+    } catch(e) { alert("Error al guardar en Firebase."); }
 }
 
 async function listarHistorial() {
     const s = document.getElementById('historial-select');
     try {
         const snap = await db.collection("cotizaciones").orderBy("fecha", "desc").limit(10).get();
-        s.innerHTML = '<option value="">Cargar cotización...</option>';
+        s.innerHTML = '<option value="">Historial reciente...</option>';
         snap.forEach(d => {
             const o = document.createElement('option'); o.value = d.id;
             o.text = `#${String(d.data().folio).padStart(3,'0')} - ${d.data().cliente}`; s.appendChild(o);
         });
-    } catch(e) { s.innerHTML = '<option>Sin conexión</option>'; }
+    } catch(e) { s.innerHTML = '<option>Error de conexión</option>'; }
 }
 
 async function cargarDesdeDB(id) {
@@ -363,19 +351,32 @@ async function cargarDesdeDB(id) {
         const data = d.data(); idDocumentoActual = id; folioActual = data.folio;
         document.getElementById('cliente').value = data.cliente; 
         document.getElementById('tel-cliente').value = data.tel || "";
-        document.getElementById('direccion').value = data.dir || "";
-        document.getElementById('inst').value = data.inst || 0;
-        document.getElementById('iva-toggle').checked = data.iva || false;
+        document.getElementById('direccion').value = data.dir || ""; 
+        // Si es 0, lo dejamos vacío para mayor claridad
+        document.getElementById('inst').value = data.inst === 0 ? "" : data.inst; 
+        document.getElementById('iva-toggle').checked = data.iva || false; 
         carrito = data.carrito; 
-        setDiscount(data.desc || 0);
-        render();
+        setDiscount(data.desc || 0); render();
     }
 }
 
-function nuevaCotizacion() { idDocumentoActual = null; carrito = []; folioActual++; render(); }
+function nuevaCotizacion() { 
+    idDocumentoActual = null; 
+    carrito = []; 
+    folioActual++; 
+    document.getElementById('inst').value = ""; // Limpiar instalación al resetear
+    document.getElementById('ancho').value = ""; 
+    document.getElementById('alto').value = "";
+    document.getElementById('cliente').value = "";
+    document.getElementById('tel-cliente').value = "";
+    document.getElementById('direccion').value = "";
+    setDiscount(0);
+    render(); 
+}
+
 function generarPDF() { 
     const e = document.getElementById('pdf-area');
-    const opt = { margin: 0.1, filename: `CS_${document.getElementById('cliente').value}.pdf`, html2canvas: { scale: 3 }, jsPDF: { unit: 'in', format: 'letter' }};
+    const opt = { margin: 0.1, filename: `CS_${document.getElementById('cliente').value || 'Cotizacion'}.pdf`, html2canvas: { scale: 3 }, jsPDF: { unit: 'in', format: 'letter' }};
     html2pdf().set(opt).from(e).save();
 }
 
