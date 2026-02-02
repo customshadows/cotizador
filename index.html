@@ -17,6 +17,11 @@
             .hide-on-pdf { display: none !important; }
         }
         .pdf-card { border: 1px solid #e2e8f0; border-radius: 12px; padding: 15px; background: #f8fafc; }
+        .config-chip { cursor: pointer; transition: all 0.2s; border: 1px solid #e2e8f0; font-size: 10px; font-weight: 800; text-transform: uppercase; padding: 4px 10px; border-radius: 20px; display: flex; align-items: center; gap: 5px; }
+        .config-chip input { cursor: pointer; accent-color: #2563eb; }
+        .config-chip:hover { border-color: #2563eb; background: #f0f7ff; }
+        /* Clase para forzar eliminación en PDF */
+        .pdf-removed { display: none !important; }
     </style>
 </head>
 <body class="bg-slate-100 py-8 px-4 text-slate-900">
@@ -47,48 +52,36 @@
             </div>
         </div>
 
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-4">
-            <div class="pdf-card">
+        <div class="no-print mb-6 p-4 bg-slate-50 rounded-2xl border border-slate-200">
+            <p class="text-[10px] font-black uppercase text-slate-400 mb-3 tracking-widest flex items-center gap-2">
+                ⚙️ Configuración del PDF <span class="text-[8px] font-normal normal-case">(Elige qué imprimir)</span>
+            </p>
+            <div class="flex flex-wrap gap-2">
+                <label class="config-chip"><input type="checkbox" checked onchange="togglePdfSection('section-logo', this.checked)"> Logo</label>
+                <label class="config-chip"><input type="checkbox" checked onchange="togglePdfSection('section-contacto', this.checked)"> Contacto</label>
+                <label class="config-chip"><input type="checkbox" checked onchange="togglePdfSection('section-tel-cliente', this.checked)"> Tel. Cliente</label>
+                <label class="config-chip"><input type="checkbox" checked onchange="togglePdfSection('section-dir-cliente', this.checked)"> Dirección</label>
+                <label class="config-chip"><input type="checkbox" checked onchange="togglePdfSection('col-medidas', this.checked)"> Medidas</label>
+                <label class="config-chip"><input type="checkbox" checked onchange="togglePdfSection('section-politicas', this.checked)"> Políticas</label>
+                <label class="config-chip"><input type="checkbox" checked onchange="togglePdfSection('section-firmas', this.checked)"> Firmas</label>
+            </div>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+            <div class="pdf-card" id="section-nom-cliente">
                 <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-1">👤 Cliente</label>
                 <input type="text" id="cliente" placeholder="Nombre completo" class="w-full bg-transparent font-bold outline-none no-print text-slate-800">
                 <div id="pdf-cliente" class="print-only font-bold text-slate-800"></div>
             </div>
-            <div id="section-tel-cliente" class="pdf-card">
+            <div class="pdf-card" id="section-tel-cliente">
                 <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-1">📞 Teléfono</label>
                 <input type="text" id="tel-cliente" placeholder="WhatsApp / Celular" class="w-full bg-transparent font-bold text-sm outline-none no-print text-slate-800">
                 <div id="pdf-tel" class="print-only font-bold text-sm text-slate-800"></div>
             </div>
-            <div id="section-dir-cliente" class="pdf-card">
+            <div class="pdf-card" id="section-dir-cliente">
                 <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-1">📍 Dirección de Obra</label>
                 <input type="text" id="direccion" placeholder="Calle, Colonia, Ciudad" class="w-full bg-transparent font-bold text-[11px] outline-none no-print text-slate-800">
                 <div id="pdf-direccion" class="print-only font-bold text-[11px] text-slate-700"></div>
-            </div>
-        </div>
-
-        <div class="no-print bg-slate-50 border border-slate-200 rounded-xl p-4 mb-8">
-            <h3 class="text-[10px] font-black uppercase text-slate-400 mb-3 tracking-widest">¿Qué mostrar en el PDF?</h3>
-            <div class="flex flex-wrap gap-4">
-                <label class="flex items-center gap-2 cursor-pointer text-[11px] font-bold text-slate-600">
-                    <input type="checkbox" checked onchange="togglePdfSection('section-logo', this.checked)" class="w-3 h-3"> Logo
-                </label>
-                <label class="flex items-center gap-2 cursor-pointer text-[11px] font-bold text-slate-600">
-                    <input type="checkbox" checked onchange="togglePdfSection('section-contacto', this.checked)" class="w-3 h-3"> Datos Contacto
-                </label>
-                <label class="flex items-center gap-2 cursor-pointer text-[11px] font-bold text-slate-600">
-                    <input type="checkbox" checked onchange="togglePdfSection('section-tel-cliente', this.checked)" class="w-3 h-3"> Tel. Cliente
-                </label>
-                <label class="flex items-center gap-2 cursor-pointer text-[11px] font-bold text-slate-600">
-                    <input type="checkbox" checked onchange="togglePdfSection('section-dir-cliente', this.checked)" class="w-3 h-3"> Dirección
-                </label>
-                <label class="flex items-center gap-2 cursor-pointer text-[11px] font-bold text-slate-600">
-                    <input type="checkbox" checked onchange="togglePdfSection('col-medidas', this.checked)" class="w-3 h-3"> Col. Medidas
-                </label>
-                <label class="flex items-center gap-2 cursor-pointer text-[11px] font-bold text-slate-600">
-                    <input type="checkbox" checked onchange="togglePdfSection('section-politicas', this.checked)" class="w-3 h-3"> Políticas
-                </label>
-                <label class="flex items-center gap-2 cursor-pointer text-[11px] font-bold text-slate-600">
-                    <input type="checkbox" checked onchange="togglePdfSection('section-firmas', this.checked)" class="w-3 h-3"> Firmas
-                </label>
             </div>
         </div>
         
@@ -132,7 +125,7 @@
                     <input type="checkbox" id="facia-toggle" class="w-4 h-4">
                     <span class="text-[9px] font-black uppercase">Facia Aluminio</span>
                 </label>
-                <input type="text" id="indicaciones" placeholder="Notas..." class="p-2 bg-white border border-blue-200 rounded-lg text-xs">
+                <input type="text" id="indicaciones" placeholder="Indicaciones..." class="p-2 bg-white border border-blue-200 rounded-lg text-xs">
             </div>
             <button onclick="agregar()" class="w-full bg-blue-600 text-white font-black rounded-xl uppercase text-sm h-12">Añadir a Cotización</button>
         </div>
@@ -155,13 +148,13 @@
 
         <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mb-10">
             <div class="space-y-4">
-                <div class="no-print bg-white p-4 rounded-xl border border-slate-200">
+                <div class="no-print">
                     <label class="text-[10px] text-slate-400 font-bold uppercase block mb-2">Descuento e Instalación</label>
                     <div class="flex gap-2 mb-3">
-                        <button onclick="setDiscount(10)" id="btn-10" class="discount-btn flex-1 py-2 border border-slate-300 rounded-lg text-xs font-bold">10%</button>
-                        <button onclick="setDiscount(15)" id="btn-15" class="discount-btn flex-1 py-2 border border-slate-300 rounded-lg text-xs font-bold">15%</button>
-                        <button onclick="setDiscount(20)" id="btn-20" class="discount-btn flex-1 py-2 border border-slate-300 rounded-lg text-xs font-bold">20%</button>
-                        <button onclick="setDiscount(0)" class="flex-1 py-2 bg-slate-100 rounded-lg text-xs font-bold">0%</button>
+                        <button onclick="setDiscount(10)" id="btn-10" class="discount-btn px-4 py-2 border border-slate-300 rounded-lg text-xs font-bold">10%</button>
+                        <button onclick="setDiscount(15)" id="btn-15" class="discount-btn px-4 py-2 border border-slate-300 rounded-lg text-xs font-bold">15%</button>
+                        <button onclick="setDiscount(20)" id="btn-20" class="discount-btn px-4 py-2 border border-slate-300 rounded-lg text-xs font-bold">20%</button>
+                        <button onclick="setDiscount(0)" class="px-4 py-2 bg-slate-100 rounded-lg text-xs font-bold">0%</button>
                     </div>
                     <input type="number" id="inst" value="0" oninput="render()" class="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl font-bold" placeholder="Costo Instalación">
                 </div>
@@ -183,7 +176,7 @@
                         <span>Subtotal Neto:</span> <span id="val-subtotal">$0.00</span>
                     </div>
                     <div id="desc-row" class="hidden flex justify-between text-red-400 text-xs font-bold uppercase">
-                        <span>Descuento aplicado:</span> <span id="val-desc-money">-$0.00</span>
+                        <span>Descuento:</span> <span id="val-desc-money">-$0.00</span>
                     </div>
                     <div class="pt-3 border-t border-white/10">
                         <p class="text-[10px] font-bold uppercase opacity-60 mb-1">Total Cotizado</p>
@@ -191,7 +184,7 @@
                     </div>
                     <div class="mt-4 pt-4 border-t border-white/20 bg-white/5 p-4 rounded-2xl">
                         <div class="flex justify-between items-center mb-1 text-blue-400">
-                            <span class="text-[11px] font-black uppercase">Anticipo 50%</span>
+                            <span class="text-[11px] font-black uppercase">Anticipo (50%)</span>
                             <span id="val-anticipo" class="text-xl font-black">$0.00</span>
                         </div>
                         <div class="flex justify-between items-center opacity-70">
@@ -205,15 +198,17 @@
 
         <div id="section-firmas" class="print-only mt-12 grid grid-cols-2 gap-20 text-center">
             <div class="border-t border-slate-300 pt-2">
-                <p class="text-[10px] font-black uppercase">Firma del Cliente</p>
+                <p class="text-[10px] font-black uppercase text-slate-800">Firma del Cliente</p>
+                <p class="text-[8px] text-slate-400">Aceptación de términos</p>
             </div>
             <div class="border-t border-slate-300 pt-2">
-                <p class="text-[10px] font-black uppercase">Custom Shadows</p>
+                <p class="text-[10px] font-black uppercase text-slate-800">Custom Shadows</p>
+                <p class="text-[8px] text-slate-400">Autorización</p>
             </div>
         </div>
 
         <div id="botones-accion" class="mt-8 no-print">
-            <button onclick="generarPDF()" class="w-full bg-slate-900 text-white py-5 rounded-2xl font-black uppercase text-sm tracking-widest hover:bg-blue-600 transition-all shadow-lg">Descargar Cotización PDF</button>
+            <button onclick="generarPDF()" class="w-full bg-slate-900 text-white py-5 rounded-2xl font-black uppercase text-sm tracking-widest hover:bg-blue-600 transition-all">Generar PDF Oficial</button>
         </div>
     </div>
 
@@ -236,13 +231,16 @@ const DATA_SHEER = {
     "DUO DIM OUT": { "Dim Out": 1609.65, "Brave": 1973.09, "Genius Dim Out": 1973.09, "Dim Out Woods": 1921.50, "Royal Dim Out": 2037.00, "Glam Dim Out": 2071.65, "Lino Dim Out": 2152.50 }
 };
 
-// Control de visibilidad para el PDF
 function togglePdfSection(id, isVisible) {
     const el = document.getElementById(id) || document.querySelectorAll('.' + id);
     if (el instanceof NodeList) {
-        el.forEach(e => e.classList.toggle('hide-on-pdf', !isVisible));
+        el.forEach(e => {
+            if (!isVisible) e.classList.add('hide-on-pdf');
+            else e.classList.remove('hide-on-pdf');
+        });
     } else if (el) {
-        el.classList.toggle('hide-on-pdf', !isVisible);
+        if (!isVisible) el.classList.add('hide-on-pdf');
+        else el.classList.remove('hide-on-pdf');
     }
 }
 
@@ -278,8 +276,8 @@ function agregar() {
     const extraP = parseFloat(document.getElementById('extra-precio').value) || 0;
     const extraN = document.getElementById('extra-nombre').value || "Extra";
     const facia = document.getElementById('facia-toggle').checked;
-    const amb = document.getElementById('ambiente').value || "General";
-    const col = document.getElementById('color').value || "N/A";
+    const amb = document.getElementById('ambiente').value || "Persiana";
+    const col = document.getElementById('color').value || "S/N";
     
     let m2 = (ancho * alto) < 1 ? 1 : (ancho * alto);
     let costoFacia = facia ? (ancho * 280) : 0;
@@ -299,7 +297,7 @@ function agregar() {
 function setDiscount(val) {
     descuentoActual = val;
     document.querySelectorAll('.discount-btn').forEach(b => b.classList.remove('active'));
-    if(val > 0) document.getElementById('btn-'+val).classList.add('active');
+    if(val > 0 && document.getElementById('btn-'+val)) document.getElementById('btn-'+val).classList.add('active');
     render();
 }
 
@@ -310,9 +308,7 @@ function render() {
     carrito.forEach((p, i) => {
         subtotalItems += p.sub;
         lista.innerHTML += `<tr>
-            <td class="p-4 align-top">
-                <div class="font-black text-slate-800 uppercase">${p.ambiente}</div>
-            </td>
+            <td class="p-4 align-top font-black uppercase text-slate-800">${p.ambiente}</td>
             <td class="p-4 align-top">
                 <div class="text-blue-600 font-bold uppercase">${p.nombre}</div>
                 <div class="text-[9px] font-bold text-slate-500 uppercase mb-1">Color: ${p.color}</div>
@@ -344,30 +340,48 @@ function render() {
     document.getElementById('val-saldo').innerText = "$" + (totalFinal - anticipo).toLocaleString(undefined, {minimumFractionDigits: 2});
 }
 
-async function generarPDF() {
-    // Sincronizar inputs a divs para el PDF
+function generarPDF() {
+    // 1. Pasar valores de inputs a texto visible para el PDF
     document.getElementById('pdf-cliente').innerText = document.getElementById('cliente').value || "---";
     document.getElementById('pdf-tel').innerText = document.getElementById('tel-cliente').value || "---";
     document.getElementById('pdf-direccion').innerText = document.getElementById('direccion').value || "---";
 
     const original = document.getElementById('cotizacion-completa');
     const clone = original.cloneNode(true);
-
-    // Limpieza de elementos que nunca deben ir en el PDF
-    const forzarBorrado = ['#panel-controles', '#botones-accion', '#col-borrar', '.no-print', '.delete-cell', 'button', 'select', 'input', '.no-print'];
-    forzarBorrado.forEach(sel => { clone.querySelectorAll(sel).forEach(el => el.remove()); });
     
-    // Respetar las selecciones del usuario (clase hide-on-pdf)
-    clone.querySelectorAll('.hide-on-pdf').forEach(el => el.remove());
+    // 2. Limpiar elementos técnicos del clon que no deben aparecer
+    const elementsToRemove = [
+        '#panel-controles', 
+        '#botones-accion', 
+        '#col-borrar', 
+        '.no-print', 
+        '.delete-cell', 
+        'button', 
+        'select', 
+        'input',
+        '.hide-on-pdf' // Aquí quitamos físicamente las secciones desmarcadas
+    ];
+    
+    elementsToRemove.forEach(sel => {
+        clone.querySelectorAll(sel).forEach(el => el.remove());
+    });
 
+    // 3. Opciones optimizadas para Chrome
     const opt = {
-        margin: [0.3, 0.3],
+        margin: [0.4, 0.4],
         filename: `Cotizacion_Shadows_${document.getElementById('cliente').value || 'Cliente'}.pdf`,
         image: { type: 'jpeg', quality: 0.98 },
-        html2canvas: { scale: 3, useCORS: true },
+        html2canvas: { 
+            scale: 2, 
+            useCORS: true, 
+            letterRendering: true,
+            scrollX: 0,
+            scrollY: 0 // Esto evita que se centre si hay scroll
+        },
         jsPDF: { unit: 'in', format: 'letter', orientation: 'portrait' }
     };
 
+    // 4. Ejecutar generación
     html2pdf().set(opt).from(clone).save().then(() => {
         folioActual++;
         localStorage.setItem('folio_shadows', folioActual);
