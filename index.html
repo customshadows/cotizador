@@ -113,14 +113,15 @@
             <table class="w-full text-left">
                 <thead class="bg-slate-800 text-white text-[10px] uppercase tracking-widest">
                     <tr>
-                        <th class="p-4">Descripción</th>
+                        <th class="p-4">Ambiente</th>
+                        <th class="p-4">Descripción / Color</th>
                         <th class="p-4 text-center">Medidas</th>
                         <th class="p-4 text-center">Cant</th>
                         <th class="p-4 text-right">Importe</th>
                         <th class="p-4 text-center no-print" id="col-borrar"></th>
                     </tr>
                 </thead>
-                <tbody id="lista" class="divide-y divide-slate-100 text-sm"></tbody>
+                <tbody id="lista" class="divide-y divide-slate-100 text-[11px]"></tbody>
             </table>
         </div>
 
@@ -165,9 +166,9 @@
                         </div>
                     </div>
                     <div class="mt-4 pt-4 border-t border-white/20 bg-white/5 p-4 rounded-2xl">
-                        <div class="flex justify-between items-center mb-1">
-                            <span class="text-[11px] font-black uppercase text-blue-400">Anticipo Requerido (50%)</span>
-                            <span id="val-anticipo" class="text-xl font-black text-blue-400">$0.00</span>
+                        <div class="flex justify-between items-center mb-1 text-blue-400">
+                            <span class="text-[11px] font-black uppercase">Anticipo Requerido (50%)</span>
+                            <span id="val-anticipo" class="text-xl font-black">$0.00</span>
                         </div>
                         <div class="flex justify-between items-center opacity-70">
                             <span class="text-[10px] font-bold uppercase">Saldo al Instalar</span>
@@ -248,7 +249,7 @@ function agregar() {
     const extraN = document.getElementById('extra-nombre').value || "Extra";
     const facia = document.getElementById('facia-toggle').checked;
     const amb = document.getElementById('ambiente').value || "Persiana";
-    const col = document.getElementById('color').value || "";
+    const col = document.getElementById('color').value || "S/N";
     
     let m2 = (ancho * alto) < 1 ? 1 : (ancho * alto);
     let costoFacia = facia ? (ancho * 280) : 0;
@@ -256,9 +257,10 @@ function agregar() {
     
     carrito.push({
         nombre: mod.options[mod.selectedIndex].getAttribute('data-full'),
-        detalle: col ? `${amb} (${col})` : amb,
+        ambiente: amb,
+        color: col,
         medidas: `${ancho.toFixed(2)} x ${alto.toFixed(2)} m`,
-        cant, sub, motor, hasFacia: facia, extraP, extraN,
+        cant, sub: parseFloat(sub.toFixed(2)), motor, hasFacia: facia, extraP, extraN,
         indic: document.getElementById('indicaciones').value
     });
     render();
@@ -278,19 +280,23 @@ function render() {
     carrito.forEach((p, i) => {
         subtotalItems += p.sub;
         lista.innerHTML += `<tr>
-            <td class="p-4">
-                <div class="font-black text-slate-800 uppercase text-[12px]">${p.detalle}</div>
-                <div class="text-[10px] text-blue-600 font-bold uppercase">${p.nombre}</div>
-                <div class="flex gap-1 mt-1">
-                    ${p.motor > 0 ? `<span class="text-[7px] bg-orange-50 text-orange-600 border border-orange-100 px-1 rounded font-black">MOTOR: $${p.motor}</span>` : ''}
-                    ${p.hasFacia ? `<span class="text-[7px] bg-blue-50 text-blue-600 border border-blue-100 px-1 rounded font-black">FACIA</span>` : ''}
-                    ${p.extraP > 0 ? `<span class="text-[7px] bg-slate-100 text-slate-600 px-1 rounded font-black">${p.extraN}: $${p.extraP}</span>` : ''}
-                </div>
+            <td class="p-4 align-top">
+                <div class="font-black text-slate-800 uppercase">${p.ambiente}</div>
             </td>
-            <td class="p-4 text-center text-xs font-mono">${p.medidas}</td>
-            <td class="p-4 text-center font-black">${p.cant}</td>
-            <td class="p-4 text-right font-black">$${p.sub.toLocaleString()}</td>
-            <td class="p-4 text-center no-print delete-cell"><button onclick="carrito.splice(${i},1);render()" class="text-red-300 hover:text-red-600">✕</button></td>
+            <td class="p-4 align-top">
+                <div class="text-blue-600 font-bold uppercase">${p.nombre}</div>
+                <div class="text-[9px] font-bold text-slate-500 uppercase mb-1">Color: ${p.color}</div>
+                <div class="flex flex-wrap gap-1 mt-1">
+                    ${p.motor > 0 ? `<span class="text-[7px] bg-orange-50 text-orange-600 border border-orange-100 px-1 rounded font-black">MOTOR: $${p.motor.toFixed(2)}</span>` : ''}
+                    ${p.hasFacia ? `<span class="text-[7px] bg-blue-50 text-blue-600 border border-blue-100 px-1 rounded font-black">FACIA</span>` : ''}
+                    ${p.extraP > 0 ? `<span class="text-[7px] bg-slate-100 text-slate-600 px-1 rounded font-black">${p.extraN.toUpperCase()}: $${p.extraP.toFixed(2)}</span>` : ''}
+                </div>
+                ${p.indic ? `<div class="text-[8px] italic text-slate-400 mt-1">Nota: ${p.indic}</div>` : ''}
+            </td>
+            <td class="p-4 text-center text-xs font-mono align-top">${p.medidas}</td>
+            <td class="p-4 text-center font-black align-top">${p.cant}</td>
+            <td class="p-4 text-right font-black align-top">$${p.sub.toLocaleString(undefined, {minimumFractionDigits: 2})}</td>
+            <td class="p-4 text-center no-print delete-cell align-top"><button onclick="carrito.splice(${i},1);render()" class="text-red-300 hover:text-red-600">✕</button></td>
         </tr>`;
     });
     
@@ -300,14 +306,13 @@ function render() {
     let totalFinal = totalBase - descMoney;
     let anticipo = totalFinal * 0.5;
     
-    document.getElementById('val-subtotal').innerText = "$" + totalBase.toLocaleString();
+    document.getElementById('val-subtotal').innerText = "$" + totalBase.toLocaleString(undefined, {minimumFractionDigits: 2});
     document.getElementById('desc-row').classList.toggle('hidden', descuentoActual === 0);
-    document.getElementById('val-desc-money').innerText = "-$" + descMoney.toLocaleString();
-    document.getElementById('granTotal').innerText = "$" + totalFinal.toLocaleString();
+    document.getElementById('val-desc-money').innerText = "-$" + descMoney.toLocaleString(undefined, {minimumFractionDigits: 2});
+    document.getElementById('granTotal').innerText = "$" + totalFinal.toLocaleString(undefined, {minimumFractionDigits: 2});
     
-    // Valores de Anticipo y Saldo
-    document.getElementById('val-anticipo').innerText = "$" + anticipo.toLocaleString();
-    document.getElementById('val-saldo').innerText = "$" + (totalFinal - anticipo).toLocaleString();
+    document.getElementById('val-anticipo').innerText = "$" + anticipo.toLocaleString(undefined, {minimumFractionDigits: 2});
+    document.getElementById('val-saldo').innerText = "$" + (totalFinal - anticipo).toLocaleString(undefined, {minimumFractionDigits: 2});
 }
 
 async function generarPDF() {
