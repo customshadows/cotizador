@@ -36,7 +36,8 @@
                     <h1 class="text-3xl font-black tracking-tighter uppercase leading-none mb-2 text-slate-800">Custom Shadows</h1>
                     <p class="text-sm font-bold text-blue-600">Porfirio Góngora | Especialista en Persianas</p>
                     <div id="section-contacto" class="text-xs text-slate-500 mt-2 space-y-1">
-                        <p class="flex items-center gap-2"><span>📞</span> 9993702007</p>
+                        <p class="flex items-center gap-2 text-emerald-600 font-bold"><span>🟢 WhatsApp:</span> <span class="text-slate-500 font-normal">9993702007</span></p>
+                        <p class="flex items-center gap-2"><span>✉️</span> customshadowsmx@gmail.com</p>
                         <p class="flex items-center gap-2"><span>📍</span> C. 41 693B Ciudad Caucel, Mérida, Yuc.</p>
                     </div>
                 </div>
@@ -147,7 +148,7 @@
         <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mb-10">
             <div class="space-y-4">
                 <div class="no-print p-4 bg-slate-50 rounded-2xl border border-slate-200">
-                    <label class="text-[10px] text-slate-400 font-bold uppercase block mb-2">Descuento e Instalación</label>
+                    <label class="text-[10px] text-slate-400 font-bold uppercase block mb-2">Descuento, Instalación e IVA</label>
                     <div class="flex gap-2 mb-3">
                         <button onclick="setDiscount(10)" id="btn-10" class="discount-btn px-4 py-2 border border-slate-300 rounded-lg text-xs font-bold">10%</button>
                         <button onclick="setDiscount(15)" id="btn-15" class="discount-btn px-4 py-2 border border-slate-300 rounded-lg text-xs font-bold">15%</button>
@@ -226,6 +227,13 @@ document.getElementById('fecha-actual').innerText = new Date().toLocaleDateStrin
 let descuentoActual = 0;
 let carrito = [];
 
+// Formateador de moneda (Comas y 2 decimales)
+const formatter = new Intl.NumberFormat('en-US', {
+    style: 'currency',
+    currency: 'USD',
+    minimumFractionDigits: 2
+});
+
 const DATA_ENROLLABLES = {
     "BLACK OUT": { "Long Beach": 810.39, "Texture": 937.44, "Ipanema": 910.88, "Ohio": 927.05, "Montreal": 991.73, "Budelli": 948.99, "Sydney": 1122.24, "Luxury": 1072.58, "B.O. 500": 1118.78, "Galaxy": 1169.60, "Stylus": 1297.80 },
     "FILTRO LIGERO": { "Long Beach": 748.65, "Cadiz": 783.83, "Ipanema": 806.93, "Budelli": 818.48, "Sydney": 933.98, "F. L. Fresh": 1049.48 },
@@ -263,7 +271,7 @@ function cargarTelas() {
                 const precio = fuente[grupo][tela];
                 const option = document.createElement('option');
                 option.value = precio;
-                option.text = `${tela} ($${precio.toFixed(2)})`;
+                option.text = `${tela} (${formatter.format(precio)})`;
                 option.setAttribute('data-full', `${grupo} - ${tela}`);
                 optgroup.appendChild(option);
             }
@@ -317,15 +325,15 @@ function render() {
                 <div class="text-blue-600 font-bold uppercase">${p.nombre}</div>
                 <div class="text-[9px] font-bold text-slate-500 uppercase mb-1">Color: ${p.color}</div>
                 <div class="flex flex-wrap gap-1 mt-1">
-                    ${p.motor > 0 ? `<span class="text-[7px] bg-orange-50 text-orange-600 border border-orange-100 px-1 rounded font-black">MOTOR: $${p.motor.toFixed(2)}</span>` : ''}
+                    ${p.motor > 0 ? `<span class="text-[7px] bg-orange-50 text-orange-600 border border-orange-100 px-1 rounded font-black">MOTOR: ${formatter.format(p.motor)}</span>` : ''}
                     ${p.hasFacia ? `<span class="text-[7px] bg-blue-50 text-blue-600 border border-blue-100 px-1 rounded font-black">FACIA</span>` : ''}
-                    ${p.extraP > 0 ? `<span class="text-[7px] bg-slate-100 text-slate-600 px-1 rounded font-black">${p.extraN.toUpperCase()}: $${p.extraP.toFixed(2)}</span>` : ''}
+                    ${p.extraP > 0 ? `<span class="text-[7px] bg-slate-100 text-slate-600 px-1 rounded font-black">${p.extraN.toUpperCase()}: ${formatter.format(p.extraP)}</span>` : ''}
                 </div>
                 ${p.indic ? `<div class="text-[8px] italic text-slate-400 mt-1">Nota: ${p.indic}</div>` : ''}
             </td>
             <td class="p-4 text-center text-xs font-mono align-top col-medidas">${p.medidas}</td>
             <td class="p-4 text-center font-black align-top">${p.cant}</td>
-            <td class="p-4 text-right font-black align-top">$${p.sub.toFixed(2)}</td>
+            <td class="p-4 text-right font-black align-top">${formatter.format(p.sub)}</td>
             <td class="p-4 text-center no-print delete-cell align-top"><button onclick="carrito.splice(${i},1);render()" class="text-red-300 hover:text-red-600">✕</button></td>
         </tr>`;
     });
@@ -341,29 +349,26 @@ function render() {
     let totalFinal = totalParcial + ivaMoney;
     let anticipo = totalFinal * 0.5;
     
-    document.getElementById('val-subtotal').innerText = "$" + subtotalItems.toFixed(2);
+    document.getElementById('val-subtotal').innerText = formatter.format(subtotalItems);
     
-    // Instalación
     const instRow = document.getElementById('inst-row');
     if(inst > 0) {
         instRow.classList.remove('hidden');
-        document.getElementById('val-inst-display').innerText = "$" + inst.toFixed(2);
+        document.getElementById('val-inst-display').innerText = formatter.format(inst);
     } else { instRow.classList.add('hidden'); }
 
-    // Descuento
     document.getElementById('desc-row').classList.toggle('hidden', descuentoActual === 0);
-    document.getElementById('val-desc-money').innerText = "-$" + descMoney.toFixed(2);
+    document.getElementById('val-desc-money').innerText = "-" + formatter.format(descMoney);
 
-    // IVA
     const ivaRow = document.getElementById('iva-row');
     if(conIva) {
         ivaRow.classList.remove('hidden');
-        document.getElementById('val-iva').innerText = "$" + ivaMoney.toFixed(2);
+        document.getElementById('val-iva').innerText = formatter.format(ivaMoney);
     } else { ivaRow.classList.add('hidden'); }
 
-    document.getElementById('granTotal').innerText = "$" + totalFinal.toFixed(2);
-    document.getElementById('val-anticipo').innerText = "$" + anticipo.toFixed(2);
-    document.getElementById('val-saldo').innerText = "$" + (totalFinal - anticipo).toFixed(2);
+    document.getElementById('granTotal').innerText = formatter.format(totalFinal);
+    document.getElementById('val-anticipo').innerText = formatter.format(anticipo);
+    document.getElementById('val-saldo').innerText = formatter.format(totalFinal - anticipo);
 }
 
 function generarPDF() {
