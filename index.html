@@ -3,235 +3,197 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Custom Shadows | Business Suite</title>
+    <title>CS | Cotizador Sobrio</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
-        body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #f8fafc; color: #1e293b; }
-        .discount-btn { transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); border: 1px solid #e2e8f0; background: white; }
-        .discount-btn.active { background-color: #0284c7 !important; color: white !important; border-color: #0284c7 !important; transform: translateY(-1px); box-shadow: 0 4px 12px rgba(2, 132, 199, 0.3); }
+        /* Tipografía y colores base más sobrios */
+        body { font-family: 'Outfit', sans-serif; background-color: #f1f5f9; color: #334155; }
+        
+        /* Botones de descuento en escala de grises */
+        .discount-btn { border: 1px solid #e2e8f0; background: white; transition: all 0.2s; color: #64748b; }
+        .discount-btn.active { border-color: #334155; background: #334155; color: #fff; font-weight: 600; }
+        
         .print-only { display: none; }
         @media print { .no-print { display: none !important; } .print-only { display: block !important; } }
-        #pdf-area { background-color: white; width: 100%; margin: 0 auto; }
-        .input-premium { transition: all 0.2s; border: 1px solid #e2e8f0; }
-        .input-premium:focus { border-color: #0284c7; ring: 2px; ring-color: #0284c7; background: white; }
+        #pdf-area { background: white; width: 100%; }
+        
+        /* Inputs minimalistas con foco gris oscuro */
+        .min-input { border-bottom: 1px solid #cbd5e1; border-radius: 0; background: transparent; transition: border-color 0.3s; color: #1e293b; }
+        .min-input:focus { outline: none; border-bottom-color: #334155; }
+        .min-input::placeholder { color: #94a3b8; }
     </style>
 </head>
-<body class="py-12 px-6">
+<body class="py-10 px-4 bg-slate-100">
 
-    <div class="max-w-5xl mx-auto">
+    <div class="max-w-4xl mx-auto">
         
-        <div class="no-print bg-white/70 backdrop-blur-md p-8 rounded-[2.5rem] shadow-2xl shadow-blue-900/5 border border-white mb-12">
-            <div class="flex items-center gap-3 mb-8">
-                <div class="w-10 h-10 bg-blue-600 rounded-xl flex items-center justify-center text-white shadow-lg shadow-blue-600/30">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6V4m0 2a2 2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4" />
-                    </svg>
-                </div>
-                <h2 class="text-2xl font-extrabold tracking-tight text-slate-800">Panel de Cotización</h2>
-            </div>
+        <div class="no-print bg-white p-10 rounded-sm shadow-sm border border-slate-200 mb-12">
+            <h2 class="text-xs font-bold tracking-[0.2em] uppercase mb-10 text-slate-700 flex items-center gap-2">
+                <span class="w-2 h-2 bg-slate-700 rounded-full"></span> Nueva Cotización
+            </h2>
             
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-                <div class="space-y-1">
-                    <label class="text-[11px] font-bold text-slate-500 uppercase ml-1">Cliente</label>
-                    <input type="text" id="cliente" oninput="render()" placeholder="Nombre del cliente" class="w-full p-4 bg-slate-50 rounded-2xl input-premium font-semibold">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8 mb-12">
+                <div class="py-2">
+                    <label class="text-[9px] uppercase tracking-widest text-slate-500 block mb-1 font-semibold">Nombre Cliente</label>
+                    <input type="text" id="cliente" oninput="render()" placeholder="Juan Pérez" class="w-full min-input font-medium pb-2">
                 </div>
-                <div class="space-y-1">
-                    <label class="text-[11px] font-bold text-slate-500 uppercase ml-1">WhatsApp</label>
-                    <input type="text" id="tel-cliente" oninput="render()" placeholder="999 000 0000" class="w-full p-4 bg-slate-50 rounded-2xl input-premium font-semibold">
+                <div class="py-2">
+                    <label class="text-[9px] uppercase tracking-widest text-slate-500 block mb-1 font-semibold">WhatsApp</label>
+                    <input type="text" id="tel-cliente" oninput="render()" placeholder="999..." class="w-full min-input font-medium pb-2">
                 </div>
-                <div class="space-y-1">
-                    <label class="text-[11px] font-bold text-slate-500 uppercase ml-1">Dirección</label>
-                    <input type="text" id="direccion" oninput="render()" placeholder="Ubicación de obra" class="w-full p-4 bg-slate-50 rounded-2xl input-premium font-semibold">
+                <div class="py-2">
+                    <label class="text-[9px] uppercase tracking-widest text-slate-500 block mb-1 font-semibold">Dirección Obra</label>
+                    <input type="text" id="direccion" oninput="render()" placeholder="Colonia..." class="w-full min-input font-medium pb-2">
                 </div>
             </div>
 
-            <div class="bg-blue-50/50 p-6 rounded-[2rem] border border-blue-100/50 space-y-6">
-                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
-                    <div class="lg:col-span-1">
-                        <label class="text-[10px] font-bold text-blue-600 uppercase ml-1">Sistema</label>
-                        <select id="categoria" onchange="cargarTelas()" class="w-full p-3 bg-white rounded-xl border-blue-100 font-bold text-sm">
-                            <option value="">Seleccionar</option>
-                            <option value="ENROLLABLES">ENROLLABLES</option>
-                            <option value="SHEER">SHEER ELEGANCE</option>
-                        </select>
-                    </div>
-                    <div class="lg:col-span-1">
-                        <label class="text-[10px] font-bold text-blue-600 uppercase ml-1">Tela / Modelo</label>
-                        <select id="modelo" class="w-full p-3 bg-white rounded-xl border-blue-100 font-bold text-xs">
-                            <option value="">Elegir tela</option>
-                        </select>
-                    </div>
-                    <div>
-                        <label class="text-[10px] font-bold text-blue-600 uppercase ml-1">Ambiente</label>
-                        <input type="text" id="ambiente" placeholder="Ej: Recámara" class="w-full p-3 bg-white rounded-xl border-blue-100 text-sm">
-                    </div>
-                    <div>
-                        <label class="text-[10px] font-bold text-blue-600 uppercase ml-1">Color</label>
-                        <input type="text" id="color" placeholder="Ej: Gris" class="w-full p-3 bg-white rounded-xl border-blue-100 text-sm">
-                    </div>
-                    <div class="grid grid-cols-3 gap-2">
-                        <div>
-                            <label class="text-[9px] font-bold text-blue-600 uppercase block text-center">An</label>
-                            <input type="number" id="ancho" step="0.01" class="w-full p-3 bg-white rounded-xl border-blue-100 text-center text-sm font-bold">
-                        </div>
-                        <div>
-                            <label class="text-[9px] font-bold text-blue-600 uppercase block text-center">Al</label>
-                            <input type="number" id="alto" step="0.01" class="w-full p-3 bg-white rounded-xl border-blue-100 text-center text-sm font-bold">
-                        </div>
-                        <div>
-                            <label class="text-[9px] font-bold text-blue-600 uppercase block text-center">Cant</label>
-                            <input type="number" id="cantidad" value="1" class="w-full p-3 bg-white rounded-xl border-blue-100 text-center text-sm font-bold">
-                        </div>
+            <div class="space-y-8 bg-slate-50 p-6 rounded-sm border border-slate-200 mb-8">
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6">
+                    <select id="categoria" onchange="cargarTelas()" class="w-full p-2 min-input bg-transparent text-sm font-medium">
+                        <option value="">Sistema</option>
+                        <option value="ENROLLABLES">ENROLLABLES</option>
+                        <option value="SHEER">SHEER ELEGANCE</option>
+                    </select>
+                    <select id="modelo" class="w-full p-2 min-input bg-transparent text-xs uppercase tracking-tight font-medium">
+                        <option value="">Tela</option>
+                    </select>
+                    <input type="text" id="ambiente" placeholder="Ambiente" class="w-full p-2 min-input bg-transparent text-sm">
+                    <input type="text" id="color" placeholder="Color" class="w-full p-2 min-input bg-transparent text-sm">
+                    <div class="flex gap-2">
+                        <input type="number" id="ancho" step="0.01" placeholder="An" class="w-1/3 p-2 min-input bg-transparent text-center text-sm font-bold text-slate-700">
+                        <input type="number" id="alto" step="0.01" placeholder="Al" class="w-1/3 p-2 min-input bg-transparent text-center text-sm font-bold text-slate-700">
+                        <input type="number" id="cantidad" value="1" class="w-1/3 p-2 min-input bg-transparent text-center text-sm font-bold">
                     </div>
                 </div>
 
                 <div class="grid grid-cols-1 md:grid-cols-4 gap-4 items-end">
-                    <input type="number" id="motor-precio" placeholder="Precio Motor $" class="p-3 bg-white rounded-xl border-blue-100 text-sm">
-                    <div class="flex gap-2">
-                        <input type="text" id="extra-nombre" placeholder="Extra" class="w-2/3 p-3 bg-white rounded-xl border-blue-100 text-xs">
-                        <input type="number" id="extra-precio" placeholder="$" class="w-1/3 p-3 bg-white rounded-xl border-blue-100 text-xs text-center">
+                    <input type="number" id="motor-precio" placeholder="Costo Motor $" class="p-2 min-input bg-transparent text-sm">
+                    <div class="flex gap-1">
+                        <input type="text" id="extra-nombre" placeholder="Concepto Extra" class="w-2/3 p-2 min-input bg-transparent text-xs uppercase tracking-widest">
+                        <input type="number" id="extra-precio" placeholder="$" class="w-1/3 p-2 min-input bg-transparent text-xs text-center">
                     </div>
-                    <label class="flex items-center justify-center gap-3 cursor-pointer bg-white p-3 rounded-xl border border-blue-100 hover:bg-blue-100/30 transition-colors">
-                        <input type="checkbox" id="facia-toggle" class="w-4 h-4 rounded text-blue-600">
-                        <span class="text-[10px] font-bold uppercase text-blue-700">Facia Aluminio</span>
+                    <label class="flex items-center gap-2 cursor-pointer p-2 border border-slate-300 rounded-sm bg-white hover:border-slate-500 text-[10px] uppercase tracking-tighter transition-all text-slate-600 font-medium">
+                        <input type="checkbox" id="facia-toggle" class="accent-slate-700 w-4 h-4"> Incluir Facia Aluminio
                     </label>
-                    <button onclick="agregar()" class="bg-blue-600 text-white font-bold rounded-xl uppercase text-xs py-4 shadow-lg shadow-blue-600/20 hover:bg-blue-700 transition-all">Añadir Concepto</button>
+                    <button onclick="agregar()" class="bg-slate-700 text-white rounded-sm px-4 py-3 text-[11px] uppercase tracking-widest font-bold hover:bg-slate-800 transition-colors shadow-sm">Añadir Ítem</button>
                 </div>
             </div>
 
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-8 pt-8 items-center">
-                <div class="space-y-2">
-                    <p class="text-[11px] font-bold text-slate-400 uppercase ml-1 tracking-widest">Estrategia de Descuento</p>
-                    <div class="flex gap-3">
-                        <button onclick="setDiscount(10)" id="btn-10" class="discount-btn flex-1 py-3 rounded-xl text-xs font-bold">10%</button>
-                        <button onclick="setDiscount(15)" id="btn-15" class="discount-btn flex-1 py-3 rounded-xl text-xs font-bold">15%</button>
-                        <button onclick="setDiscount(20)" id="btn-20" class="discount-btn flex-1 py-3 rounded-xl text-xs font-bold">20%</button>
-                        <button onclick="setDiscount(0)" id="btn-0" class="flex-1 py-3 bg-slate-100 text-slate-500 rounded-xl text-xs font-bold hover:bg-slate-200">Sin Desc.</button>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-10 items-center">
+                <div>
+                    <span class="text-[9px] uppercase tracking-[0.3em] text-slate-400 block mb-3 font-bold">Aplicar Descuento</span>
+                    <div class="flex gap-2">
+                        <button onclick="setDiscount(10)" id="btn-10" class="discount-btn flex-1 py-2 rounded-sm text-[11px]">10%</button>
+                        <button onclick="setDiscount(15)" id="btn-15" class="discount-btn flex-1 py-2 rounded-sm text-[11px]">15%</button>
+                        <button onclick="setDiscount(20)" id="btn-20" class="discount-btn flex-1 py-2 rounded-sm text-[11px]">20%</button>
+                        <button onclick="setDiscount(0)" id="btn-0" class="flex-1 py-2 rounded-sm text-[11px] text-slate-400 bg-slate-50 border-slate-200">0%</button>
                     </div>
                 </div>
                 <div class="flex gap-4 items-end">
                     <div class="flex-1">
-                        <label class="text-[11px] font-bold text-slate-400 uppercase ml-1 block mb-1">Costo de Instalación</label>
-                        <input type="number" id="inst" oninput="render()" class="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl text-sm font-bold focus:ring-2 focus:ring-blue-500 outline-none" placeholder="$ 0.00">
+                        <span class="text-[9px] uppercase tracking-[0.3em] text-slate-600 block mb-1 font-bold">Instalación</span>
+                        <input type="number" id="inst" oninput="render()" class="w-full p-2 min-input border-slate-300 bg-slate-100 text-sm font-bold text-slate-800" placeholder="$ 0.00">
                     </div>
-                    <label class="flex-1 flex items-center justify-center gap-3 border border-slate-200 rounded-xl p-3.5 text-xs font-bold cursor-pointer hover:bg-white transition-colors">
-                        <input type="checkbox" id="iva-toggle" onchange="render()" class="w-4 h-4 text-blue-600"> Aplicar IVA 16%
+                    <label class="flex-1 p-2 border border-slate-300 rounded-sm text-center text-[10px] uppercase tracking-widest cursor-pointer hover:bg-white hover:border-slate-500 transition-colors text-slate-600 font-medium flex items-center justify-center gap-2">
+                        <input type="checkbox" id="iva-toggle" onchange="render()" class="accent-slate-700 w-4 h-4"> + IVA 16%
                     </label>
                 </div>
             </div>
 
-            <button onclick="generarPDF()" class="w-full mt-10 bg-slate-900 text-white py-5 rounded-[1.5rem] font-bold uppercase text-sm tracking-[0.2em] hover:bg-blue-600 shadow-2xl transition-all flex items-center justify-center gap-3">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                </svg>
-                Generar Documento PDF
-            </button>
+            <button onclick="generarPDF()" class="w-full mt-12 bg-slate-900 text-white rounded-sm py-4 text-[11px] uppercase tracking-[0.4em] font-bold hover:bg-slate-800 transition-all shadow-md">Descargar PDF Oficial</button>
         </div>
 
-        <div id="pdf-area" class="shadow-[0_0_50px_rgba(0,0,0,0.05)] border border-slate-100 rounded-sm">
-            <div id="cotizacion-completa" class="p-16">
+        <div id="pdf-area" class="p-16 shadow-xl rounded-sm border border-slate-100">
+            <div id="cotizacion-completa">
                 
-                <div class="flex justify-between items-start border-b-4 border-slate-900 pb-10 mb-10">
-                    <div class="flex gap-8">
-                        <div class="w-28 h-28 flex items-center justify-center bg-white border border-slate-100 p-2">
-                            <img src="https://raw.githubusercontent.com/customshadows/cotizador/main/logo%20custom%20shadows.jpg" alt="Logo" class="object-contain w-full h-full">
+                <div class="flex justify-between items-start border-b-2 border-slate-200 pb-10 mb-12">
+                    <div class="flex gap-8 items-center">
+                        <div class="w-16 h-16 bg-slate-50 rounded-full flex items-center justify-center border border-slate-200 p-3 grayscale opacity-80">
+                            <img src="https://raw.githubusercontent.com/customshadows/cotizador/main/logo%20custom%20shadows.jpg" alt="Logo" class="w-full h-full object-contain">
                         </div>
                         <div>
-                            <h1 class="text-4xl font-[900] tracking-tighter uppercase mb-2 text-slate-900">Custom Shadows</h1>
-                            <p class="text-xs font-extrabold text-blue-600 tracking-[0.3em] uppercase mb-4">Especialista en Persianas & Control Solar</p>
-                            <div class="grid grid-cols-2 gap-x-8 gap-y-1 text-[11px] text-slate-500 font-medium italic">
-                                <p>📱 <b>WhatsApp:</b> 9993702007</p>
-                                <p>✉️ customshadowsmx@gmail.com</p>
-                                <p class="col-span-2 text-slate-400">📍 Ciudad Caucel, Mérida, Yuc.</p>
+                            <h1 class="text-2xl font-black tracking-tight uppercase mb-1 text-slate-800">Custom Shadows</h1>
+                            <p class="text-[10px] tracking-[0.3em] uppercase text-slate-500 font-semibold">Control Solar & Diseño</p>
+                            <div class="mt-4 text-[10px] uppercase tracking-widest text-slate-400 space-y-1 font-medium">
+                                <p class="flex items-center gap-2"><span class="text-slate-600">Whatsapp.</span> 9993702007</p>
+                                <p class="flex items-center gap-2"><span class="text-slate-600">Email.</span> customshadowsmx@gmail.com</p>
                             </div>
                         </div>
                     </div>
                     <div class="text-right">
-                        <div class="border-2 border-slate-900 p-4 rounded-none inline-block">
-                            <span class="text-[10px] font-black uppercase block text-slate-400 mb-1">Folio Cotización</span>
-                            <span id="folio-display" class="text-3xl font-black text-slate-900 leading-none">#001</span>
+                        <span class="text-[9px] tracking-[0.3em] uppercase text-slate-400 font-bold block mb-1">Folio</span>
+                        <p id="folio-display" class="text-2xl font-bold text-slate-700">#001</p>
+                        <p id="fecha-actual" class="text-[10px] text-slate-400 uppercase tracking-widest mt-2 font-medium"></p>
+                    </div>
+                </div>
+
+                <div class="mb-14 border-l-[3px] border-slate-700 pl-6 py-1">
+                    <span class="text-[9px] tracking-[0.3em] uppercase text-slate-400 block mb-2 font-bold">Preparado para</span>
+                    <p id="pdf-cliente" class="text-xl font-bold uppercase tracking-wider mb-1 text-slate-900">Público General</p>
+                    <div class="flex gap-6 text-[10px] text-slate-500 uppercase tracking-widest font-medium mt-3">
+                        <p id="pdf-direccion" class="flex items-center gap-1"><span class="text-slate-600">Ubicación.</span> <span>--</span></p>
+                        <p id="pdf-tel" class="flex items-center gap-1"><span class="text-slate-600">Tel.</span> <span>--</span></p>
+                    </div>
+                </div>
+
+                <table class="w-full mb-12">
+                    <thead>
+                        <tr class="text-[10px] uppercase tracking-[0.2em] text-slate-500 border-b border-slate-300 font-bold">
+                            <th class="py-4 text-left">Ambiente</th>
+                            <th class="py-4 text-left">Descripción</th>
+                            <th class="py-4 text-center">Medidas</th>
+                            <th class="py-4 text-center">Cant</th>
+                            <th class="py-4 text-right">Importe</th>
+                            <th class="no-print w-10"></th>
+                        </tr>
+                    </thead>
+                    <tbody id="lista" class="text-[11px] text-slate-700 divide-y divide-slate-200 font-medium"></tbody>
+                </table>
+
+                <div class="grid grid-cols-5 gap-12">
+                    <div class="col-span-3 pt-4">
+                        <h4 class="text-[10px] uppercase tracking-[0.3em] text-slate-700 mb-6 font-bold">Términos</h4>
+                        <div class="grid grid-cols-2 gap-x-8 gap-y-3 text-[10px] text-slate-500 uppercase tracking-widest font-medium leading-relaxed">
+                            <p><span class="text-slate-400">•</span> Anticipo 50% req.</p>
+                            <p><span class="text-slate-400">•</span> Entrega 8-12 días</p>
+                            <p><span class="text-slate-400">•</span> Garantía 1 Año</p>
+                            <p><span class="text-slate-400">•</span> Vigencia 15 Días</p>
                         </div>
-                        <p class="text-[11px] text-slate-500 font-bold mt-4 uppercase tracking-widest" id="fecha-actual"></p>
-                    </div>
-                </div>
-
-                <div class="grid grid-cols-5 gap-6 mb-12 items-end">
-                    <div class="col-span-3 border-l-4 border-slate-900 pl-6">
-                        <span class="text-[10px] font-black uppercase text-slate-400 block tracking-[0.2em] mb-2">Preparado para</span>
-                        <div id="pdf-cliente" class="text-2xl font-extrabold text-slate-900 uppercase">Público General</div>
-                        <div id="pdf-direccion" class="text-sm font-medium text-slate-500 mt-1">--</div>
-                    </div>
-                    <div class="col-span-2 bg-slate-50 p-4 border-t border-slate-100">
-                        <span class="text-[10px] font-black uppercase text-slate-400 block tracking-[0.1em] mb-1">Contacto Directo</span>
-                        <div id="pdf-tel" class="text-lg font-bold text-slate-800 tracking-tighter">--</div>
-                    </div>
-                </div>
-
-                <div class="mb-10">
-                    <table class="w-full">
-                        <thead class="bg-slate-900 text-white text-[10px] font-bold uppercase tracking-[0.2em]">
-                            <tr>
-                                <th class="py-5 px-4 text-left">Espacio / Ambiente</th>
-                                <th class="py-5 px-4 text-left">Especificaciones</th>
-                                <th class="py-5 px-4 text-center">Dimensiones</th>
-                                <th class="py-5 px-4 text-center">Cant</th>
-                                <th class="py-5 px-4 text-right">Subtotal</th>
-                                <th class="no-print p-4"></th>
-                            </tr>
-                        </thead>
-                        <tbody id="lista" class="text-[11px] text-slate-700 divide-y divide-slate-100">
-                            </tbody>
-                    </table>
-                </div>
-
-                <div class="grid grid-cols-2 gap-16">
-                    <div class="space-y-8">
-                        <div class="p-6 border border-slate-100 bg-slate-50/50">
-                            <h4 class="text-[11px] font-black uppercase text-slate-900 mb-4 tracking-widest border-b border-slate-200 pb-2">Términos y Condiciones</h4>
-                            <ul class="text-[10px] text-slate-500 space-y-2.5 leading-relaxed">
-                                <li class="flex gap-2"><span>•</span> <p><b>Anticipo:</b> Requiere 50% para inicio de producción.</p></li>
-                                <li class="flex gap-2"><span>•</span> <p><b>Entrega:</b> Periodo estimado de 8 a 12 días hábiles.</p></li>
-                                <li class="flex gap-2"><span>•</span> <p><b>Calidad:</b> Garantía extendida de 12 meses contra defectos.</p></li>
-                                <li class="flex gap-2"><span>•</span> <p>Vigencia del presupuesto: 15 días naturales.</p></li>
-                            </ul>
-                        </div>
-                        <div class="text-center pt-8">
-                            <div class="w-56 mx-auto border-t-2 border-slate-900 pt-3">
-                                <p class="text-[10px] font-black uppercase text-slate-900 tracking-[0.2em]">Firma de Aceptación</p>
-                            </div>
+                        <div class="mt-16">
+                            <div class="w-48 border-b-2 border-slate-300 mb-3"></div>
+                            <span class="text-[9px] uppercase tracking-[0.3em] text-slate-400 font-bold">Firma de aceptación</span>
                         </div>
                     </div>
                     
-                    <div class="bg-slate-900 text-white p-10 rounded-none relative overflow-hidden">
-                        <div class="absolute top-0 right-0 w-32 h-32 bg-blue-600/10 rounded-full -mr-16 -mt-16"></div>
-                        <div class="space-y-4 relative z-10">
-                            <div class="flex justify-between text-[11px] font-bold uppercase tracking-widest opacity-60">
-                                <span>Subtotal</span> <span id="val-subtotal">$0.00</span>
+                    <div class="col-span-2 space-y-3 pt-4 relative">
+                        <div class="flex justify-between text-[10px] tracking-widest uppercase text-slate-500 font-medium">
+                            <span>Suma Artículos</span> <span id="val-subtotal" class="font-bold text-slate-700">$0.00</span>
+                        </div>
+                        <div id="desc-row" class="hidden flex justify-between text-[10px] tracking-widest uppercase text-slate-600 font-bold bg-slate-100 p-1 rounded-sm">
+                            <span>Descuento</span> <span id="val-desc-money">-$0.00</span>
+                        </div>
+                        <div id="inst-row" class="hidden flex justify-between text-[10px] tracking-widest uppercase text-slate-500 font-medium">
+                            <span>Instalación</span> <span id="val-inst-money" class="font-bold text-slate-700">$0.00</span>
+                        </div>
+                        <div id="iva-row" class="hidden flex justify-between text-[10px] tracking-widest uppercase text-slate-400 font-medium">
+                            <span>IVA (16%)</span> <span id="val-iva">$0.00</span>
+                        </div>
+                        
+                        <div class="flex justify-between border-t-2 border-slate-800 pt-4 items-end mt-4">
+                            <span class="text-[12px] font-black uppercase tracking-[0.3em] text-slate-800">Total Neto</span>
+                            <span id="granTotal" class="text-4xl font-black tracking-tighter text-slate-900 leading-none">$0.00</span>
+                        </div>
+                        
+                        <div class="bg-slate-50 p-5 mt-6 grid grid-cols-2 text-[10px] tracking-widest uppercase rounded-sm border border-slate-200">
+                            <div>
+                                <p class="mb-1 text-slate-500 font-bold">Anticipo 50%</p>
+                                <p id="val-anticipo" class="text-xl font-black text-slate-700">$0.00</p>
                             </div>
-                            <div id="desc-row" class="hidden flex justify-between text-[11px] font-bold text-blue-400 uppercase tracking-widest">
-                                <span>Descuento</span> <span id="val-desc-money">-$0.00</span>
-                            </div>
-                            <div id="inst-row" class="hidden flex justify-between text-[11px] font-bold text-blue-300 uppercase tracking-widest">
-                                <span>Instalación</span> <span id="val-inst-money">$0.00</span>
-                            </div>
-                            <div id="iva-row" class="hidden flex justify-between text-[11px] font-bold uppercase tracking-widest opacity-60">
-                                <span>IVA (16%)</span> <span id="val-iva">$0.00</span>
-                            </div>
-                            <div class="pt-6 border-t border-white/20 flex justify-between items-end">
-                                <span class="text-[13px] font-black uppercase tracking-[0.3em]">Total Neto</span>
-                                <span id="granTotal" class="text-4xl font-black tracking-tighter">$0.00</span>
-                            </div>
-                            <div class="mt-8 grid grid-cols-2 gap-6 border-t border-white/10 pt-6">
-                                <div>
-                                    <p class="text-[9px] font-black uppercase opacity-40 mb-1">Pago Inicial</p>
-                                    <p id="val-anticipo" class="text-xl font-bold text-blue-400">$0.00</p>
-                                </div>
-                                <div class="text-right border-l border-white/10 pl-6">
-                                    <p class="text-[9px] font-black uppercase opacity-40 mb-1">Pendiente</p>
-                                    <p id="val-saldo" class="text-xl font-bold">$0.00</p>
-                                </div>
+                            <div class="text-right">
+                                <p class="mb-1 text-slate-400 font-bold">Saldo Pendiente</p>
+                                <p id="val-saldo" class="text-xl font-bold text-slate-600">$0.00</p>
                             </div>
                         </div>
                     </div>
@@ -263,7 +225,7 @@ const DATA_SHEER = {
 function cargarTelas() {
     const sistema = document.getElementById('categoria').value;
     const select = document.getElementById('modelo');
-    select.innerHTML = '<option value="">Elegir tela</option>';
+    select.innerHTML = '<option value="">Elegir Tela</option>';
     let fuente = sistema === "ENROLLABLES" ? DATA_ENROLLABLES : (sistema === "SHEER" ? DATA_SHEER : null);
     if (fuente) {
         for (const grupo in fuente) {
@@ -299,10 +261,10 @@ function agregar() {
     carrito.push({
         ambiente: document.getElementById('ambiente').value || "General",
         nombre: mod.options[mod.selectedIndex].getAttribute('data-full'),
-        color: document.getElementById('color').value || "No especificado",
+        color: document.getElementById('color').value || "S/C",
         medidas: `${ancho.toFixed(2)} x ${alto.toFixed(2)}`,
         cant, sub,
-        detalles: `${facia ? '[Facia]' : ''} ${motor > 0 ? '[Motor]' : ''}`
+        detalles: `${facia ? 'Facia ' : ''}${motor > 0 ? '+ Mot' : ''}`
     });
     render();
 }
@@ -320,12 +282,12 @@ function render() {
         subtotalArticulos += item.sub;
         lista.innerHTML += `
             <tr class="hover:bg-slate-50 transition-colors">
-                <td class="py-5 px-4 font-bold text-slate-900">${item.ambiente}</td>
-                <td class="py-5 px-4"><div class="font-bold">${item.nombre}</div><div class="text-[9px] text-slate-400 uppercase font-black tracking-tighter">${item.color} ${item.detalles}</div></td>
-                <td class="py-5 px-4 text-center font-medium">${item.medidas}m</td>
-                <td class="py-5 px-4 text-center font-bold text-slate-900">${item.cant}</td>
-                <td class="py-5 px-4 text-right font-bold text-slate-900">${formatter.format(item.sub)}</td>
-                <td class="no-print p-4 text-center"><button onclick="eliminar(${index})" class="text-red-300 hover:text-red-600 transition-colors">✕</button></td>
+                <td class="py-4 font-bold text-slate-800">${item.ambiente}</td>
+                <td class="py-4 text-[10px] uppercase tracking-tight font-medium"><b>${item.nombre}</b><br><span class="text-slate-500 font-semibold">${item.color} ${item.detalles}</span></td>
+                <td class="py-4 text-center font-semibold">${item.medidas}</td>
+                <td class="py-4 text-center font-semibold">${item.cant}</td>
+                <td class="py-4 text-right font-bold text-slate-800">${formatter.format(item.sub)}</td>
+                <td class="no-print p-4 text-center"><button onclick="eliminar(${index})" class="text-slate-300 hover:text-red-500 transition-colors font-bold">✕</button></td>
             </tr>`;
     });
 
@@ -360,7 +322,7 @@ function generarPDF() {
     const element = document.getElementById('pdf-area');
     const opt = {
         margin: 0,
-        filename: `CS_Cotizacion_${document.getElementById('cliente').value || 'Cliente'}.pdf`,
+        filename: `Cotizacion_${document.getElementById('cliente').value || 'Cliente'}.pdf`,
         image: { type: 'jpeg', quality: 1 },
         html2canvas: { scale: 3, useCORS: true, scrollY: 0 },
         jsPDF: { unit: 'in', format: 'letter', orientation: 'portrait' }
