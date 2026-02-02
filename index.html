@@ -10,9 +10,7 @@
     <style>
         body { font-family: 'Inter', sans-serif; }
         .discount-btn.active { background-color: #ef4444 !important; color: white !important; border-color: #ef4444 !important; }
-        
         .print-only { display: none; }
-        
         @media print {
             .no-print { display: none !important; }
             .print-only { display: block !important; }
@@ -81,6 +79,30 @@
                     <input type="number" id="cantidad" value="1" class="p-2.5 border border-blue-200 rounded-xl text-center font-bold">
                 </div>
             </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-4 pt-2">
+                <div>
+                    <label class="text-[10px] font-bold text-blue-400 uppercase">Precio Motor $</label>
+                    <input type="number" id="motor-precio" placeholder="0.00" class="w-full p-2.5 bg-white border border-blue-200 rounded-xl font-bold text-sm">
+                </div>
+                <div>
+                    <label class="text-[10px] font-bold text-blue-400 uppercase">Extra (Nombre y $)</label>
+                    <div class="flex gap-1">
+                        <input type="text" id="extra-nombre" placeholder="Puntas" class="w-2/3 p-2.5 border border-blue-200 rounded-xl text-xs">
+                        <input type="number" id="extra-precio" placeholder="$" class="w-1/3 p-2.5 border border-blue-200 rounded-xl text-xs">
+                    </div>
+                </div>
+                <div class="flex flex-col justify-end">
+                    <label class="flex items-center gap-2 cursor-pointer bg-white p-2.5 rounded-xl border border-blue-200 h-[42px]">
+                        <input type="checkbox" id="facia-toggle" class="w-4 h-4">
+                        <span class="text-[9px] font-black uppercase">Facia Aluminio</span>
+                    </label>
+                </div>
+                <div>
+                    <label class="text-[10px] font-bold text-blue-400 uppercase">Indicaciones</label>
+                    <input type="text" id="indicaciones" placeholder="Detalles..." class="w-full p-2.5 bg-white border border-blue-200 rounded-xl text-xs">
+                </div>
+            </div>
             <button onclick="agregar()" class="w-full bg-slate-900 text-white font-black rounded-xl hover:bg-blue-600 transition-all uppercase text-sm h-12">Añadir a Cotización</button>
         </div>
 
@@ -88,7 +110,7 @@
             <table class="w-full text-left">
                 <thead class="bg-slate-800 text-white text-[10px] uppercase tracking-widest">
                     <tr>
-                        <th class="p-4">Detalles</th>
+                        <th class="p-4">Detalles de Persiana</th>
                         <th class="p-4 text-center">Medidas</th>
                         <th class="p-4 text-center">Cant</th>
                         <th class="p-4 text-right">Subtotal</th>
@@ -108,11 +130,11 @@
                             <button onclick="setDiscount(10)" id="btn-10" class="discount-btn px-4 py-2 border border-slate-300 rounded-xl text-xs font-bold transition-all">10%</button>
                             <button onclick="setDiscount(15)" id="btn-15" class="discount-btn px-4 py-2 border border-slate-300 rounded-xl text-xs font-bold transition-all">15%</button>
                             <button onclick="setDiscount(20)" id="btn-20" class="discount-btn px-4 py-2 border border-slate-300 rounded-xl text-xs font-bold transition-all">20%</button>
-                            <button onclick="setDiscount(0)" class="px-4 py-2 bg-slate-100 rounded-xl text-[10px] uppercase font-bold">Limpiar</button>
+                            <button onclick="setDiscount(0)" class="px-4 py-2 bg-slate-100 rounded-xl text-[10px] uppercase font-bold">0%</button>
                         </div>
                     </div>
                     <div>
-                        <label class="text-[10px] text-slate-400 font-bold uppercase block mb-1">Instalación ($)</label>
+                        <label class="text-[10px] text-slate-400 font-bold uppercase block mb-1">Costo Instalación ($)</label>
                         <input type="number" id="inst" value="0" oninput="render()" class="w-full p-2 bg-slate-50 border border-slate-200 rounded-lg font-bold">
                     </div>
                 </div>
@@ -122,7 +144,7 @@
                         <span>Subtotal:</span> <span id="val-subtotal">$0.00</span>
                     </div>
                     <div id="desc-row" class="hidden flex justify-between text-red-500 text-xs font-bold uppercase">
-                        <span>Ahorro (<span id="val-desc-perc">0</span>%):</span> <span id="val-desc-money">-$0.00</span>
+                        <span>Descuento (<span id="val-desc-perc">0</span>%):</span> <span id="val-desc-money">-$0.00</span>
                     </div>
                     <div class="bg-slate-900 text-white p-4 rounded-2xl mt-4">
                         <p class="text-[10px] font-bold uppercase opacity-60">Total Neto</p>
@@ -132,7 +154,7 @@
             </div>
             
             <div id="botones-accion" class="grid grid-cols-2 gap-4 mt-8 no-print">
-                <button onclick="enviarWA()" class="bg-[#25D366] text-white py-4 rounded-xl font-bold uppercase text-xs">Enviar WhatsApp</button>
+                <button onclick="enviarWA()" class="bg-[#25D366] text-white py-4 rounded-xl font-bold uppercase text-xs">WhatsApp</button>
                 <button onclick="generarPDF()" class="bg-slate-800 text-white py-4 rounded-xl font-bold uppercase text-xs">Descargar PDF</button>
             </div>
         </div>
@@ -160,16 +182,13 @@ function cargarTelas() {
     const select = document.getElementById('modelo');
     select.innerHTML = '<option value="">-- Elige Tela --</option>';
     let fuente = sistema === "ENROLLABLES" ? DATA_ENROLLABLES : (sistema === "SHEER" ? DATA_SHEER : null);
-    
     if (fuente) {
         for (const grupo in fuente) {
-            const optgroup = document.createElement('optgroup');
-            optgroup.label = grupo;
+            const optgroup = document.createElement('optgroup'); optgroup.label = grupo;
             for (const tela in fuente[grupo]) {
                 const precio = fuente[grupo][tela];
                 const option = document.createElement('option');
                 option.value = precio;
-                // PRECIOS VISIBLES AQUÍ
                 option.text = `${tela} ($${precio.toFixed(2)})`;
                 option.setAttribute('data-full', `${grupo} - ${tela}`);
                 optgroup.appendChild(option);
@@ -185,16 +204,27 @@ function agregar() {
     const ancho = parseFloat(document.getElementById('ancho').value) || 0;
     const alto = parseFloat(document.getElementById('alto').value) || 0;
     const cant = parseInt(document.getElementById('cantidad').value) || 1;
+    const motor = parseFloat(document.getElementById('motor-precio').value) || 0;
+    const extraP = parseFloat(document.getElementById('extra-precio').value) || 0;
+    const extraN = document.getElementById('extra-nombre').value || "Extra";
+    const facia = document.getElementById('facia-toggle').checked;
+    
     let m2 = (ancho * alto) < 1 ? 1 : (ancho * alto);
-    let sub = (m2 * parseFloat(mod.value)) * cant;
+    let costoFacia = facia ? (ancho * 280) : 0;
+    let sub = ( (m2 * parseFloat(mod.value)) + motor + costoFacia + extraP ) * cant;
     
     carrito.push({
         nombre: mod.options[mod.selectedIndex].getAttribute('data-full'),
         ambiente: document.getElementById('ambiente').value || "Persiana",
         medidas: `${ancho}x${alto}m`,
-        cant, sub
+        cant, sub, motor, hasFacia: facia, extraP, extraN,
+        indic: document.getElementById('indicaciones').value
     });
     render();
+    // Limpiar campos de extras después de agregar
+    document.getElementById('motor-precio').value = "";
+    document.getElementById('extra-precio').value = "";
+    document.getElementById('indicaciones').value = "";
 }
 
 function setDiscount(val) {
@@ -207,11 +237,20 @@ function setDiscount(val) {
 function render() {
     const lista = document.getElementById('lista');
     lista.innerHTML = "";
-    let subtotalP = 0;
+    let subtotalItems = 0;
     carrito.forEach((p, i) => {
-        subtotalP += p.sub;
+        subtotalItems += p.sub;
         lista.innerHTML += `<tr>
-            <td class="p-4"><div class="font-bold text-slate-800">${p.ambiente}</div><div class="text-[10px] text-slate-400 uppercase font-bold">${p.nombre}</div></td>
+            <td class="p-4">
+                <div class="font-bold text-slate-800">${p.ambiente}</div>
+                <div class="text-[10px] text-slate-400 uppercase font-bold">${p.nombre}</div>
+                <div class="flex gap-1 mt-1">
+                    ${p.motor > 0 ? `<span class="text-[8px] bg-orange-100 text-orange-600 px-1 rounded font-bold">MOTOR: $${p.motor}</span>` : ''}
+                    ${p.hasFacia ? `<span class="text-[8px] bg-blue-100 text-blue-600 px-1 rounded font-bold">FACIA</span>` : ''}
+                    ${p.extraP > 0 ? `<span class="text-[8px] bg-slate-100 text-slate-600 px-1 rounded font-bold">${p.extraN}: $${p.extraP}</span>` : ''}
+                </div>
+                ${p.indic ? `<div class="text-[9px] italic text-slate-500 mt-1">Nota: ${p.indic}</div>` : ''}
+            </td>
             <td class="p-4 text-center text-xs font-mono">${p.medidas}</td>
             <td class="p-4 text-center font-bold">${p.cant}</td>
             <td class="p-4 text-right font-bold text-blue-600">$${p.sub.toLocaleString()}</td>
@@ -220,7 +259,7 @@ function render() {
     });
     
     const inst = parseFloat(document.getElementById('inst').value) || 0;
-    let base = subtotalP + inst;
+    let base = subtotalItems + inst;
     let descMoney = base * (descuentoActual / 100);
     
     document.getElementById('val-subtotal').innerText = "$" + base.toLocaleString();
@@ -231,33 +270,27 @@ function render() {
 }
 
 async function generarPDF() {
-    // 1. Pasar valores a campos de impresión
     document.getElementById('pdf-cliente').innerText = document.getElementById('cliente').value || "---";
     document.getElementById('pdf-tel').innerText = document.getElementById('tel-cliente').value || "---";
 
-    // 2. Clonar el elemento
     const element = document.getElementById('cotizacion-completa');
     const clone = element.cloneNode(true);
 
-    // 3. ELIMINACIÓN FÍSICA de controles en el clon
-    const idsParaBorrar = ['panel-controles', 'seccion-descuentos-inst', 'botones-accion', 'col-borrar'];
-    idsParaBorrar.forEach(id => {
-        const nodo = clone.querySelector(`#${id}`);
-        if(nodo) nodo.remove();
+    // Eliminación estricta de controles para el PDF resultante
+    const selectors = ['#panel-controles', '#seccion-descuentos-inst', '#botones-accion', '#col-borrar', '.no-print', '.delete-cell', 'button', 'select'];
+    selectors.forEach(sel => {
+        clone.querySelectorAll(sel).forEach(n => n.remove());
     });
-
-    clone.querySelectorAll('.no-print, .delete-cell, button, select').forEach(n => n.remove());
 
     const opt = {
         margin: 0.4,
-        filename: `Cotizacion_Shadows_${document.getElementById('cliente').value}.pdf`,
+        filename: `Cotizacion_${document.getElementById('cliente').value || 'Cliente'}.pdf`,
         image: { type: 'jpeg', quality: 0.98 },
         html2canvas: { scale: 3, useCORS: true },
         jsPDF: { unit: 'in', format: 'letter', orientation: 'portrait' }
     };
 
     html2pdf().set(opt).from(clone).save();
-
     folioActual++;
     localStorage.setItem('folio_shadows', folioActual);
     document.getElementById('folio-display').innerText = '#' + String(folioActual).padStart(3, '0');
