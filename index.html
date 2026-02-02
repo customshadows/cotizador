@@ -31,10 +31,8 @@
         .modern-input:focus { border-color: #0ea5e9; background: white; box-shadow: 0 0 0 4px rgba(14, 165, 233, 0.1); }
         .tab-btn { padding: 12px 24px; font-weight: 700; font-size: 0.75rem; text-transform: uppercase; border-bottom: 3px solid transparent; transition: 0.3s; cursor: pointer; }
         .tab-btn.active { border-color: #0ea5e9; color: #0ea5e9; background: rgba(14, 165, 233, 0.05); }
+        input[type=number]::-webkit-inner-spin-button, input[type=number]::-webkit-outer-spin-button { opacity: 1; cursor: pointer; }
         @media print { .no-print { display: none !important; } }
-        ::-webkit-scrollbar { width: 6px; }
-        ::-webkit-scrollbar-track { background: #f1f5f9; }
-        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
     </style>
 </head>
 <body class="bg-[#f8fafc] text-slate-800">
@@ -44,11 +42,11 @@
             <div class="flex items-center gap-8">
                 <span class="font-black text-2xl tracking-tighter text-brand-500">CS<span class="text-white">PRO</span></span>
                 <div class="flex gap-1">
-                    <button onclick="switchTab('cotizador')" id="btn-tab-cotizador" class="tab-btn active text-white">Cotizador</button>
-                    <button onclick="switchTab('admin')" id="btn-tab-admin" class="tab-btn text-slate-400">Configuración de Catálogo</button>
+                    <button onclick="switchTab('cotizador')" id="btn-tab-cotizador" class="tab-btn active text-white">Cotización</button>
+                    <button onclick="switchTab('historial')" id="btn-tab-historial" class="tab-btn text-slate-400">Cotizaciones</button>
+                    <button onclick="switchTab('admin')" id="btn-tab-admin" class="tab-btn text-slate-400">Backend</button>
                 </div>
             </div>
-            <div class="hidden md:block text-[10px] font-bold uppercase tracking-[0.2em] text-slate-500">Cloud Sync & Backup Active</div>
         </div>
     </nav>
 
@@ -57,150 +55,160 @@
         <div id="view-cotizador" class="grid grid-cols-1 lg:grid-cols-12 gap-8">
             <div class="lg:col-span-4 space-y-5 no-print">
                 <div class="bg-white p-6 rounded-3xl shadow-sm border border-slate-200">
-                    <h3 class="text-[10px] font-black uppercase mb-5 text-slate-400 tracking-widest flex items-center gap-2">
-                        <span class="w-2 h-2 bg-brand-500 rounded-full"></span> Información del Cliente
-                    </h3>
+                    <h3 class="text-[10px] font-black uppercase mb-5 text-slate-400 tracking-widest flex items-center gap-2">Datos del Cliente</h3>
                     <div class="space-y-3">
                         <input type="text" id="cliente" oninput="render()" placeholder="Nombre del Cliente" class="modern-input">
-                        <input type="text" id="tel-cliente" oninput="render()" placeholder="Teléfono / WhatsApp" class="modern-input">
-                        <input type="text" id="direccion" oninput="render()" placeholder="Dirección del Proyecto" class="modern-input">
+                        <input type="text" id="tel-cliente" oninput="render()" placeholder="Teléfono" class="modern-input">
+                        <input type="text" id="direccion" oninput="render()" placeholder="Dirección" class="modern-input">
                     </div>
                 </div>
 
                 <div class="bg-white p-6 rounded-3xl shadow-sm border border-slate-200">
-                    <h3 class="text-[10px] font-black uppercase mb-5 text-slate-400 tracking-widest flex items-center gap-2">
-                        <span class="w-2 h-2 bg-brand-500 rounded-full"></span> Configuración de Producto
-                    </h3>
+                    <h3 class="text-[10px] font-black uppercase mb-5 text-slate-400 tracking-widest">Configuración de Persianas</h3>
                     <div class="space-y-3">
-                        <select id="categoria-select" onchange="actualizarModelos()" class="modern-input bg-slate-50 font-bold uppercase text-brand-900"></select>
+                        <select id="categoria-select" onchange="actualizarModelos()" class="modern-input bg-slate-50 font-bold uppercase"></select>
                         <select id="modelo-select" class="modern-input text-[11px] uppercase font-bold"></select>
                         <div class="grid grid-cols-2 gap-2">
-                            <input type="text" id="ambiente" placeholder="Ambiente (Ej. Sala)" class="modern-input">
+                            <input type="text" id="ambiente" placeholder="Ambiente (Habitación)" class="modern-input">
                             <input type="text" id="color" placeholder="Color de tela" class="modern-input">
                         </div>
-                        <div class="grid grid-cols-3 gap-2">
+                        <div class="grid grid-cols-2 gap-2">
                             <div>
-                                <label class="text-[8px] font-bold text-slate-400 ml-1">ANCHO</label>
-                                <input type="number" id="ancho" step="0.01" class="modern-input text-center font-bold">
+                                <label class="text-[8px] font-bold text-slate-400 ml-1">ANCHO (M)</label>
+                                <input type="number" id="ancho" step="0.10" value="1.00" class="modern-input text-center font-bold">
                             </div>
                             <div>
-                                <label class="text-[8px] font-bold text-slate-400 ml-1">ALTO</label>
-                                <input type="number" id="alto" step="0.01" class="modern-input text-center font-bold">
-                            </div>
-                            <div>
-                                <label class="text-[8px] font-bold text-slate-400 ml-1">CANT.</label>
-                                <input type="number" id="cantidad" value="1" class="modern-input text-center font-bold">
+                                <label class="text-[8px] font-bold text-slate-400 ml-1">ALTO (M)</label>
+                                <input type="number" id="alto" step="0.10" value="1.00" class="modern-input text-center font-bold">
                             </div>
                         </div>
+                        
+                        <div class="flex items-center gap-3 p-2 bg-slate-50 rounded-xl border border-slate-200">
+                            <input type="checkbox" id="facia-toggle" class="w-5 h-5 accent-brand-500">
+                            <label for="facia-toggle" class="text-[11px] font-black text-slate-700 uppercase">Incluir Facia (+$280 ml)</label>
+                        </div>
+
                         <div class="bg-slate-50 p-4 rounded-2xl border border-dashed border-slate-200 space-y-3">
-                            <input type="number" id="motor-precio" placeholder="Precio Motor (Opcional) $" class="modern-input">
+                            <input type="number" id="motor-precio" placeholder="Precio Motor $" class="modern-input">
                             <div class="flex gap-2">
-                                <input type="text" id="extra-nombre" placeholder="Extra (Facia, etc)" class="modern-input w-2/3">
+                                <input type="text" id="extra-nombre" placeholder="Concepto Adicional" class="modern-input w-2/3">
                                 <input type="number" id="extra-precio" placeholder="$" class="modern-input w-1/3 text-center">
                             </div>
                         </div>
-                        <button onclick="agregarItem()" class="w-full bg-brand-600 text-white py-4 rounded-2xl font-black text-xs uppercase hover:bg-brand-900 shadow-lg shadow-brand-500/20 transition-all active:scale-95">Añadir a Cotización</button>
+                        <button onclick="agregarItem()" class="w-full bg-brand-600 text-white py-4 rounded-2xl font-black uppercase shadow-lg shadow-brand-500/20 transition-all active:scale-95">Agregar al Carrito</button>
                     </div>
                 </div>
 
                 <div class="bg-white p-6 rounded-3xl shadow-sm border border-slate-200">
-                    <div class="grid grid-cols-2 gap-3">
-                        <div>
-                            <label class="text-[9px] font-black text-slate-400 uppercase mb-1 block ml-1">Instalación $</label>
-                            <input type="number" id="inst" oninput="render()" placeholder="0.00" class="modern-input font-bold text-brand-600">
+                    <div class="space-y-4">
+                        <div class="grid grid-cols-2 gap-3">
+                            <div>
+                                <label class="text-[9px] font-black text-slate-400 uppercase block ml-1">Instalación $</label>
+                                <input type="number" id="inst" oninput="render()" placeholder="0.00" class="modern-input font-bold">
+                            </div>
+                            <div>
+                                <label class="text-[9px] font-black text-slate-400 uppercase block ml-1">Descuento</label>
+                                <select id="desc-tipo" onchange="toggleCustomDesc(); render();" class="modern-input font-bold">
+                                    <option value="0">0%</option>
+                                    <option value="5">5%</option>
+                                    <option value="10">10%</option>
+                                    <option value="15">15%</option>
+                                    <option value="20">20%</option>
+                                    <option value="custom">Personalizado</option>
+                                </select>
+                            </div>
                         </div>
-                        <div>
-                            <label class="text-[9px] font-black text-slate-400 uppercase mb-1 block ml-1">Descuento %</label>
-                            <select id="desc-global" onchange="render()" class="modern-input font-bold">
-                                <option value="0">Sin Desc.</option>
-                                <option value="10">10% Off</option>
-                                <option value="15">15% Off</option>
-                                <option value="20">20% Off</option>
+                        <div id="custom-desc-area" class="hidden flex gap-2">
+                            <input type="number" id="desc-custom-val" oninput="render()" placeholder="Valor" class="modern-input">
+                            <select id="desc-custom-tipo" onchange="render()" class="modern-input w-1/3">
+                                <option value="percent">%</option>
+                                <option value="money">$</option>
                             </select>
                         </div>
+                        <label class="flex items-center gap-3 text-[10px] font-black text-slate-600 uppercase cursor-pointer">
+                            <input type="checkbox" id="iva-toggle" onchange="render()" class="w-5 h-5 accent-brand-500"> IVA 16%
+                        </label>
                     </div>
-                    <label class="flex items-center gap-3 text-[10px] font-black text-slate-600 uppercase mt-5 bg-slate-50 p-3 rounded-xl cursor-pointer">
-                        <input type="checkbox" id="iva-toggle" onchange="render()" class="w-5 h-5 accent-brand-500"> Aplicar IVA (+16%)
-                    </label>
                 </div>
             </div>
 
             <div class="lg:col-span-8 space-y-4">
                 <div class="no-print flex gap-3">
-                    <button onclick="generarPDF()" class="flex-1 bg-slate-800 text-white p-4 rounded-2xl font-black text-[11px] uppercase shadow-xl hover:bg-slate-700 transition-all">Descargar Cotización PDF</button>
+                    <button onclick="generarPDF()" class="flex-1 bg-slate-800 text-white p-4 rounded-2xl font-black text-[11px] uppercase shadow-xl hover:bg-slate-700 transition-all">Generar PDF</button>
+                    <button onclick="guardarCotizacion()" class="bg-emerald-600 text-white px-8 rounded-2xl font-black text-[11px] uppercase shadow-xl hover:bg-emerald-700 transition-all">Guardar Cotización</button>
                 </div>
                 
                 <div id="pdf-area" class="bg-white p-12 shadow-2xl min-h-[1050px] border border-slate-100 relative rounded-sm">
                     <div class="flex justify-between items-start border-b-4 border-slate-900 pb-8 mb-10">
                         <div class="flex gap-6">
-                            <img id="logo-preview" src="" class="h-24 w-24 object-contain">
+                            <img id="logo-preview" src="" class="h-20 w-20 object-contain">
                             <div>
-                                <h1 id="negocio-nombre" class="text-3xl font-black text-slate-900 uppercase leading-none tracking-tighter">Cargando...</h1>
-                                <p id="asesor-nombre" class="text-sm font-bold text-brand-600 uppercase mt-1 tracking-widest"></p>
-                                <div class="mt-4 text-[10px] font-bold text-slate-400 space-y-1 uppercase">
+                                <h1 id="negocio-nombre" class="text-3xl font-black text-slate-900 uppercase">Shadows</h1>
+                                <p id="asesor-nombre" class="text-sm font-bold text-brand-600 uppercase"></p>
+                                <div class="mt-2 text-[10px] font-bold text-slate-400 space-y-0.5 uppercase">
                                     <p id="negocio-datos-1"></p>
-                                    <p id="negocio-datos-2" class="text-slate-500"></p>
+                                    <p id="negocio-datos-2"></p>
                                 </div>
                             </div>
                         </div>
                         <div class="text-right">
-                            <span class="bg-brand-500 text-white text-[9px] px-3 py-1 rounded-full font-black uppercase">Presupuesto</span>
-                            <h2 class="text-5xl font-black text-slate-900 mt-4">#<span id="folio">001</span></h2>
+                            <h2 class="text-4xl font-black text-slate-900">#<span id="folio">--</span></h2>
                             <p id="fecha-pdf" class="text-[10px] font-black text-slate-400 uppercase mt-2"></p>
+                            <p id="vigencia-pdf" class="text-[10px] font-black text-red-500 uppercase"></p>
                         </div>
                     </div>
 
                     <div class="grid grid-cols-2 gap-8 mb-10">
                         <div class="bg-slate-50 p-5 rounded-2xl border-l-4 border-brand-500">
-                            <p class="text-[9px] font-black text-slate-400 uppercase mb-1">Cliente / Receptor</p>
-                            <p id="pdf-cliente" class="text-xl font-black text-slate-800 uppercase leading-tight">PÚBLICO GENERAL</p>
+                            <p class="text-[9px] font-black text-slate-400 uppercase mb-1">Datos del Cliente</p>
+                            <p id="pdf-cliente" class="text-xl font-black text-slate-800 uppercase leading-tight">--</p>
                             <p id="pdf-tel-display" class="text-[11px] text-slate-500 mt-2 font-bold"></p>
-                        </div>
-                        <div class="text-right p-5">
-                            <p class="text-[9px] font-black text-slate-400 uppercase mb-1">Lugar de Entrega</p>
-                            <p id="pdf-direccion-display" class="text-[11px] font-bold text-slate-600 uppercase italic leading-relaxed">--</p>
+                            <p id="pdf-direccion-display" class="text-[10px] text-slate-400 mt-1 uppercase font-bold"></p>
                         </div>
                     </div>
 
                     <table class="w-full mb-10">
                         <thead class="bg-slate-900 text-white text-[10px] uppercase font-black">
                             <tr>
-                                <th class="text-left p-4 rounded-l-xl">Descripción del Producto</th>
-                                <th class="p-4 text-center">Medidas (m)</th>
-                                <th class="p-4 text-center">Cant</th>
-                                <th class="text-right p-4 rounded-r-xl">Subtotal</th>
+                                <th class="text-left p-4 rounded-l-xl">Ambiente / Tela</th>
+                                <th class="p-4 text-center">Medidas</th>
+                                <th class="text-right p-4 rounded-r-xl">Precio</th>
                             </tr>
                         </thead>
                         <tbody id="lista-pdf" class="divide-y divide-slate-100 text-[11px]"></tbody>
                     </table>
 
                     <div class="grid grid-cols-5 gap-12 mt-20">
-                        <div class="col-span-3">
-                            <div class="bg-slate-50 p-6 rounded-3xl border border-slate-100">
-                                <h4 class="text-[10px] font-black text-slate-900 uppercase mb-4 border-b pb-2">Condiciones Comerciales</h4>
-                                <ul class="text-[10px] font-bold text-slate-500 uppercase space-y-3">
-                                    <li class="flex items-start gap-2"><span>•</span> <span>Pago: 50% anticipo para fabricación y 50% al momento de la instalación.</span></li>
-                                    <li class="flex items-start gap-2"><span>•</span> <span>Tiempo de entrega: 8 a 12 días hábiles (Sujeto a disponibilidad).</span></li>
-                                    <li class="flex items-start gap-2"><span>•</span> <span>Garantía: 1 año contra defectos de fabricación en mecanismos.</span></li>
-                                </ul>
+                        <div class="col-span-3" id="terminos-pdf-area">
+                            <div class="bg-slate-50 p-6 rounded-3xl border border-slate-100 h-full">
+                                <h4 class="text-[10px] font-black text-slate-900 uppercase mb-3 border-b pb-1">Términos y Condiciones</h4>
+                                <div id="pdf-terminos" class="text-[9px] font-bold text-slate-500 uppercase leading-relaxed whitespace-pre-line"></div>
                             </div>
                         </div>
                         <div class="col-span-2 space-y-3">
-                            <div class="flex justify-between text-[11px] font-bold text-slate-400 uppercase px-2">
+                            <div class="flex justify-between text-[11px] font-bold text-slate-400 uppercase">
                                 <span>Subtotal</span> <span id="val-raw">$0.00</span>
                             </div>
-                            <div id="pdf-desc-row" class="hidden flex justify-between text-[11px] font-black text-emerald-600 uppercase bg-emerald-50 px-2 py-1 rounded-lg">
-                                <span>Descuento aplicado</span> <span id="val-desc-money">-$0.00</span>
+                            <div id="pdf-desc-row" class="hidden flex justify-between text-[11px] font-black text-emerald-600 uppercase">
+                                <span>Descuento</span> <span id="val-desc-money">-$0.00</span>
                             </div>
-                            <div id="pdf-inst-row" class="hidden flex justify-between text-[11px] font-bold text-slate-500 uppercase px-2">
+                            <div id="pdf-inst-row" class="hidden flex justify-between text-[11px] font-bold text-slate-500 uppercase">
                                 <span>Instalación</span> <span id="val-inst-money">$0.00</span>
                             </div>
-                            <div id="pdf-iva-row" class="hidden flex justify-between text-[11px] font-bold text-slate-500 uppercase px-2">
-                                <span>I.V.A. (16%)</span> <span id="val-iva-money">$0.00</span>
+                            <div id="pdf-iva-row" class="hidden flex justify-between text-[11px] font-bold text-slate-500 uppercase">
+                                <span>IVA (16%)</span> <span id="val-iva-money">$0.00</span>
                             </div>
-                            <div class="flex justify-between items-end border-t-4 border-slate-900 pt-5 mt-4 px-2">
-                                <span class="text-[14px] font-black uppercase">Total Neto</span>
-                                <span id="val-total" class="text-4xl font-black text-slate-900 tracking-tighter">$0.00</span>
+                            <div class="flex justify-between items-end border-t-4 border-slate-900 pt-5 mt-4">
+                                <span class="text-[14px] font-black uppercase">Total</span>
+                                <span id="val-total" class="text-4xl font-black text-slate-900">$0.00</span>
+                            </div>
+                            <div class="bg-slate-900 text-white p-4 rounded-2xl mt-4 space-y-1">
+                                <div class="flex justify-between text-[10px] font-bold uppercase opacity-70">
+                                    <span>50% Anticipo</span> <span id="val-anticipo">$0.00</span>
+                                </div>
+                                <div class="flex justify-between text-[10px] font-bold uppercase opacity-70">
+                                    <span>50% Saldo Final</span> <span id="val-saldo">$0.00</span>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -208,91 +216,91 @@
             </div>
         </div>
 
-        <div id="view-admin" class="hidden space-y-8 animate-in slide-in-from-bottom-5 duration-500">
-            <div class="flex justify-between items-end bg-white p-8 rounded-3xl shadow-sm border border-slate-200">
-                <div>
-                    <h2 class="text-2xl font-black text-slate-900 uppercase tracking-tighter">Gestión de Catálogo</h2>
-                    <p class="text-slate-400 text-sm font-medium">Modifica nombres de telas, precios por m² y añade nuevas categorías.</p>
-                </div>
-                <button onclick="guardarAjustes()" class="bg-emerald-600 text-white px-8 py-4 rounded-2xl font-black uppercase text-xs shadow-lg hover:bg-emerald-700 transition-all">Sincronizar cambios en la nube</button>
+        <div id="view-historial" class="hidden space-y-4">
+            <h2 class="text-2xl font-black text-slate-900 uppercase">Cotizaciones Guardadas</h2>
+            <div id="lista-cotizaciones" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"></div>
+        </div>
+
+        <div id="view-admin" class="hidden space-y-8 animate-in slide-in-from-bottom-5">
+            <div id="auth-admin" class="max-w-md mx-auto bg-white p-8 rounded-3xl shadow-xl border border-slate-200">
+                <h2 class="text-xl font-black text-slate-900 uppercase mb-4 text-center">Acceso Requerido</h2>
+                <input type="password" id="admin-pass" placeholder="Introducir Contraseña" class="modern-input mb-4 text-center">
+                <button onclick="checkAdmin()" class="w-full bg-slate-900 text-white py-3 rounded-xl font-black uppercase">Entrar</button>
             </div>
 
-            <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
-                <div class="bg-white p-8 rounded-3xl shadow-sm border border-slate-200 h-fit">
-                    <h3 class="font-black text-slate-900 uppercase text-xs mb-6 border-b-2 border-brand-500 pb-2 inline-block">Datos del Negocio</h3>
-                    <div class="space-y-4">
-                        <div><label class="text-[10px] font-bold uppercase text-slate-400 mb-1 block">URL Logotipo (PNG/JPG)</label><input type="text" id="conf-logo" class="modern-input"></div>
-                        <div><label class="text-[10px] font-bold uppercase text-slate-400 mb-1 block">Nombre Comercial</label><input type="text" id="conf-nombre" class="modern-input"></div>
-                        <div><label class="text-[10px] font-bold uppercase text-slate-400 mb-1 block">Asesor Principal</label><input type="text" id="conf-asesor" class="modern-input"></div>
-                        <div><label class="text-[10px] font-bold uppercase text-slate-400 mb-1 block">Contacto Ventas</label><input type="text" id="conf-datos1" class="modern-input"></div>
-                        <div><label class="text-[10px] font-bold uppercase text-slate-400 mb-1 block">Domicilio Fiscal/Físico</label><input type="text" id="conf-datos2" class="modern-input"></div>
-                    </div>
+            <div id="admin-content" class="hidden space-y-8">
+                <div class="flex justify-between items-center bg-white p-8 rounded-3xl shadow-sm border border-slate-200">
+                    <h2 class="text-2xl font-black text-slate-900 uppercase">Backend Management</h2>
+                    <button onclick="guardarAjustes()" class="bg-emerald-600 text-white px-8 py-4 rounded-2xl font-black uppercase text-xs shadow-lg">Sincronizar Nube</button>
                 </div>
 
-                <div class="lg:col-span-2 bg-white p-8 rounded-3xl shadow-sm border border-slate-200">
-                    <div class="flex justify-between items-center mb-6">
-                        <h3 class="font-black text-slate-900 uppercase text-xs border-b-2 border-brand-500 pb-2 inline-block">Telas y Precios por m²</h3>
-                        <button onclick="agregarNuevaCategoria()" class="text-[10px] bg-slate-900 text-white px-4 py-2 rounded-xl font-black uppercase hover:bg-brand-600 transition-colors">+ Crear Nueva Categoría</button>
-                    </div>
-                    
-                    <div id="admin-productos" class="space-y-8 max-h-[700px] overflow-y-auto pr-2">
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                    <div class="bg-white p-8 rounded-3xl shadow-sm border border-slate-200 h-fit">
+                        <h3 class="font-black text-slate-900 uppercase text-xs mb-6 border-b-2 border-brand-500 pb-2 inline-block">Configuración General</h3>
+                        <div class="space-y-4">
+                            <div><label class="text-[10px] font-bold text-slate-400 uppercase">Logo URL</label><input type="text" id="conf-logo" class="modern-input"></div>
+                            <div><label class="text-[10px] font-bold text-slate-400 uppercase">Empresa</label><input type="text" id="conf-nombre" class="modern-input"></div>
+                            <div><label class="text-[10px] font-bold text-slate-400 uppercase">Asesor</label><input type="text" id="conf-asesor" class="modern-input"></div>
+                            <div><label class="text-[10px] font-bold text-slate-400 uppercase">Tel / Email</label><input type="text" id="conf-datos1" class="modern-input"></div>
+                            <div><label class="text-[10px] font-bold text-slate-400 uppercase">Dirección</label><input type="text" id="conf-datos2" class="modern-input"></div>
+                            <div><label class="text-[10px] font-bold text-slate-400 uppercase">Nueva Contraseña</label><input type="password" id="conf-pass" class="modern-input"></div>
                         </div>
+                    </div>
+                    <div class="lg:col-span-2 bg-white p-8 rounded-3xl shadow-sm border border-slate-200">
+                        <div class="flex justify-between items-center mb-6">
+                            <h3 class="font-black text-slate-900 uppercase text-xs border-b-2 border-brand-500 pb-2 inline-block">Catálogo de Productos</h3>
+                            <button onclick="agregarNuevaCategoria()" class="text-[10px] bg-slate-900 text-white px-4 py-2 rounded-xl font-black uppercase">+ Nueva Categoría</button>
+                        </div>
+                        <div id="admin-productos" class="space-y-6"></div>
+                        <div class="mt-8 border-t pt-6">
+                            <h3 class="font-black text-slate-900 uppercase text-xs mb-4">Términos y Condiciones (Solo PDF)</h3>
+                            <textarea id="conf-terminos" rows="6" class="modern-input font-normal"></textarea>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
     </main>
 
 <script>
-// --- BASE DE DATOS INICIAL CON TODOS LOS DATOS RESTAURADOS ---
+// --- DATOS Y LOGICA ---
 let configGlobal = {
-    negocio: "Custom Shadows",
-    asesor: "Porfirio Góngora",
-    logo: "https://raw.githubusercontent.com/customshadows/cotizador/main/logo%20custom%20shadows.jpg",
-    datos1: "999 370 2007 | customshadowsmx@gmail.com",
-    datos2: "C. 41 693B Ciudad Caucel, Mérida, Yuc.",
+    pass: "1234",
+    negocio: "Shadows",
+    asesor: "Asesor Ventas",
+    logo: "",
+    datos1: "Tel: 000 000 0000 | email@empresa.com",
+    datos2: "Calle Ficticia #123, Mérida",
+    terminos: "1. Pago del 50% para iniciar.\n2. Saldo contra entrega.\n3. Tiempo de entrega 10 días.",
     productos: [
-        {
-            cat: "ENROLLABLES",
-            telas: [
-                {n: "Black Out Long Beach", p: 810.39}, {n: "Black Out Texture", p: 937.44}, 
-                {n: "Black Out Ipanema", p: 910.88}, {n: "Black Out Ohio", p: 927.05}, 
-                {n: "Black Out Montreal", p: 991.73}, {n: "Black Out Budelli", p: 948.99},
-                {n: "Black Out Sydney", p: 1122.24}, {n: "Black Out Luxury", p: 1072.58}, 
-                {n: "Black Out B.O. 500", p: 1118.78}, {n: "Black Out Galaxy", p: 1169.60}, 
-                {n: "Black Out Stylus", p: 1297.80}, {n: "Filtro Ligero Long Beach", p: 748.65}, 
-                {n: "Filtro Ligero Cadiz", p: 783.83}, {n: "Filtro Ligero Ipanema", p: 806.93},
-                {n: "Filtro Ligero Budelli", p: 818.48}, {n: "Filtro Ligero Sydney", p: 933.98}, 
-                {n: "Filtro Ligero Fresh", p: 1049.48}, {n: "Screen Basic", p: 810.39}, 
-                {n: "Screen Soft", p: 810.39}, {n: "Screen Millan", p: 962.85}, 
-                {n: "Screen One", p: 1058.72}
-            ]
-        },
-        {
-            cat: "SHEER ELEGANCE",
-            telas: [
-                {n: "Duoline Basic", p: 995.19}, {n: "Duoline Aromy", p: 1041.39}, 
-                {n: "Duoline Viewty", p: 1071.42}, {n: "Duoline Aquamarine", p: 1018.92}, 
-                {n: "Duoline Woodline", p: 1226.19}, {n: "Duoline Celebrity", p: 1268.93},
-                {n: "Duoline Bright", p: 1285.10}, {n: "Duoline Radiance", p: 1436.40}, 
-                {n: "Duoline Terra", p: 1459.50}, {n: "Duoline Season", p: 1575.00},
-                {n: "Duo Dim Out Brave", p: 1973.09}, {n: "Duo Dim Out Genius", p: 1973.09}, 
-                {n: "Duo Dim Out Woods", p: 1921.50}, {n: "Duo Dim Out Royal", p: 2037.00}, 
-                {n: "Duo Dim Out Glam", p: 2071.65}, {n: "Duo Dim Out Lino", p: 2152.50}
-            ]
-        }
+        { cat: "ENROLLABLES", telas: [{n: "Black Out Long Beach", p: 810.39}, {n: "Screen Basic", p: 810.39}] },
+        { cat: "SHEER ELEGANCE", telas: [{n: "Duoline Basic", p: 995.19}, {n: "Duo Dim Out Brave", p: 1973.09}] }
     ]
 };
 
 let carrito = [];
+let currentFolio = 1;
 const fmt = new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' });
 
 async function init() {
     try {
         const doc = await db.collection("ajustes").doc("config").get();
         if(doc.exists) configGlobal = doc.data();
-    } catch(e) { console.log("Usando base de datos local temporal."); }
+        
+        // Cargar el último folio
+        obtenerUltimoFolio();
+    } catch(e) { console.log("Offline mode"); }
     aplicarConfig();
     render();
+}
+
+async function obtenerUltimoFolio() {
+    const snap = await db.collection("cotizaciones").orderBy("fecha", "desc").limit(1).get();
+    if(!snap.empty) {
+        const ultima = snap.docs[0].data();
+        currentFolio = (ultima.numFolio || 0) + 1;
+    }
+    document.getElementById('folio').innerText = currentFolio;
 }
 
 function aplicarConfig() {
@@ -301,51 +309,19 @@ function aplicarConfig() {
     document.getElementById('logo-preview').src = configGlobal.logo;
     document.getElementById('negocio-datos-1').innerText = configGlobal.datos1;
     document.getElementById('negocio-datos-2').innerText = configGlobal.datos2;
+    document.getElementById('pdf-terminos').innerText = configGlobal.terminos;
+    
+    // Admin inputs
     document.getElementById('conf-nombre').value = configGlobal.negocio;
     document.getElementById('conf-asesor').value = configGlobal.asesor;
     document.getElementById('conf-logo').value = configGlobal.logo;
     document.getElementById('conf-datos1').value = configGlobal.datos1;
     document.getElementById('conf-datos2').value = configGlobal.datos2;
+    document.getElementById('conf-terminos').value = configGlobal.terminos;
 
     const catSel = document.getElementById('categoria-select');
     catSel.innerHTML = configGlobal.productos.map(p => `<option value="${p.cat}">${p.cat}</option>`).join('');
     actualizarModelos();
-    renderAdminProducts();
-}
-
-function renderAdminProducts() {
-    const container = document.getElementById('admin-productos');
-    container.innerHTML = configGlobal.productos.map((c, i) => `
-        <div class="bg-slate-50 p-6 rounded-3xl border border-slate-200 shadow-sm">
-            <div class="flex justify-between items-center mb-5 border-b pb-3">
-                <input type="text" value="${c.cat}" onchange="configGlobal.productos[${i}].cat = this.value.toUpperCase()" 
-                       class="font-black text-brand-600 text-sm uppercase bg-transparent outline-none focus:text-brand-900 w-2/3">
-                <button onclick="eliminarCat(${i})" class="text-red-400 hover:text-red-600 transition-colors text-xs font-bold uppercase tracking-tighter">Eliminar Categoría</button>
-            </div>
-            <div class="space-y-2">
-                <div class="grid grid-cols-12 gap-2 mb-2 px-2">
-                    <div class="col-span-8 text-[8px] font-black text-slate-400 uppercase">Nombre de la Tela</div>
-                    <div class="col-span-3 text-[8px] font-black text-slate-400 uppercase text-right">Precio m²</div>
-                </div>
-                ${c.telas.map((t, ti) => `
-                    <div class="grid grid-cols-12 gap-2 items-center">
-                        <div class="col-span-8">
-                            <input type="text" value="${t.n}" onchange="configGlobal.productos[${i}].telas[${ti}].n = this.value" 
-                                   class="modern-input py-1.5 text-[11px] w-full bg-white border-slate-100">
-                        </div>
-                        <div class="col-span-3">
-                            <input type="number" step="0.01" value="${t.p}" onchange="configGlobal.productos[${i}].telas[${ti}].p = parseFloat(this.value)" 
-                                   class="modern-input py-1.5 text-[11px] w-full text-right bg-white border-slate-100 font-bold text-brand-600">
-                        </div>
-                        <div class="col-span-1 text-center">
-                            <button onclick="eliminarTela(${i}, ${ti})" class="text-slate-300 hover:text-red-500 transition-colors">✕</button>
-                        </div>
-                    </div>
-                `).join('')}
-                <button onclick="nuevaTela(${i})" class="w-full py-2 mt-4 border-2 border-dashed border-slate-200 rounded-xl text-[10px] font-black text-slate-400 uppercase hover:border-brand-500 hover:text-brand-500 transition-all">+ Añadir Nueva Tela a ${c.cat}</button>
-            </div>
-        </div>
-    `).join('');
 }
 
 function actualizarModelos() {
@@ -362,22 +338,32 @@ function agregarItem() {
     if(!mod.value) return;
     const an = parseFloat(document.getElementById('ancho').value) || 0;
     const al = parseFloat(document.getElementById('alto').value) || 0;
-    const ct = parseInt(document.getElementById('cantidad').value) || 1;
     const mot = parseFloat(document.getElementById('motor-precio').value) || 0;
     const extraP = parseFloat(document.getElementById('extra-precio').value) || 0;
     const extraN = document.getElementById('extra-nombre').value;
+    const faciaCheck = document.getElementById('facia-toggle').checked;
     
-    const m2 = (an * al) < 1 ? 1 : (an * al);
-    const sub = ((m2 * parseFloat(mod.value)) + mot + extraP) * ct;
+    // Regla de Oro: Menos de 1 metro se toma como metro completo
+    const anCalc = an < 1 ? 1 : an;
+    const alCalc = al < 1 ? 1 : al;
+    const m2 = anCalc * alCalc;
+    
+    // Cálculo de Facia ($280 por metro lineal basado en el ancho)
+    const precioFacia = faciaCheck ? (anCalc * 280) : 0;
+
+    const sub = (m2 * parseFloat(mod.value)) + mot + extraP + precioFacia;
 
     carrito.push({
         amb: document.getElementById('ambiente').value || "General",
         tela: mod.options[mod.selectedIndex].getAttribute('data-name'),
-        col: document.getElementById('color').value || "No especificado",
-        med: `${an.toFixed(2)} x ${al.toFixed(2)}`,
-        ct, sub,
-        det: `${mot>0 ? '[CON MOTORIZACIÓN]' : ''} ${extraN ? '['+extraN.toUpperCase()+']' : ''}`
+        col: document.getElementById('color').value || "-",
+        med: `${an.toFixed(2)}x${al.toFixed(2)}`,
+        sub: sub,
+        desc: `${mot > 0 ? '+MOTOR ' : ''}${faciaCheck ? '+FACIA ' : ''}${extraN ? '+'+extraN.toUpperCase() : ''}`
     });
+    
+    // Reset Facia check para el siguiente item
+    document.getElementById('facia-toggle').checked = false;
     render();
 }
 
@@ -391,48 +377,106 @@ function render() {
             <tr class="border-b border-slate-50">
                 <td class="p-4">
                     <div class="font-black uppercase text-[10px] text-slate-900">${it.amb}</div>
-                    <div class="text-[9px] text-slate-400 font-bold uppercase">${it.tela} / ${it.col} <span class="text-brand-500">${it.det}</span></div>
+                    <div class="text-[9px] text-slate-400 font-bold uppercase">${it.tela} / ${it.col} <span class="text-brand-500">${it.desc}</span></div>
                 </td>
                 <td class="text-center font-bold text-slate-600">${it.med}</td>
-                <td class="text-center font-bold text-slate-600">${it.ct}</td>
                 <td class="text-right p-4 font-black text-slate-900">
                     ${fmt.format(it.sub)} 
-                    <button onclick="eliminarItem(${i})" class="no-print ml-3 text-red-200 hover:text-red-500 transition-colors">✕</button>
+                    <button onclick="eliminarItem(${i})" class="no-print ml-3 text-red-200 hover:text-red-500">✕</button>
                 </td>
             </tr>`;
     });
 
-    const valDesc = sumRaw * (parseFloat(document.getElementById('desc-global').value) / 100);
-    const inst = parseFloat(document.getElementById('inst').value) || 0;
-    const subConDesc = sumRaw - valDesc + inst;
-    const iva = document.getElementById('iva-toggle').checked ? subConDesc * 0.16 : 0;
-    const total = subConDesc + iva;
+    // Descuentos
+    let valDesc = 0;
+    const dTipo = document.getElementById('desc-tipo').value;
+    if(dTipo === 'custom') {
+        const cVal = parseFloat(document.getElementById('desc-custom-val').value) || 0;
+        const cTipo = document.getElementById('desc-custom-tipo').value;
+        valDesc = cTipo === 'percent' ? (sumRaw * (cVal/100)) : cVal;
+    } else {
+        valDesc = sumRaw * (parseFloat(dTipo) / 100);
+    }
 
+    const inst = parseFloat(document.getElementById('inst').value) || 0;
+    const subTotalCalculado = sumRaw - valDesc + inst;
+    const iva = document.getElementById('iva-toggle').checked ? subTotalCalculado * 0.16 : 0;
+    const total = subTotalCalculado + iva;
+
+    // Actualizar UI Totales
     document.getElementById('val-raw').innerText = fmt.format(sumRaw);
     document.getElementById('val-desc-money').innerText = `-${fmt.format(valDesc)}`;
     document.getElementById('pdf-desc-row').classList.toggle('hidden', valDesc <= 0);
-    
     document.getElementById('val-inst-money').innerText = fmt.format(inst);
     document.getElementById('pdf-inst-row').classList.toggle('hidden', inst <= 0);
-    
     document.getElementById('val-iva-money').innerText = fmt.format(iva);
     document.getElementById('pdf-iva-row').classList.toggle('hidden', iva <= 0);
-
     document.getElementById('val-total').innerText = fmt.format(total);
+    document.getElementById('val-anticipo').innerText = fmt.format(total / 2);
+    document.getElementById('val-saldo').innerText = fmt.format(total / 2);
 
-    // Actualizar textos PDF
+    // PDF Info y Vigencia
+    const hoy = new Date();
+    const vencimiento = new Date();
+    vencimiento.setDate(hoy.getDate() + 15);
+
     document.getElementById('pdf-cliente').innerText = document.getElementById('cliente').value || "PÚBLICO GENERAL";
-    document.getElementById('pdf-tel-display').innerText = document.getElementById('tel-cliente').value ? "WHATSAPP: " + document.getElementById('tel-cliente').value : "";
-    document.getElementById('pdf-direccion-display').innerText = document.getElementById('direccion').value || "ENTREGA EN TIENDA / DOMICILIO NO ESPECIFICADO";
-    document.getElementById('fecha-pdf').innerText = new Date().toLocaleDateString('es-MX', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+    document.getElementById('pdf-tel-display').innerText = document.getElementById('tel-cliente').value;
+    document.getElementById('pdf-direccion-display').innerText = document.getElementById('direccion').value;
+    
+    document.getElementById('fecha-pdf').innerText = hoy.toLocaleDateString('es-MX', { day:'numeric', month:'long', year:'numeric' });
+    document.getElementById('vigencia-pdf').innerText = "Vencimiento: " + vencimiento.toLocaleDateString('es-MX', { day:'numeric', month:'long', year:'numeric' });
 }
 
-// Funciones Administrativas
-function nuevaTela(idx) { configGlobal.productos[idx].telas.push({n: "Nueva Tela Modelo", p: 0}); renderAdminProducts(); }
-function eliminarTela(idx, tidx) { configGlobal.productos[idx].telas.splice(tidx, 1); renderAdminProducts(); }
-function agregarNuevaCategoria() { configGlobal.productos.push({cat: "NUEVA LÍNEA", telas: []}); renderAdminProducts(); }
-function eliminarCat(idx) { if(confirm("¿Estás seguro de eliminar toda esta categoría?")) { configGlobal.productos.splice(idx, 1); renderAdminProducts(); } }
+function toggleCustomDesc() {
+    document.getElementById('custom-desc-area').classList.toggle('hidden', document.getElementById('desc-tipo').value !== 'custom');
+}
+
 function eliminarItem(i) { carrito.splice(i, 1); render(); }
+
+// --- PERSISTENCIA ---
+async function guardarCotizacion() {
+    const cot = {
+        numFolio: currentFolio,
+        cliente: document.getElementById('cliente').value || "S/N",
+        telefono: document.getElementById('tel-cliente').value || "",
+        direccion: document.getElementById('direccion').value || "",
+        total: document.getElementById('val-total').innerText,
+        fecha: new Date().toISOString(),
+        items: carrito
+    };
+    await db.collection("cotizaciones").add(cot);
+    alert("Cotización #" + currentFolio + " Guardada");
+    obtenerUltimoFolio(); // Actualizar el folio para la siguiente
+}
+
+function checkAdmin() {
+    if(document.getElementById('admin-pass').value === configGlobal.pass) {
+        document.getElementById('auth-admin').classList.add('hidden');
+        document.getElementById('admin-content').classList.remove('hidden');
+        renderAdminProducts();
+    } else { alert("Pass incorrecto"); }
+}
+
+function renderAdminProducts() {
+    const container = document.getElementById('admin-productos');
+    container.innerHTML = configGlobal.productos.map((c, i) => `
+        <div class="bg-slate-50 p-6 rounded-3xl border border-slate-200">
+            <div class="flex justify-between items-center mb-4 border-b pb-2">
+                <input type="text" value="${c.cat}" onchange="configGlobal.productos[${i}].cat = this.value.toUpperCase()" class="font-black bg-transparent">
+                <button onclick="eliminarCat(${i})" class="text-red-500 text-[10px] font-bold">BORRAR CAT</button>
+            </div>
+            ${c.telas.map((t, ti) => `
+                <div class="flex gap-2 mb-2">
+                    <input type="text" value="${t.n}" onchange="configGlobal.productos[${i}].telas[${ti}].n = this.value" class="modern-input py-1 text-[11px] w-2/3">
+                    <input type="number" value="${t.p}" onchange="configGlobal.productos[${i}].telas[${ti}].p = parseFloat(this.value)" class="modern-input py-1 text-[11px] w-1/3">
+                    <button onclick="configGlobal.productos[${i}].telas.splice(${ti},1); renderAdminProducts()">✕</button>
+                </div>
+            `).join('')}
+            <button onclick="configGlobal.productos[${i}].telas.push({n:'Nueva', p:0}); renderAdminProducts()" class="text-[9px] font-black mt-2">+ AGREGAR TELA</button>
+        </div>
+    `).join('');
+}
 
 async function guardarAjustes() {
     configGlobal.negocio = document.getElementById('conf-nombre').value;
@@ -440,34 +484,83 @@ async function guardarAjustes() {
     configGlobal.logo = document.getElementById('conf-logo').value;
     configGlobal.datos1 = document.getElementById('conf-datos1').value;
     configGlobal.datos2 = document.getElementById('conf-datos2').value;
+    configGlobal.terminos = document.getElementById('conf-terminos').value;
+    if(document.getElementById('conf-pass').value) configGlobal.pass = document.getElementById('conf-pass').value;
     
-    try {
-        await db.collection("ajustes").doc("config").set(configGlobal);
-        alert("¡Catálogo actualizado correctamente en la nube!");
-        aplicarConfig();
-        switchTab('cotizador');
-    } catch(e) {
-        alert("Error al guardar: " + e.message);
-    }
+    await db.collection("ajustes").doc("config").set(configGlobal);
+    alert("Configuración Sincronizada");
+    location.reload();
 }
 
 function switchTab(tab) {
-    document.getElementById('view-cotizador').classList.toggle('hidden', tab !== 'cotizador');
-    document.getElementById('view-admin').classList.toggle('hidden', tab !== 'admin');
-    document.getElementById('btn-tab-cotizador').classList.toggle('active', tab === 'cotizador');
-    document.getElementById('btn-tab-admin').classList.toggle('active', tab === 'admin');
+    document.querySelectorAll('main > div').forEach(d => d.classList.add('hidden'));
+    document.getElementById('view-' + tab).classList.remove('hidden');
+
+    document.querySelectorAll('.tab-btn').forEach(b => {
+        b.classList.remove('active', 'text-white');
+        b.classList.add('text-slate-400');
+    });
+    document.getElementById('btn-tab-' + tab).classList.add('active', 'text-white');
+    
+    if(tab === 'historial') cargarHistorial();
+}
+
+async function cargarHistorial() {
+    const container = document.getElementById('lista-cotizaciones');
+    container.innerHTML = '<p class="col-span-full text-center py-10 opacity-50">Cargando cotizaciones...</p>';
+    const snap = await db.collection("cotizaciones").orderBy("fecha", "desc").get();
+    container.innerHTML = '';
+    snap.forEach(doc => {
+        const d = doc.data();
+        container.innerHTML += `
+            <div class="bg-white p-6 rounded-3xl shadow-sm border border-slate-100 flex justify-between items-center">
+                <div>
+                    <span class="text-[9px] bg-slate-100 px-2 py-0.5 rounded font-bold text-slate-500">FOLIO #${d.numFolio || 'S/F'}</span>
+                    <h4 class="font-black text-slate-900 uppercase mt-1">${d.cliente}</h4>
+                    <p class="text-[10px] text-slate-400 font-bold">${new Date(d.fecha).toLocaleDateString()}</p>
+                    <p class="text-brand-600 font-black text-xl mt-1">${d.total}</p>
+                </div>
+                <div class="flex flex-col gap-2">
+                    <button onclick="cargarParaEditar('${doc.id}')" class="bg-brand-500 text-white px-4 py-2 rounded-xl font-bold text-[10px] uppercase">Editar</button>
+                    <button onclick="eliminarCotizacion('${doc.id}')" class="text-red-300 hover:text-red-600 font-bold text-[10px] uppercase">Eliminar</button>
+                </div>
+            </div>`;
+    });
+}
+
+async function cargarParaEditar(id) {
+    try {
+        const doc = await db.collection("cotizaciones").doc(id).get();
+        if (!doc.exists) return alert("No se encontró el registro");
+        const data = doc.data();
+        
+        currentFolio = data.numFolio || currentFolio;
+        document.getElementById('folio').innerText = currentFolio;
+        document.getElementById('cliente').value = data.cliente || "";
+        document.getElementById('tel-cliente').value = data.telefono || "";
+        document.getElementById('direccion').value = data.direccion || "";
+        carrito = data.items || [];
+        switchTab('cotizador');
+        render();
+    } catch (e) { alert("Error al cargar"); }
+}
+
+async function eliminarCotizacion(id) {
+    if(confirm("¿Borrar definitivamente?")) {
+        await db.collection("cotizaciones").doc(id).delete();
+        cargarHistorial();
+    }
 }
 
 function generarPDF() {
     const e = document.getElementById('pdf-area');
-    const opt = {
+    html2pdf().set({
         margin: 0,
-        filename: `Cotizacion_${document.getElementById('cliente').value || 'CS'}.pdf`,
+        filename: `Cotizacion_${currentFolio}_${document.getElementById('cliente').value || 'CS'}.pdf`,
         image: { type: 'jpeg', quality: 0.98 },
         html2canvas: { scale: 3, useCORS: true },
         jsPDF: { unit: 'in', format: 'letter', orientation: 'portrait' }
-    };
-    html2pdf().set(opt).from(e).save();
+    }).from(e).save();
 }
 
 window.onload = init;
