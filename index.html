@@ -20,8 +20,6 @@
         .config-chip { cursor: pointer; transition: all 0.2s; border: 1px solid #e2e8f0; font-size: 10px; font-weight: 800; text-transform: uppercase; padding: 4px 10px; border-radius: 20px; display: flex; align-items: center; gap: 5px; }
         .config-chip input { cursor: pointer; accent-color: #2563eb; }
         .config-chip:hover { border-color: #2563eb; background: #f0f7ff; }
-        /* Clase para forzar eliminación en PDF */
-        .pdf-removed { display: none !important; }
     </style>
 </head>
 <body class="bg-slate-100 py-8 px-4 text-slate-900">
@@ -54,7 +52,7 @@
 
         <div class="no-print mb-6 p-4 bg-slate-50 rounded-2xl border border-slate-200">
             <p class="text-[10px] font-black uppercase text-slate-400 mb-3 tracking-widest flex items-center gap-2">
-                ⚙️ Configuración del PDF <span class="text-[8px] font-normal normal-case">(Elige qué imprimir)</span>
+                ⚙️ Configuración del PDF
             </p>
             <div class="flex flex-wrap gap-2">
                 <label class="config-chip"><input type="checkbox" checked onchange="togglePdfSection('section-logo', this.checked)"> Logo</label>
@@ -63,7 +61,7 @@
                 <label class="config-chip"><input type="checkbox" checked onchange="togglePdfSection('section-dir-cliente', this.checked)"> Dirección</label>
                 <label class="config-chip"><input type="checkbox" checked onchange="togglePdfSection('col-medidas', this.checked)"> Medidas</label>
                 <label class="config-chip"><input type="checkbox" checked onchange="togglePdfSection('section-politicas', this.checked)"> Políticas</label>
-                <label class="config-chip"><input type="checkbox" checked onchange="togglePdfSection('section-firmas', this.checked)"> Firmas</label>
+                <label class="config-chip"><input type="checkbox" checked onchange="togglePdfSection('section-firmas', this.checked)"> Firma</label>
             </div>
         </div>
 
@@ -148,7 +146,7 @@
 
         <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mb-10">
             <div class="space-y-4">
-                <div class="no-print">
+                <div class="no-print p-4 bg-slate-50 rounded-2xl border border-slate-200">
                     <label class="text-[10px] text-slate-400 font-bold uppercase block mb-2">Descuento e Instalación</label>
                     <div class="flex gap-2 mb-3">
                         <button onclick="setDiscount(10)" id="btn-10" class="discount-btn px-4 py-2 border border-slate-300 rounded-lg text-xs font-bold">10%</button>
@@ -156,14 +154,20 @@
                         <button onclick="setDiscount(20)" id="btn-20" class="discount-btn px-4 py-2 border border-slate-300 rounded-lg text-xs font-bold">20%</button>
                         <button onclick="setDiscount(0)" class="px-4 py-2 bg-slate-100 rounded-lg text-xs font-bold">0%</button>
                     </div>
-                    <input type="number" id="inst" value="0" oninput="render()" class="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl font-bold" placeholder="Costo Instalación">
+                    <div class="grid grid-cols-2 gap-3 mb-3">
+                        <input type="number" id="inst" value="0" oninput="render()" class="w-full p-3 bg-white border border-slate-200 rounded-xl font-bold text-sm" placeholder="Instalación $">
+                        <label class="flex items-center justify-center gap-2 cursor-pointer bg-white p-3 rounded-xl border border-slate-200">
+                            <input type="checkbox" id="iva-toggle" onchange="render()" class="w-4 h-4">
+                            <span class="text-[10px] font-black uppercase">Aplicar IVA 16%</span>
+                        </label>
+                    </div>
                 </div>
                 
                 <div id="section-politicas" class="bg-slate-50 p-5 rounded-2xl border border-slate-100">
                     <h4 class="text-[10px] font-black uppercase text-slate-400 mb-2 tracking-widest">Información de Pago</h4>
-                    <p class="text-[11px] font-bold text-slate-700 mb-2">Para iniciar el pedido se requiere el 50% de anticipo.</p>
+                    <p class="text-[11px] font-bold text-slate-700 mb-2">Anticipo del 50% para procesar pedido.</p>
                     <ul class="text-[9px] text-slate-500 space-y-1">
-                        <li>• Tiempo de entrega: 8 a 12 días hábiles tras anticipo.</li>
+                        <li>• Entrega: 8 a 12 días hábiles tras anticipo.</li>
                         <li>• Garantía: 1 año por defectos de fábrica.</li>
                         <li>• Presupuesto vigente por 15 días naturales.</li>
                     </ul>
@@ -173,13 +177,19 @@
             <div class="bg-slate-900 text-white p-8 rounded-[2rem] shadow-xl">
                 <div class="space-y-3">
                     <div class="flex justify-between text-xs font-bold uppercase opacity-60">
-                        <span>Subtotal Neto:</span> <span id="val-subtotal">$0.00</span>
+                        <span>Suma de Artículos:</span> <span id="val-subtotal">$0.00</span>
+                    </div>
+                    <div id="inst-row" class="hidden flex justify-between text-xs font-bold uppercase opacity-60">
+                        <span>Instalación:</span> <span id="val-inst-display">$0.00</span>
                     </div>
                     <div id="desc-row" class="hidden flex justify-between text-red-400 text-xs font-bold uppercase">
-                        <span>Descuento:</span> <span id="val-desc-money">-$0.00</span>
+                        <span>Descuento Aplicado:</span> <span id="val-desc-money">-$0.00</span>
+                    </div>
+                    <div id="iva-row" class="hidden flex justify-between text-xs font-bold uppercase opacity-60">
+                        <span>IVA (16%):</span> <span id="val-iva">$0.00</span>
                     </div>
                     <div class="pt-3 border-t border-white/10">
-                        <p class="text-[10px] font-bold uppercase opacity-60 mb-1">Total Cotizado</p>
+                        <p class="text-[10px] font-bold uppercase opacity-60 mb-1">Total Final</p>
                         <h3 id="granTotal" class="text-4xl font-black tracking-tighter">$0.00</h3>
                     </div>
                     <div class="mt-4 pt-4 border-t border-white/20 bg-white/5 p-4 rounded-2xl">
@@ -188,7 +198,7 @@
                             <span id="val-anticipo" class="text-xl font-black">$0.00</span>
                         </div>
                         <div class="flex justify-between items-center opacity-70">
-                            <span class="text-[10px] font-bold uppercase">Saldo al Instalar</span>
+                            <span class="text-[10px] font-bold uppercase">Saldo Restante</span>
                             <span id="val-saldo" class="text-sm font-bold">$0.00</span>
                         </div>
                     </div>
@@ -196,14 +206,10 @@
             </div>
         </div>
 
-        <div id="section-firmas" class="print-only mt-12 grid grid-cols-2 gap-20 text-center">
-            <div class="border-t border-slate-300 pt-2">
-                <p class="text-[10px] font-black uppercase text-slate-800">Firma del Cliente</p>
-                <p class="text-[8px] text-slate-400">Aceptación de términos</p>
-            </div>
-            <div class="border-t border-slate-300 pt-2">
-                <p class="text-[10px] font-black uppercase text-slate-800">Custom Shadows</p>
-                <p class="text-[8px] text-slate-400">Autorización</p>
+        <div id="section-firmas" class="print-only mt-16 text-center">
+            <div class="max-w-[250px] mx-auto border-t border-slate-300 pt-3">
+                <p class="text-[10px] font-black uppercase text-slate-800">Firma de Conformidad Cliente</p>
+                <p class="text-[8px] text-slate-400 italic">Al firmar acepta términos y condiciones</p>
             </div>
         </div>
 
@@ -276,8 +282,6 @@ function agregar() {
     const extraP = parseFloat(document.getElementById('extra-precio').value) || 0;
     const extraN = document.getElementById('extra-nombre').value || "Extra";
     const facia = document.getElementById('facia-toggle').checked;
-    const amb = document.getElementById('ambiente').value || "Persiana";
-    const col = document.getElementById('color').value || "S/N";
     
     let m2 = (ancho * alto) < 1 ? 1 : (ancho * alto);
     let costoFacia = facia ? (ancho * 280) : 0;
@@ -285,8 +289,8 @@ function agregar() {
     
     carrito.push({
         nombre: mod.options[mod.selectedIndex].getAttribute('data-full'),
-        ambiente: amb,
-        color: col,
+        ambiente: document.getElementById('ambiente').value || "Persiana",
+        color: document.getElementById('color').value || "S/N",
         medidas: `${ancho.toFixed(2)} x ${alto.toFixed(2)} m`,
         cant, sub: parseFloat(sub.toFixed(2)), motor, hasFacia: facia, extraP, extraN,
         indic: document.getElementById('indicaciones').value
@@ -321,27 +325,48 @@ function render() {
             </td>
             <td class="p-4 text-center text-xs font-mono align-top col-medidas">${p.medidas}</td>
             <td class="p-4 text-center font-black align-top">${p.cant}</td>
-            <td class="p-4 text-right font-black align-top">$${p.sub.toLocaleString(undefined, {minimumFractionDigits: 2})}</td>
+            <td class="p-4 text-right font-black align-top">$${p.sub.toFixed(2)}</td>
             <td class="p-4 text-center no-print delete-cell align-top"><button onclick="carrito.splice(${i},1);render()" class="text-red-300 hover:text-red-600">✕</button></td>
         </tr>`;
     });
     
     const inst = parseFloat(document.getElementById('inst').value) || 0;
-    let totalBase = subtotalItems + inst;
-    let descMoney = totalBase * (descuentoActual / 100);
-    let totalFinal = totalBase - descMoney;
+    const conIva = document.getElementById('iva-toggle').checked;
+    
+    let subNeto = subtotalItems + inst;
+    let descMoney = subNeto * (descuentoActual / 100);
+    let totalParcial = subNeto - descMoney;
+    
+    let ivaMoney = conIva ? (totalParcial * 0.16) : 0;
+    let totalFinal = totalParcial + ivaMoney;
     let anticipo = totalFinal * 0.5;
     
-    document.getElementById('val-subtotal').innerText = "$" + totalBase.toLocaleString(undefined, {minimumFractionDigits: 2});
+    document.getElementById('val-subtotal').innerText = "$" + subtotalItems.toFixed(2);
+    
+    // Instalación
+    const instRow = document.getElementById('inst-row');
+    if(inst > 0) {
+        instRow.classList.remove('hidden');
+        document.getElementById('val-inst-display').innerText = "$" + inst.toFixed(2);
+    } else { instRow.classList.add('hidden'); }
+
+    // Descuento
     document.getElementById('desc-row').classList.toggle('hidden', descuentoActual === 0);
-    document.getElementById('val-desc-money').innerText = "-$" + descMoney.toLocaleString(undefined, {minimumFractionDigits: 2});
-    document.getElementById('granTotal').innerText = "$" + totalFinal.toLocaleString(undefined, {minimumFractionDigits: 2});
-    document.getElementById('val-anticipo').innerText = "$" + anticipo.toLocaleString(undefined, {minimumFractionDigits: 2});
-    document.getElementById('val-saldo').innerText = "$" + (totalFinal - anticipo).toLocaleString(undefined, {minimumFractionDigits: 2});
+    document.getElementById('val-desc-money').innerText = "-$" + descMoney.toFixed(2);
+
+    // IVA
+    const ivaRow = document.getElementById('iva-row');
+    if(conIva) {
+        ivaRow.classList.remove('hidden');
+        document.getElementById('val-iva').innerText = "$" + ivaMoney.toFixed(2);
+    } else { ivaRow.classList.add('hidden'); }
+
+    document.getElementById('granTotal').innerText = "$" + totalFinal.toFixed(2);
+    document.getElementById('val-anticipo').innerText = "$" + anticipo.toFixed(2);
+    document.getElementById('val-saldo').innerText = "$" + (totalFinal - anticipo).toFixed(2);
 }
 
 function generarPDF() {
-    // 1. Pasar valores de inputs a texto visible para el PDF
     document.getElementById('pdf-cliente').innerText = document.getElementById('cliente').value || "---";
     document.getElementById('pdf-tel').innerText = document.getElementById('tel-cliente').value || "---";
     document.getElementById('pdf-direccion').innerText = document.getElementById('direccion').value || "---";
@@ -349,39 +374,17 @@ function generarPDF() {
     const original = document.getElementById('cotizacion-completa');
     const clone = original.cloneNode(true);
     
-    // 2. Limpiar elementos técnicos del clon que no deben aparecer
-    const elementsToRemove = [
-        '#panel-controles', 
-        '#botones-accion', 
-        '#col-borrar', 
-        '.no-print', 
-        '.delete-cell', 
-        'button', 
-        'select', 
-        'input',
-        '.hide-on-pdf' // Aquí quitamos físicamente las secciones desmarcadas
-    ];
-    
-    elementsToRemove.forEach(sel => {
-        clone.querySelectorAll(sel).forEach(el => el.remove());
-    });
+    const elementsToRemove = ['#panel-controles', '#botones-accion', '#col-borrar', '.no-print', '.delete-cell', 'button', 'select', 'input', '.hide-on-pdf'];
+    elementsToRemove.forEach(sel => { clone.querySelectorAll(sel).forEach(el => el.remove()); });
 
-    // 3. Opciones optimizadas para Chrome
     const opt = {
         margin: [0.4, 0.4],
         filename: `Cotizacion_Shadows_${document.getElementById('cliente').value || 'Cliente'}.pdf`,
         image: { type: 'jpeg', quality: 0.98 },
-        html2canvas: { 
-            scale: 2, 
-            useCORS: true, 
-            letterRendering: true,
-            scrollX: 0,
-            scrollY: 0 // Esto evita que se centre si hay scroll
-        },
+        html2canvas: { scale: 2, useCORS: true, letterRendering: true, scrollX: 0, scrollY: 0 },
         jsPDF: { unit: 'in', format: 'letter', orientation: 'portrait' }
     };
 
-    // 4. Ejecutar generación
     html2pdf().set(opt).from(clone).save().then(() => {
         folioActual++;
         localStorage.setItem('folio_shadows', folioActual);
