@@ -3,27 +3,37 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CS | Porfirio Góngora</title>
+    <title>CS | Porfirio Góngora - Cotizador Cloud</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+
     <script>
+        // Configuración extraída de tus datos
+        const firebaseConfig = {
+            apiKey: "AIzaSyCwb6vK_hwvCCBXRAdtIFH0WLG4GbSygBA",
+            authDomain: "cotizador-shadows-e544b.firebaseapp.com",
+            projectId: "cotizador-shadows-e544b",
+            storageBucket: "cotizador-shadows-e544b.firebasestorage.app",
+            messagingSenderId: "174933464686",
+            appId: "1:174933464686:web:fe03d5369f2fd5bc6bb87f",
+            measurementId: "G-DHW5LGS8VV"
+        };
+
+        // Inicializar Firebase
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.firestore();
+
         tailwind.config = {
             theme: {
                 extend: {
                     colors: {
-                        accent: {
-                            50: '#ecfeff',
-                            100: '#cffafe',
-                            500: '#06b6d4',
-                            700: '#0e7490',
-                            800: '#155e75',
-                            900: '#164e63',
-                        }
+                        accent: { 50: '#ecfeff', 100: '#cffafe', 500: '#06b6d4', 700: '#0e7490', 800: '#155e75', 900: '#164e63' }
                     },
-                    fontFamily: {
-                        sans: ['Outfit', 'sans-serif'],
-                    }
+                    fontFamily: { sans: ['Outfit', 'sans-serif'] }
                 }
             }
         }
@@ -37,13 +47,23 @@
         #pdf-area { background: white; width: 100%; }
         .min-input { border-bottom: 1px solid #cbd5e1; border-radius: 0; background: transparent; transition: border-color 0.3s; color: #1e293b; }
         .min-input:focus { outline: none; border-bottom-color: #0e7490; }
-        .min-input::placeholder { color: #94a3b8; }
     </style>
 </head>
 <body class="py-10 px-4 bg-slate-50">
 
     <div class="max-w-4xl mx-auto">
         
+        <div class="no-print mb-6 bg-slate-900 p-4 rounded-sm shadow-lg flex flex-col md:flex-row justify-between items-center gap-4">
+            <div class="flex items-center gap-3">
+                <div class="w-2 h-2 bg-emerald-400 rounded-full animate-pulse"></div>
+                <h3 class="text-[10px] font-bold text-white uppercase tracking-[0.2em]">Historial en la Nube</h3>
+            </div>
+            <select id="historial-select" onchange="cargarDesdeDB(this.value)" class="bg-slate-800 text-slate-300 text-xs p-2 rounded border border-slate-700 w-full md:w-64 outline-none">
+                <option value="">Cargando historial...</option>
+            </select>
+            <button onclick="nuevaCotizacion()" class="text-[9px] bg-slate-700 text-white px-3 py-2 rounded hover:bg-slate-600 uppercase font-bold tracking-widest">Nueva Limpia</button>
+        </div>
+
         <div class="no-print bg-white p-10 rounded-sm shadow-sm border border-slate-100 mb-12">
             <h2 class="text-xs font-bold tracking-[0.2em] uppercase mb-10 text-slate-700 flex items-center gap-2">
                 <span class="w-2 h-2 bg-accent-700 rounded-full"></span> Panel de Cotización
@@ -117,25 +137,25 @@
                 </div>
             </div>
 
-            <button onclick="generarPDF()" class="w-full mt-12 bg-accent-800 text-white rounded-sm py-4 text-[11px] uppercase tracking-[0.4em] font-bold hover:bg-accent-900 transition-all shadow-md">Exportar Cotización</button>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-12">
+                <button onclick="guardarEnDB()" class="bg-emerald-700 text-white rounded-sm py-4 text-[11px] uppercase tracking-[0.4em] font-bold hover:bg-emerald-800 transition-all shadow-md">Guardar en Nube</button>
+                <button onclick="generarPDF()" class="bg-accent-800 text-white rounded-sm py-4 text-[11px] uppercase tracking-[0.4em] font-bold hover:bg-accent-900 transition-all shadow-md">Exportar PDF</button>
+            </div>
         </div>
 
         <div id="pdf-area" class="p-16 border border-slate-50">
             <div id="cotizacion-completa">
-                
                 <div class="flex justify-between items-start border-b border-slate-100 pb-10 mb-12">
                     <div class="flex gap-8 items-center">
-                        <div class="w-28 h-28 bg-white rounded-full flex items-center justify-center border border-slate-100 p-4">
+                        <div class="w-16 h-16 bg-white rounded-full flex items-center justify-center border border-slate-100 p-3">
                             <img src="https://raw.githubusercontent.com/customshadows/cotizador/main/logo%20custom%20shadows.jpg" alt="Logo" class="w-full h-full object-contain">
                         </div>
                         <div>
                             <h1 class="text-2xl font-black tracking-tight uppercase mb-1 text-accent-900">Custom Shadows</h1>
                             <p class="text-[10px] tracking-[0.3em] uppercase text-slate-400 font-semibold">Porfirio Góngora</p>
-                            
                             <div class="mt-4 text-[9px] uppercase tracking-[0.3em] text-slate-400 space-y-1 font-medium">
-                                <p class="flex items-center gap-2">9993702007</p>
-                                <p class="flex items-center gap-2">customshadowsmx@gmail.com</p>
-                                <p class="flex items-center gap-2 text-slate-300">C. 41 693B Ciudad Caucel, Mérida, Yuc.</p>
+                                <p>9993702007</p>
+                                <p>customshadowsmx@gmail.com</p>
                             </div>
                         </div>
                     </div>
@@ -178,10 +198,6 @@
                             <p><span class="text-accent-500">•</span> Garantía 1 Año</p>
                             <p><span class="text-accent-500">•</span> Vigencia 15 Días</p>
                         </div>
-                        <div class="mt-16">
-                            <div class="w-48 border-b border-slate-300 mb-3"></div>
-                            <span class="text-[9px] uppercase tracking-[0.3em] text-slate-400 font-bold">Firma de aceptación</span>
-                        </div>
                     </div>
                     
                     <div class="col-span-2 space-y-3 pt-4">
@@ -197,15 +213,13 @@
                         <div id="iva-row" class="hidden flex justify-between text-[10px] tracking-widest uppercase text-slate-400 font-medium">
                             <span>IVA (16%)</span> <span id="val-iva">$0.00</span>
                         </div>
-                        
                         <div class="flex justify-between border-t-2 border-accent-900/20 pt-4 items-end mt-4">
                             <span class="text-[12px] font-black uppercase tracking-[0.3em] text-accent-900">Total Neto</span>
                             <span id="granTotal" class="text-4xl font-black tracking-tighter text-accent-900 leading-none">$0.00</span>
                         </div>
-                        
                         <div class="bg-slate-50 p-5 mt-6 grid grid-cols-2 text-[10px] tracking-widest uppercase rounded-sm border border-slate-100">
                             <div>
-                                <p class="mb-1 text-accent-600 font-bold">Anticipo 50%</p>
+                                <p class="mb-1 text-accent-600 font-bold">Anticipo</p>
                                 <p id="val-anticipo" class="text-xl font-black text-accent-800">$0.00</p>
                             </div>
                             <div class="text-right">
@@ -220,25 +234,25 @@
     </div>
 
 <script>
-let folioActual = localStorage.getItem('folio_shadows') ? parseInt(localStorage.getItem('folio_shadows')) : 1;
-document.getElementById('folio-display').innerText = '#' + String(folioActual).padStart(3, '0');
-document.getElementById('fecha-actual').innerText = new Date().toLocaleDateString('es-MX', { day: 'numeric', month: 'long', year: 'numeric' });
-
+// --- VARIABLES GLOBALES ---
+let folioActual = 1;
+let idDocumentoActual = null;
 let descuentoActual = 0;
 let carrito = [];
 const formatter = new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' });
 
+// --- DATOS DE TELAS ---
 const DATA_ENROLLABLES = {
     "BLACK OUT": { "Long Beach": 810.39, "Texture": 937.44, "Ipanema": 910.88, "Ohio": 927.05, "Montreal": 991.73, "Budelli": 948.99, "Sydney": 1122.24, "Luxury": 1072.58, "B.O. 500": 1118.78, "Galaxy": 1169.60, "Stylus": 1297.80 },
     "FILTRO LIGERO": { "Long Beach": 748.65, "Cadiz": 783.83, "Ipanema": 806.93, "Budelli": 818.48, "Sydney": 933.98, "F. L. Fresh": 1049.48 },
     "SCREEN": { "Screen Basic": 810.39, "Screen Soft": 810.39, "Screen Millan": 962.85, "Screen One": 1058.72 }
 };
-
 const DATA_SHEER = {
     "DUOLINE": { "Basic": 995.19, "Aromy": 1041.39, "Viewty": 1071.42, "Aquamarine": 1018.92, "Woodline": 1226.19, "Celebrity": 1268.93, "Bright": 1285.10, "Radiance": 1436.40, "Terra": 1459.50, "Season": 1575.00 },
     "DUO DIM OUT": { "Dim Out": 1609.65, "Brave": 1973.09, "Genius Dim Out": 1973.09, "Dim Out Woods": 1921.50, "Royal Dim Out": 2037.00, "Glam Dim Out": 2071.65, "Lino Dim Out": 2152.50 }
 };
 
+// --- LOGICA CORE ---
 function cargarTelas() {
     const sistema = document.getElementById('categoria').value;
     const select = document.getElementById('modelo');
@@ -286,17 +300,26 @@ function agregar() {
     render();
 }
 
+function setDiscount(val) {
+    descuentoActual = val;
+    document.querySelectorAll('.discount-btn').forEach(b => b.classList.remove('active'));
+    if(val > 0) document.getElementById('btn-'+val).classList.add('active');
+    render();
+}
+
 function render() {
     document.getElementById('pdf-cliente').innerText = document.getElementById('cliente').value || "PÚBLICO GENERAL";
     document.getElementById('pdf-tel').innerText = document.getElementById('tel-cliente').value || "--";
     document.getElementById('pdf-direccion').innerText = document.getElementById('direccion').value || "--";
+    document.getElementById('folio-display').innerText = '#' + String(folioActual).padStart(3, '0');
+    document.getElementById('fecha-actual').innerText = new Date().toLocaleDateString('es-MX', { day: 'numeric', month: 'long', year: 'numeric' });
 
     const lista = document.getElementById('lista');
     lista.innerHTML = '';
-    let subtotalArticulos = 0;
+    let sumaArticulos = 0;
 
     carrito.forEach((item, index) => {
-        subtotalArticulos += item.sub;
+        sumaArticulos += item.sub;
         lista.innerHTML += `
             <tr class="hover:bg-slate-50 transition-colors">
                 <td class="py-4 font-bold text-slate-800">${item.ambiente}</td>
@@ -304,52 +327,132 @@ function render() {
                 <td class="py-4 text-center font-semibold">${item.medidas}</td>
                 <td class="py-4 text-center font-semibold">${item.cant}</td>
                 <td class="py-4 text-right font-bold text-slate-800">${formatter.format(item.sub)}</td>
-                <td class="no-print p-4 text-center"><button onclick="eliminar(${index})" class="text-slate-300 hover:text-red-500 transition-colors font-bold">✕</button></td>
+                <td class="no-print p-4 text-right"><button onclick="eliminar(${index})" class="text-red-400 hover:text-red-600">✕</button></td>
             </tr>`;
     });
 
-    const inst = parseFloat(document.getElementById('inst').value) || 0;
-    const montoDesc = subtotalArticulos * (descuentoActual / 100);
-    const subconDescEInst = (subtotalArticulos - montoDesc) + inst;
-    const iva = document.getElementById('iva-toggle').checked ? subconDescEInst * 0.16 : 0;
-    const total = subconDescEInst + iva;
+    let montoDesc = sumaArticulos * (descuentoActual / 100);
+    let subtotalConDesc = sumaArticulos - montoDesc;
+    let inst = parseFloat(document.getElementById('inst').value) || 0;
+    let baseIva = subtotalConDesc + inst;
+    let iva = document.getElementById('iva-toggle').checked ? baseIva * 0.16 : 0;
+    let total = baseIva + iva;
 
-    document.getElementById('val-subtotal').innerText = formatter.format(subtotalArticulos);
-    document.getElementById('desc-row').classList.toggle('hidden', montoDesc <= 0);
+    document.getElementById('val-subtotal').innerText = formatter.format(sumaArticulos);
     document.getElementById('val-desc-money').innerText = `-${formatter.format(montoDesc)}`;
-    document.getElementById('inst-row').classList.toggle('hidden', inst <= 0);
+    document.getElementById('desc-row').style.display = descuentoActual > 0 ? 'flex' : 'none';
     document.getElementById('val-inst-money').innerText = formatter.format(inst);
-    document.getElementById('iva-row').classList.toggle('hidden', iva <= 0);
+    document.getElementById('inst-row').style.display = inst > 0 ? 'flex' : 'none';
     document.getElementById('val-iva').innerText = formatter.format(iva);
+    document.getElementById('iva-row').style.display = iva > 0 ? 'flex' : 'none';
     document.getElementById('granTotal').innerText = formatter.format(total);
     document.getElementById('val-anticipo').innerText = formatter.format(total / 2);
     document.getElementById('val-saldo').innerText = formatter.format(total / 2);
 }
 
-function eliminar(index) { carrito.splice(index, 1); render(); }
-function setDiscount(val) { 
-    descuentoActual = val; 
-    document.querySelectorAll('.discount-btn').forEach(b => b.classList.remove('active'));
-    if(val > 0) document.getElementById('btn-'+val).classList.add('active');
-    render(); 
+function eliminar(idx) {
+    carrito.splice(idx, 1);
+    render();
+}
+
+// --- PERSISTENCIA FIREBASE ---
+async function guardarEnDB() {
+    if (carrito.length === 0) return alert("Añade productos antes de guardar.");
+    
+    const cotizacion = {
+        folio: folioActual,
+        cliente: document.getElementById('cliente').value || "PÚBLICO GENERAL",
+        telefono: document.getElementById('tel-cliente').value,
+        direccion: document.getElementById('direccion').value,
+        carrito: carrito,
+        descuento: descuentoActual,
+        instalacion: parseFloat(document.getElementById('inst').value) || 0,
+        conIva: document.getElementById('iva-toggle').checked,
+        fecha: new Date().toISOString(),
+        total: document.getElementById('granTotal').innerText
+    };
+
+    try {
+        if (idDocumentoActual) {
+            await db.collection("cotizaciones").doc(idDocumentoActual).set(cotizacion);
+            alert("¡Cotización actualizada correctamente!");
+        } else {
+            const docRef = await db.collection("cotizaciones").add(cotizacion);
+            idDocumentoActual = docRef.id;
+            alert("¡Guardado en la nube con éxito!");
+        }
+        listarHistorial();
+    } catch (e) {
+        console.error(e);
+        alert("Error al conectar con Firebase.");
+    }
+}
+
+async function listarHistorial() {
+    const select = document.getElementById('historial-select');
+    try {
+        const snapshot = await db.collection("cotizaciones").orderBy("fecha", "desc").limit(15).get();
+        select.innerHTML = '<option value="">Abrir guardada...</option>';
+        snapshot.forEach(doc => {
+            const d = doc.data();
+            const opt = document.createElement('option');
+            opt.value = doc.id;
+            opt.text = `#${String(d.folio).padStart(3, '0')} - ${d.cliente}`;
+            select.appendChild(opt);
+        });
+    } catch (e) {
+        select.innerHTML = '<option>Error al cargar historial</option>';
+    }
+}
+
+async function cargarDesdeDB(id) {
+    if (!id) return;
+    const doc = await db.collection("cotizaciones").doc(id).get();
+    if (doc.exists) {
+        const data = doc.data();
+        idDocumentoActual = id;
+        folioActual = data.folio;
+        document.getElementById('cliente').value = data.cliente;
+        document.getElementById('tel-cliente').value = data.telefono || "";
+        document.getElementById('direccion').value = data.direccion || "";
+        document.getElementById('inst').value = data.instalacion;
+        document.getElementById('iva-toggle').checked = data.conIva;
+        carrito = data.carrito;
+        setDiscount(data.descuento);
+        render();
+    }
+}
+
+function nuevaCotizacion() {
+    idDocumentoActual = null;
+    carrito = [];
+    document.getElementById('cliente').value = "";
+    document.getElementById('tel-cliente').value = "";
+    document.getElementById('direccion').value = "";
+    document.getElementById('inst').value = "";
+    document.getElementById('iva-toggle').checked = false;
+    setDiscount(0);
+    // Incrementar folio sugerido
+    folioActual++;
+    render();
 }
 
 function generarPDF() {
-    render();
     const element = document.getElementById('pdf-area');
     const opt = {
         margin: 0,
         filename: `Cotizacion_${document.getElementById('cliente').value || 'Cliente'}.pdf`,
-        image: { type: 'jpeg', quality: 1 },
-        html2canvas: { scale: 3, useCORS: true, scrollY: 0 },
+        image: { type: 'jpeg', quality: 0.98 },
+        html2canvas: { scale: 2, useCORS: true },
         jsPDF: { unit: 'in', format: 'letter', orientation: 'portrait' }
     };
-    html2pdf().set(opt).from(element).save().then(() => {
-        folioActual++;
-        localStorage.setItem('folio_shadows', folioActual);
-        document.getElementById('folio-display').innerText = '#' + String(folioActual).padStart(3, '0');
-    });
+    html2pdf().set(opt).from(element).save();
 }
+
+window.onload = () => {
+    listarHistorial();
+    render();
+};
 </script>
 </body>
 </html>
