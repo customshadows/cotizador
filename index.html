@@ -3,16 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CS | Porfirio Góngora - Cotizador Cloud</title>
+    <title>Cotizador Pro | Custom Shadows</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;900&display=swap" rel="stylesheet">
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
 
     <script>
-        // Configuración extraída de tus datos
         const firebaseConfig = {
             apiKey: "AIzaSyCwb6vK_hwvCCBXRAdtIFH0WLG4GbSygBA",
             authDomain: "cotizador-shadows-e544b.firebaseapp.com",
@@ -22,8 +20,6 @@
             appId: "1:174933464686:web:fe03d5369f2fd5bc6bb87f",
             measurementId: "G-DHW5LGS8VV"
         };
-
-        // Inicializar Firebase
         firebase.initializeApp(firebaseConfig);
         const db = firebase.firestore();
 
@@ -31,7 +27,8 @@
             theme: {
                 extend: {
                     colors: {
-                        accent: { 50: '#ecfeff', 100: '#cffafe', 500: '#06b6d4', 700: '#0e7490', 800: '#155e75', 900: '#164e63' }
+                        brand: { 50: '#f0f9ff', 500: '#0ea5e9', 700: '#0369a1', 800: '#075985', 900: '#0c4a6e' },
+                        slate: { 850: '#1e293b' }
                     },
                     fontFamily: { sans: ['Outfit', 'sans-serif'] }
                 }
@@ -39,192 +36,171 @@
         }
     </script>
     <style>
-        body { background-color: #f8fafc; color: #334155; }
-        .discount-btn { border: 1px solid #e2e8f0; background: white; transition: all 0.2s; color: #64748b; }
-        .discount-btn.active { border-color: #0e7490; background: #0e7490; color: #fff; font-weight: 600; }
-        .print-only { display: none; }
-        @media print { .no-print { display: none !important; } .print-only { display: block !important; } }
-        #pdf-area { background: white; width: 100%; }
-        .min-input { border-bottom: 1px solid #cbd5e1; border-radius: 0; background: transparent; transition: border-color 0.3s; color: #1e293b; }
-        .min-input:focus { outline: none; border-bottom-color: #0e7490; }
+        body { background: #f1f5f9; font-family: 'Outfit', sans-serif; }
+        .card { background: white; border-radius: 12px; box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1); border: 1px solid #e2e8f0; }
+        .input-group label { font-size: 0.7rem; font-weight: 700; text-transform: uppercase; color: #64748b; letter-spacing: 0.05em; margin-bottom: 4px; display: block; }
+        .modern-input { width: 100%; padding: 10px; border: 2px solid #f1f5f9; border-radius: 8px; transition: all 0.2s; font-size: 0.95rem; font-weight: 500; }
+        .modern-input:focus { border-color: #0ea5e9; outline: none; background: #fff; box-shadow: 0 0 0 4px rgba(14, 165, 233, 0.1); }
+        .btn-primary { background: #0c4a6e; color: white; transition: all 0.2s; cursor: pointer; border-radius: 8px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; }
+        .btn-primary:hover { background: #075985; transform: translateY(-1px); }
+        .table-header { font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.1em; color: #94a3b8; border-bottom: 2px solid #f1f5f9; padding: 12px; }
+        .no-print { display: block; }
+        @media print { .no-print { display: none !important; } #pdf-area { margin: 0; padding: 0; border: none; box-shadow: none; } }
     </style>
 </head>
-<body class="py-10 px-4 bg-slate-50">
+<body class="p-4 md:p-8">
 
-    <div class="max-w-4xl mx-auto">
+    <div class="max-w-5xl mx-auto">
         
-        <div class="no-print mb-6 bg-slate-900 p-4 rounded-sm shadow-lg flex flex-col md:flex-row justify-between items-center gap-4">
-            <div class="flex items-center gap-3">
-                <div class="w-2 h-2 bg-emerald-400 rounded-full animate-pulse"></div>
-                <h3 class="text-[10px] font-bold text-white uppercase tracking-[0.2em]">Historial en la Nube</h3>
-            </div>
-            <select id="historial-select" onchange="cargarDesdeDB(this.value)" class="bg-slate-800 text-slate-300 text-xs p-2 rounded border border-slate-700 w-full md:w-64 outline-none">
-                <option value="">Cargando historial...</option>
-            </select>
-            <button onclick="nuevaCotizacion()" class="text-[9px] bg-slate-700 text-white px-3 py-2 rounded hover:bg-slate-600 uppercase font-bold tracking-widest">Nueva Limpia</button>
-        </div>
-
-        <div class="no-print bg-white p-10 rounded-sm shadow-sm border border-slate-100 mb-12">
-            <h2 class="text-xs font-bold tracking-[0.2em] uppercase mb-10 text-slate-700 flex items-center gap-2">
-                <span class="w-2 h-2 bg-accent-700 rounded-full"></span> Panel de Cotización
-            </h2>
-            
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-8 mb-12">
-                <div class="py-2">
-                    <label class="text-[9px] uppercase tracking-widest text-slate-500 block mb-1 font-semibold">Cliente</label>
-                    <input type="text" id="cliente" oninput="render()" placeholder="Nombre del cliente" class="w-full min-input font-medium pb-2">
-                </div>
-                <div class="py-2">
-                    <label class="text-[9px] uppercase tracking-widest text-slate-500 block mb-1 font-semibold">Teléfono</label>
-                    <input type="text" id="tel-cliente" oninput="render()" placeholder="WhatsApp" class="w-full min-input font-medium pb-2">
-                </div>
-                <div class="py-2">
-                    <label class="text-[9px] uppercase tracking-widest text-slate-500 block mb-1 font-semibold">Ubicación de Obra</label>
-                    <input type="text" id="direccion" oninput="render()" placeholder="Dirección del proyecto" class="w-full min-input font-medium pb-2">
-                </div>
-            </div>
-
-            <div class="space-y-8 bg-slate-50/50 p-6 rounded-sm border border-slate-100 mb-8">
-                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6">
-                    <select id="categoria" onchange="cargarTelas()" class="w-full p-2 min-input bg-transparent text-sm font-medium">
-                        <option value="">Sistema</option>
-                        <option value="ENROLLABLES">ENROLLABLES</option>
-                        <option value="SHEER">SHEER ELEGANCE</option>
-                    </select>
-                    <select id="modelo" class="w-full p-2 min-input bg-transparent text-xs uppercase tracking-tight font-medium text-slate-600">
-                        <option value="">Tela</option>
-                    </select>
-                    <input type="text" id="ambiente" placeholder="Ambiente" class="w-full p-2 min-input bg-transparent text-sm">
-                    <input type="text" id="color" placeholder="Color" class="w-full p-2 min-input bg-transparent text-sm">
-                    <div class="flex gap-2">
-                        <input type="number" id="ancho" step="0.01" placeholder="An" class="w-1/3 p-2 min-input bg-transparent text-center text-sm font-bold text-accent-800">
-                        <input type="number" id="alto" step="0.01" placeholder="Al" class="w-1/3 p-2 min-input bg-transparent text-center text-sm font-bold text-accent-800">
-                        <input type="number" id="cantidad" value="1" class="w-1/3 p-2 min-input bg-transparent text-center text-sm font-bold">
-                    </div>
-                </div>
-
-                <div class="grid grid-cols-1 md:grid-cols-4 gap-4 items-end">
-                    <input type="number" id="motor-precio" placeholder="Motor $" class="p-2 min-input bg-transparent text-sm">
-                    <div class="flex gap-1">
-                        <input type="text" id="extra-nombre" placeholder="Extra" class="w-2/3 p-2 min-input bg-transparent text-xs uppercase tracking-widest">
-                        <input type="number" id="extra-precio" placeholder="$" class="w-1/3 p-2 min-input bg-transparent text-xs text-center">
-                    </div>
-                    <label class="flex items-center gap-2 cursor-pointer p-2 border border-slate-200 rounded-sm bg-white hover:border-accent-500 text-[10px] uppercase tracking-tighter transition-all text-slate-600 font-medium">
-                        <input type="checkbox" id="facia-toggle" class="accent-accent-700 w-4 h-4"> Incluir Facia
-                    </label>
-                    <button onclick="agregar()" class="bg-accent-700 text-white rounded-sm px-4 py-3 text-[11px] uppercase tracking-widest font-bold hover:bg-accent-800 transition-colors">Añadir</button>
-                </div>
-            </div>
-
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-10">
+        <div class="no-print card bg-slate-850 p-4 mb-8 flex flex-col md:flex-row items-center justify-between gap-4 border-none">
+            <div class="flex items-center gap-4">
+                <div class="h-10 w-10 bg-brand-500 rounded-lg flex items-center justify-center text-white font-black">CS</div>
                 <div>
-                    <span class="text-[9px] uppercase tracking-[0.3em] text-slate-400 block mb-3 font-bold">Descuento</span>
-                    <div class="flex gap-2">
-                        <button onclick="setDiscount(10)" id="btn-10" class="discount-btn flex-1 py-2 rounded-sm text-[11px]">10%</button>
-                        <button onclick="setDiscount(15)" id="btn-15" class="discount-btn flex-1 py-2 rounded-sm text-[11px]">15%</button>
-                        <button onclick="setDiscount(20)" id="btn-20" class="discount-btn flex-1 py-2 rounded-sm text-[11px]">20%</button>
-                        <button onclick="setDiscount(0)" id="btn-0" class="flex-1 py-2 rounded-sm text-[11px] text-slate-400 bg-slate-50 border-slate-200">0%</button>
-                    </div>
-                </div>
-                <div class="flex gap-4 items-end">
-                    <div class="flex-1">
-                        <span class="text-[9px] uppercase tracking-[0.3em] text-slate-600 block mb-1 font-bold">Instalación</span>
-                        <input type="number" id="inst" oninput="render()" class="w-full p-2 min-input bg-slate-50/50 text-sm font-bold text-accent-900" placeholder="$ 0.00">
-                    </div>
-                    <label class="flex-1 p-2 border border-slate-200 rounded-sm text-center text-[10px] uppercase tracking-widest cursor-pointer hover:bg-white hover:border-accent-500 transition-colors text-slate-600 font-medium flex items-center justify-center gap-2">
-                        <input type="checkbox" id="iva-toggle" onchange="render()" class="accent-accent-700 w-4 h-4"> + IVA
-                    </label>
+                    <h2 class="text-white font-bold text-sm tracking-tight">Gestor de Cotizaciones</h2>
+                    <p class="text-brand-500 text-[10px] uppercase font-bold">Base de datos Activa</p>
                 </div>
             </div>
-
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-12">
-                <button onclick="guardarEnDB()" class="bg-emerald-700 text-white rounded-sm py-4 text-[11px] uppercase tracking-[0.4em] font-bold hover:bg-emerald-800 transition-all shadow-md">Guardar en Nube</button>
-                <button onclick="generarPDF()" class="bg-accent-800 text-white rounded-sm py-4 text-[11px] uppercase tracking-[0.4em] font-bold hover:bg-accent-900 transition-all shadow-md">Exportar PDF</button>
+            <div class="flex gap-2 w-full md:w-auto">
+                <select id="historial-select" onchange="cargarDesdeDB(this.value)" class="bg-slate-800 text-white text-xs p-3 rounded-lg border border-slate-700 w-full outline-none">
+                    <option value="">Historial reciente...</option>
+                </select>
+                <button onclick="nuevaCotizacion()" class="bg-white/10 hover:bg-white/20 text-white text-[10px] px-4 rounded-lg font-bold transition-all">NUEVO</button>
             </div>
         </div>
 
-        <div id="pdf-area" class="p-16 border border-slate-50">
-            <div id="cotizacion-completa">
-                <div class="flex justify-between items-start border-b border-slate-100 pb-10 mb-12">
-                    <div class="flex gap-8 items-center">
-                        <div class="w-16 h-16 bg-white rounded-full flex items-center justify-center border border-slate-100 p-3">
-                            <img src="https://raw.githubusercontent.com/customshadows/cotizador/main/logo%20custom%20shadows.jpg" alt="Logo" class="w-full h-full object-contain">
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            
+            <div class="lg:col-span-1 space-y-6 no-print">
+                <div class="card p-6">
+                    <h3 class="text-slate-900 font-bold mb-6 flex items-center gap-2">
+                        <span class="w-1.5 h-4 bg-brand-500 rounded-full"></span> 1. Datos del Proyecto
+                    </h3>
+                    <div class="space-y-4">
+                        <div class="input-group">
+                            <label>Nombre del Cliente</label>
+                            <input type="text" id="cliente" oninput="render()" class="modern-input" placeholder="Ej. Juan Pérez">
                         </div>
-                        <div>
-                            <h1 class="text-2xl font-black tracking-tight uppercase mb-1 text-accent-900">Custom Shadows</h1>
-                            <p class="text-[10px] tracking-[0.3em] uppercase text-slate-400 font-semibold">Porfirio Góngora</p>
-                            <div class="mt-4 text-[9px] uppercase tracking-[0.3em] text-slate-400 space-y-1 font-medium">
-                                <p>9993702007</p>
-                                <p>customshadowsmx@gmail.com</p>
-                            </div>
+                        <div class="input-group">
+                            <label>Teléfono de Contacto</label>
+                            <input type="text" id="tel-cliente" oninput="render()" class="modern-input" placeholder="999 000 0000">
                         </div>
-                    </div>
-                    <div class="text-right">
-                        <span class="text-[9px] tracking-[0.3em] uppercase text-slate-400 font-bold block mb-1">Folio</span>
-                        <p id="folio-display" class="text-2xl font-bold text-accent-700">#001</p>
-                        <p id="fecha-actual" class="text-[10px] text-slate-400 uppercase tracking-widest mt-2 font-medium"></p>
+                        <div class="input-group">
+                            <label>Ubicación / Obra</label>
+                            <input type="text" id="direccion" oninput="render()" class="modern-input" placeholder="Fracc. o Colonia">
+                        </div>
                     </div>
                 </div>
 
-                <div class="mb-14 border-l-[3px] border-accent-700 pl-6 py-1">
-                    <span class="text-[9px] tracking-[0.3em] uppercase text-accent-800 block mb-2 font-bold">Cliente / Proyecto</span>
-                    <p id="pdf-cliente" class="text-xl font-bold uppercase tracking-wider mb-1 text-slate-900">Público General</p>
-                    <div class="flex gap-6 text-[10px] text-slate-500 uppercase tracking-widest font-medium mt-3">
-                        <p id="pdf-direccion" class="flex items-center gap-1"><span class="text-slate-400">Dirección Obra.</span> <span>--</span></p>
-                        <p id="pdf-tel" class="flex items-center gap-1"><span class="text-slate-400">Tel.</span> <span>--</span></p>
+                <div class="card p-6">
+                    <h3 class="text-slate-900 font-bold mb-6 flex items-center gap-2">
+                        <span class="w-1.5 h-4 bg-brand-500 rounded-full"></span> 2. Añadir Producto
+                    </h3>
+                    <div class="space-y-4">
+                        <select id="categoria" onchange="cargarTelas()" class="modern-input">
+                            <option value="">Seleccione Sistema</option>
+                            <option value="ENROLLABLES">Enrollables</option>
+                            <option value="SHEER">Sheer Elegance</option>
+                        </select>
+                        <select id="modelo" class="modern-input text-xs font-bold uppercase"></select>
+                        <div class="grid grid-cols-2 gap-4">
+                            <input type="text" id="ambiente" placeholder="Ambiente" class="modern-input">
+                            <input type="text" id="color" placeholder="Color" class="modern-input">
+                        </div>
+                        <div class="grid grid-cols-3 gap-2">
+                            <input type="number" id="ancho" step="0.01" placeholder="Ancho" class="modern-input text-center">
+                            <input type="number" id="alto" step="0.01" placeholder="Alto" class="modern-input text-center">
+                            <input type="number" id="cantidad" value="1" placeholder="Cant" class="modern-input text-center font-bold">
+                        </div>
+                        <div class="bg-slate-50 p-4 rounded-lg space-y-3">
+                            <input type="number" id="motor-precio" placeholder="Precio Motor ($)" class="modern-input">
+                            <label class="flex items-center gap-2 text-[11px] font-bold text-slate-600 uppercase cursor-pointer">
+                                <input type="checkbox" id="facia-toggle" class="w-4 h-4 accent-brand-500"> Incluir Facia (Caja)
+                            </label>
+                        </div>
+                        <button onclick="agregar()" class="w-full btn-primary py-4 text-xs">Añadir a la lista</button>
                     </div>
                 </div>
+            </div>
 
-                <table class="w-full mb-12">
-                    <thead>
-                        <tr class="text-[10px] uppercase tracking-[0.2em] text-slate-500 border-b border-slate-200 font-bold">
-                            <th class="py-4 text-left">Ambiente</th>
-                            <th class="py-4 text-left">Descripción</th>
-                            <th class="py-4 text-center">Medidas</th>
-                            <th class="py-4 text-center">Cant</th>
-                            <th class="py-4 text-right">Importe</th>
-                            <th class="no-print w-10"></th>
-                        </tr>
-                    </thead>
-                    <tbody id="lista" class="text-[11px] text-slate-700 divide-y divide-slate-100 font-medium"></tbody>
-                </table>
+            <div class="lg:col-span-2 space-y-6">
+                
+                <div class="no-print flex gap-4">
+                    <button onclick="guardarEnDB()" class="flex-1 bg-emerald-600 hover:bg-emerald-700 text-white p-4 rounded-xl font-bold text-xs uppercase shadow-lg transition-all">Guardar en Nube</button>
+                    <button onclick="generarPDF()" class="flex-1 bg-brand-700 hover:bg-brand-800 text-white p-4 rounded-xl font-bold text-xs uppercase shadow-lg transition-all">Descargar PDF</button>
+                </div>
 
-                <div class="grid grid-cols-5 gap-12">
-                    <div class="col-span-3 pt-4">
-                        <h4 class="text-[10px] uppercase tracking-[0.3em] text-accent-900 mb-6 font-bold">Términos</h4>
-                        <div class="grid grid-cols-2 gap-x-8 gap-y-3 text-[10px] text-slate-500 uppercase tracking-widest font-medium leading-relaxed">
-                            <p><span class="text-accent-500">•</span> Anticipo 50%</p>
-                            <p><span class="text-accent-500">•</span> Entrega 8-12 días</p>
-                            <p><span class="text-accent-500">•</span> Garantía 1 Año</p>
-                            <p><span class="text-accent-500">•</span> Vigencia 15 Días</p>
-                        </div>
-                    </div>
-                    
-                    <div class="col-span-2 space-y-3 pt-4">
-                        <div class="flex justify-between text-[10px] tracking-widest uppercase text-slate-500 font-medium">
-                            <span>Subtotal</span> <span id="val-subtotal" class="font-bold">$0.00</span>
-                        </div>
-                        <div id="desc-row" class="hidden flex justify-between text-[10px] tracking-widest uppercase text-accent-700 font-bold bg-accent-50 p-1 rounded-sm">
-                            <span>Descuento</span> <span id="val-desc-money">-$0.00</span>
-                        </div>
-                        <div id="inst-row" class="hidden flex justify-between text-[10px] tracking-widest uppercase text-slate-500 font-medium">
-                            <span>Instalación</span> <span id="val-inst-money">$0.00</span>
-                        </div>
-                        <div id="iva-row" class="hidden flex justify-between text-[10px] tracking-widest uppercase text-slate-400 font-medium">
-                            <span>IVA (16%)</span> <span id="val-iva">$0.00</span>
-                        </div>
-                        <div class="flex justify-between border-t-2 border-accent-900/20 pt-4 items-end mt-4">
-                            <span class="text-[12px] font-black uppercase tracking-[0.3em] text-accent-900">Total Neto</span>
-                            <span id="granTotal" class="text-4xl font-black tracking-tighter text-accent-900 leading-none">$0.00</span>
-                        </div>
-                        <div class="bg-slate-50 p-5 mt-6 grid grid-cols-2 text-[10px] tracking-widest uppercase rounded-sm border border-slate-100">
+                <div id="pdf-area" class="card bg-white p-8 md:p-12 overflow-hidden border-none shadow-2xl">
+                    <div class="flex justify-between items-start mb-10 pb-8 border-b-2 border-slate-50">
+                        <div class="flex gap-6 items-center">
+                            <img src="https://raw.githubusercontent.com/customshadows/cotizador/main/logo%20custom%20shadows.jpg" class="h-20 w-20 object-contain">
                             <div>
-                                <p class="mb-1 text-accent-600 font-bold">Anticipo</p>
-                                <p id="val-anticipo" class="text-xl font-black text-accent-800">$0.00</p>
+                                <h1 class="text-3xl font-black text-slate-900 uppercase tracking-tighter">Custom Shadows</h1>
+                                <p class="text-slate-400 font-bold text-xs uppercase tracking-widest">Premium Window Coverings</p>
                             </div>
-                            <div class="text-right">
-                                <p class="mb-1 text-slate-400 font-bold">Saldo</p>
-                                <p id="val-saldo" class="text-xl font-bold text-slate-600">$0.00</p>
+                        </div>
+                        <div class="text-right">
+                            <p class="text-[10px] font-black text-brand-500 uppercase">Cotización</p>
+                            <h2 id="folio-display" class="text-3xl font-black text-slate-900">#000</h2>
+                            <p id="fecha-actual" class="text-[10px] text-slate-400 font-bold uppercase"></p>
+                        </div>
+                    </div>
+
+                    <div class="bg-slate-50 rounded-xl p-6 mb-10 grid grid-cols-2 gap-4">
+                        <div>
+                            <span class="text-[9px] font-black text-slate-400 uppercase tracking-widest">Para:</span>
+                            <h3 id="pdf-cliente" class="text-xl font-bold text-slate-800 uppercase">Nombre Cliente</h3>
+                        </div>
+                        <div class="text-right">
+                            <span class="text-[9px] font-black text-slate-400 uppercase tracking-widest">Lugar:</span>
+                            <p id="pdf-direccion" class="text-slate-600 font-medium italic"></p>
+                        </div>
+                    </div>
+
+                    <table class="w-full mb-10">
+                        <thead>
+                            <tr class="table-header">
+                                <th class="text-left py-4">Descripción</th>
+                                <th class="text-center py-4">Medidas</th>
+                                <th class="text-center py-4">Cant</th>
+                                <th class="text-right py-4">Subtotal</th>
+                                <th class="no-print w-10"></th>
+                            </tr>
+                        </thead>
+                        <tbody id="lista" class="divide-y divide-slate-100"></tbody>
+                    </table>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-12 pt-8 border-t-4 border-slate-900">
+                        <div class="space-y-6">
+                            <div class="bg-brand-50 p-4 rounded-lg border-l-4 border-brand-500">
+                                <h4 class="text-[10px] font-black text-brand-700 uppercase mb-2">Resumen de Pago</h4>
+                                <div class="flex justify-between items-center mb-1">
+                                    <span class="text-xs font-bold text-slate-600">Anticipo (50%)</span>
+                                    <span id="val-anticipo" class="text-lg font-black text-slate-900">$0.00</span>
+                                </div>
+                                <div class="flex justify-between items-center">
+                                    <span class="text-xs font-bold text-slate-400">Saldo a Entrega</span>
+                                    <span id="val-saldo" class="text-lg font-bold text-slate-400">$0.00</span>
+                                </div>
+                            </div>
+                            <div class="text-[9px] text-slate-400 leading-relaxed uppercase font-bold space-y-1">
+                                <p>• Garantía de 1 año en defectos de fábrica</p>
+                                <p>• Tiempo de entrega: 8 a 12 días hábiles</p>
+                                <p>• Vigencia de precios: 15 días</p>
+                            </div>
+                        </div>
+
+                        <div class="space-y-3">
+                            <div class="flex justify-between px-2 text-sm font-bold text-slate-500">
+                                <span>Bruto</span>
+                                <span id="val-subtotal">$0.00</span>
+                            </div>
+                            <div id="desc-row" class="flex justify-between px-2 text-sm font-bold text-emerald-600 hidden">
+                                <span>Descuento Aplicado</span>
+                                <span id="val-desc-money">-$0.00</span>
+                            </div>
+                            <div class="flex justify-between items-center px-4 py-6 bg-slate-900 rounded-2xl text-white">
+                                <span class="text-xs font-bold uppercase tracking-widest">Total Neto</span>
+                                <span id="granTotal" class="text-4xl font-black tracking-tighter">$0.00</span>
                             </div>
                         </div>
                     </div>
@@ -234,14 +210,9 @@
     </div>
 
 <script>
-// --- VARIABLES GLOBALES ---
-let folioActual = 1;
-let idDocumentoActual = null;
-let descuentoActual = 0;
-let carrito = [];
+let folioActual = 1, idDocumentoActual = null, descuentoActual = 0, carrito = [];
 const formatter = new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' });
 
-// --- DATOS DE TELAS ---
 const DATA_ENROLLABLES = {
     "BLACK OUT": { "Long Beach": 810.39, "Texture": 937.44, "Ipanema": 910.88, "Ohio": 927.05, "Montreal": 991.73, "Budelli": 948.99, "Sydney": 1122.24, "Luxury": 1072.58, "B.O. 500": 1118.78, "Galaxy": 1169.60, "Stylus": 1297.80 },
     "FILTRO LIGERO": { "Long Beach": 748.65, "Cadiz": 783.83, "Ipanema": 806.93, "Budelli": 818.48, "Sydney": 933.98, "F. L. Fresh": 1049.48 },
@@ -252,207 +223,87 @@ const DATA_SHEER = {
     "DUO DIM OUT": { "Dim Out": 1609.65, "Brave": 1973.09, "Genius Dim Out": 1973.09, "Dim Out Woods": 1921.50, "Royal Dim Out": 2037.00, "Glam Dim Out": 2071.65, "Lino Dim Out": 2152.50 }
 };
 
-// --- LOGICA CORE ---
 function cargarTelas() {
-    const sistema = document.getElementById('categoria').value;
-    const select = document.getElementById('modelo');
-    select.innerHTML = '<option value="">Elegir Tela</option>';
-    let fuente = sistema === "ENROLLABLES" ? DATA_ENROLLABLES : (sistema === "SHEER" ? DATA_SHEER : null);
-    if (fuente) {
-        for (const grupo in fuente) {
-            const optgroup = document.createElement('optgroup');
-            optgroup.label = grupo;
-            for (const tela in fuente[grupo]) {
-                const precio = fuente[grupo][tela];
-                const option = document.createElement('option');
-                option.value = precio;
-                option.text = `${tela} (${formatter.format(precio)})`;
-                option.setAttribute('data-full', `${grupo} - ${tela}`);
-                optgroup.appendChild(option);
-            }
-            select.appendChild(optgroup);
-        }
-    }
+    const s = document.getElementById('categoria').value, sel = document.getElementById('modelo');
+    sel.innerHTML = '<option value="">Seleccione Tela</option>';
+    let f = s === "ENROLLABLES" ? DATA_ENROLLABLES : (s === "SHEER" ? DATA_SHEER : null);
+    if(f) Object.keys(f).forEach(g => {
+        let gr = document.createElement('optgroup'); gr.label = g;
+        Object.keys(f[g]).forEach(t => {
+            let o = document.createElement('option'); o.value = f[g][t]; o.text = `${t} (${formatter.format(f[g][t])})`;
+            o.setAttribute('data-full', `${g} - ${t}`); gr.appendChild(o);
+        }); sel.appendChild(gr);
+    });
 }
 
 function agregar() {
-    const mod = document.getElementById('modelo');
-    if (!mod.value) return;
-    const ancho = parseFloat(document.getElementById('ancho').value) || 0;
-    const alto = parseFloat(document.getElementById('alto').value) || 0;
-    const cant = parseInt(document.getElementById('cantidad').value) || 1;
-    const motor = parseFloat(document.getElementById('motor-precio').value) || 0;
-    const extraP = parseFloat(document.getElementById('extra-precio').value) || 0;
-    const facia = document.getElementById('facia-toggle').checked;
-    
-    let m2 = (ancho * alto) < 1 ? 1 : (ancho * alto);
-    let costoFacia = facia ? (ancho * 280) : 0;
-    let sub = ( (m2 * parseFloat(mod.value)) + motor + costoFacia + extraP ) * cant;
-    
+    const m = document.getElementById('modelo'); if(!m.value) return;
+    const an = parseFloat(document.getElementById('ancho').value) || 0, al = parseFloat(document.getElementById('alto').value) || 0, ct = parseInt(document.getElementById('cantidad').value) || 1;
+    const mot = parseFloat(document.getElementById('motor-precio').value) || 0, fc = document.getElementById('facia-toggle').checked;
+    let m2 = (an * al) < 1 ? 1 : (an * al), cf = fc ? (an * 280) : 0, sub = ((m2 * parseFloat(m.value)) + mot + cf) * ct;
     carrito.push({
-        ambiente: document.getElementById('ambiente').value || "General",
-        nombre: mod.options[mod.selectedIndex].getAttribute('data-full'),
-        color: document.getElementById('color').value || "S/C",
-        medidas: `${ancho.toFixed(2)} x ${alto.toFixed(2)}`,
-        cant, sub,
-        detalles: `${facia ? 'Facia ' : ''}${motor > 0 ? '+ Mot' : ''}`
+        amb: document.getElementById('ambiente').value || "Gral",
+        nom: m.options[m.selectedIndex].getAttribute('data-full'),
+        col: document.getElementById('color').value || "S/C",
+        med: `${an.toFixed(2)}x${al.toFixed(2)}`, ct, sub, det: `${fc ? '[Facia]' : ''} ${mot>0 ? '[Mot]' : ''}`
     });
-    render();
-}
-
-function setDiscount(val) {
-    descuentoActual = val;
-    document.querySelectorAll('.discount-btn').forEach(b => b.classList.remove('active'));
-    if(val > 0) document.getElementById('btn-'+val).classList.add('active');
     render();
 }
 
 function render() {
     document.getElementById('pdf-cliente').innerText = document.getElementById('cliente').value || "PÚBLICO GENERAL";
-    document.getElementById('pdf-tel').innerText = document.getElementById('tel-cliente').value || "--";
     document.getElementById('pdf-direccion').innerText = document.getElementById('direccion').value || "--";
     document.getElementById('folio-display').innerText = '#' + String(folioActual).padStart(3, '0');
     document.getElementById('fecha-actual').innerText = new Date().toLocaleDateString('es-MX', { day: 'numeric', month: 'long', year: 'numeric' });
-
-    const lista = document.getElementById('lista');
-    lista.innerHTML = '';
-    let sumaArticulos = 0;
-
-    carrito.forEach((item, index) => {
-        sumaArticulos += item.sub;
-        lista.innerHTML += `
-            <tr class="hover:bg-slate-50 transition-colors">
-                <td class="py-4 font-bold text-slate-800">${item.ambiente}</td>
-                <td class="py-4 text-[10px] uppercase tracking-tight font-medium"><b>${item.nombre}</b><br><span class="text-slate-500 font-semibold">${item.color} ${item.detalles}</span></td>
-                <td class="py-4 text-center font-semibold">${item.medidas}</td>
-                <td class="py-4 text-center font-semibold">${item.cant}</td>
-                <td class="py-4 text-right font-bold text-slate-800">${formatter.format(item.sub)}</td>
-                <td class="no-print p-4 text-right"><button onclick="eliminar(${index})" class="text-red-400 hover:text-red-600">✕</button></td>
-            </tr>`;
+    const l = document.getElementById('lista'); l.innerHTML = ''; let sum = 0;
+    carrito.forEach((it, i) => {
+        sum += it.sub;
+        l.innerHTML += `<tr class="text-slate-700"><td class="py-4"><div class="font-bold text-slate-900">${it.amb}</div><div class="text-[10px] text-slate-400 uppercase font-black">${it.nom} | ${it.col} ${it.det}</div></td><td class="text-center font-bold text-xs">${it.med}</td><td class="text-center font-bold text-xs">${it.ct}</td><td class="text-right font-black text-slate-900">${formatter.format(it.sub)}</td><td class="no-print text-right"><button onclick="eliminar(${i})" class="text-red-300 hover:text-red-600 transition-all">✕</button></td></tr>`;
     });
-
-    let montoDesc = sumaArticulos * (descuentoActual / 100);
-    let subtotalConDesc = sumaArticulos - montoDesc;
-    let inst = parseFloat(document.getElementById('inst').value) || 0;
-    let baseIva = subtotalConDesc + inst;
-    let iva = document.getElementById('iva-toggle').checked ? baseIva * 0.16 : 0;
-    let total = baseIva + iva;
-
-    document.getElementById('val-subtotal').innerText = formatter.format(sumaArticulos);
-    document.getElementById('val-desc-money').innerText = `-${formatter.format(montoDesc)}`;
-    document.getElementById('desc-row').style.display = descuentoActual > 0 ? 'flex' : 'none';
-    document.getElementById('val-inst-money').innerText = formatter.format(inst);
-    document.getElementById('inst-row').style.display = inst > 0 ? 'flex' : 'none';
-    document.getElementById('val-iva').innerText = formatter.format(iva);
-    document.getElementById('iva-row').style.display = iva > 0 ? 'flex' : 'none';
-    document.getElementById('granTotal').innerText = formatter.format(total);
-    document.getElementById('val-anticipo').innerText = formatter.format(total / 2);
-    document.getElementById('val-saldo').innerText = formatter.format(total / 2);
+    document.getElementById('val-subtotal').innerText = formatter.format(sum);
+    document.getElementById('granTotal').innerText = formatter.format(sum);
+    document.getElementById('val-anticipo').innerText = formatter.format(sum / 2);
+    document.getElementById('val-saldo').innerText = formatter.format(sum / 2);
 }
 
-function eliminar(idx) {
-    carrito.splice(idx, 1);
-    render();
-}
+function eliminar(i) { carrito.splice(i, 1); render(); }
 
-// --- PERSISTENCIA FIREBASE ---
 async function guardarEnDB() {
-    if (carrito.length === 0) return alert("Añade productos antes de guardar.");
-    
-    const cotizacion = {
-        folio: folioActual,
-        cliente: document.getElementById('cliente').value || "PÚBLICO GENERAL",
-        telefono: document.getElementById('tel-cliente').value,
-        direccion: document.getElementById('direccion').value,
-        carrito: carrito,
-        descuento: descuentoActual,
-        instalacion: parseFloat(document.getElementById('inst').value) || 0,
-        conIva: document.getElementById('iva-toggle').checked,
-        fecha: new Date().toISOString(),
-        total: document.getElementById('granTotal').innerText
-    };
-
+    if(carrito.length===0) return alert("Carrito vacío");
+    const doc = { folio: folioActual, cliente: document.getElementById('cliente').value, tel: document.getElementById('tel-cliente').value, dir: document.getElementById('direccion').value, carrito, fecha: new Date().toISOString() };
     try {
-        if (idDocumentoActual) {
-            await db.collection("cotizaciones").doc(idDocumentoActual).set(cotizacion);
-            alert("¡Cotización actualizada correctamente!");
-        } else {
-            const docRef = await db.collection("cotizaciones").add(cotizacion);
-            idDocumentoActual = docRef.id;
-            alert("¡Guardado en la nube con éxito!");
-        }
-        listarHistorial();
-    } catch (e) {
-        console.error(e);
-        alert("Error al conectar con Firebase.");
-    }
+        if(idDocumentoActual) await db.collection("cotizaciones").doc(idDocumentoActual).set(doc);
+        else { const r = await db.collection("cotizaciones").add(doc); idDocumentoActual = r.id; }
+        alert("Sincronizado con la nube"); listarHistorial();
+    } catch(e) { alert("Error Firebase: Verifica las reglas"); }
 }
 
 async function listarHistorial() {
-    const select = document.getElementById('historial-select');
-    try {
-        const snapshot = await db.collection("cotizaciones").orderBy("fecha", "desc").limit(15).get();
-        select.innerHTML = '<option value="">Abrir guardada...</option>';
-        snapshot.forEach(doc => {
-            const d = doc.data();
-            const opt = document.createElement('option');
-            opt.value = doc.id;
-            opt.text = `#${String(d.folio).padStart(3, '0')} - ${d.cliente}`;
-            select.appendChild(opt);
-        });
-    } catch (e) {
-        select.innerHTML = '<option>Error al cargar historial</option>';
-    }
+    const s = document.getElementById('historial-select');
+    const snap = await db.collection("cotizaciones").orderBy("fecha", "desc").limit(10).get();
+    s.innerHTML = '<option value="">Historial reciente...</option>';
+    snap.forEach(d => {
+        const o = document.createElement('option'); o.value = d.id;
+        o.text = `#${String(d.data().folio).padStart(3,'0')} - ${d.data().cliente}`; s.appendChild(o);
+    });
 }
 
 async function cargarDesdeDB(id) {
-    if (!id) return;
-    const doc = await db.collection("cotizaciones").doc(id).get();
-    if (doc.exists) {
-        const data = doc.data();
-        idDocumentoActual = id;
-        folioActual = data.folio;
-        document.getElementById('cliente').value = data.cliente;
-        document.getElementById('tel-cliente').value = data.telefono || "";
-        document.getElementById('direccion').value = data.direccion || "";
-        document.getElementById('inst').value = data.instalacion;
-        document.getElementById('iva-toggle').checked = data.conIva;
-        carrito = data.carrito;
-        setDiscount(data.descuento);
-        render();
+    if(!id) return; const d = await db.collection("cotizaciones").doc(id).get();
+    if(d.exists) {
+        const data = d.data(); idDocumentoActual = id; folioActual = data.folio;
+        document.getElementById('cliente').value = data.cliente; document.getElementById('tel-cliente').value = data.tel;
+        document.getElementById('direccion').value = data.dir; carrito = data.carrito; render();
     }
 }
 
-function nuevaCotizacion() {
-    idDocumentoActual = null;
-    carrito = [];
-    document.getElementById('cliente').value = "";
-    document.getElementById('tel-cliente').value = "";
-    document.getElementById('direccion').value = "";
-    document.getElementById('inst').value = "";
-    document.getElementById('iva-toggle').checked = false;
-    setDiscount(0);
-    // Incrementar folio sugerido
-    folioActual++;
-    render();
+function nuevaCotizacion() { idDocumentoActual = null; carrito = []; folioActual++; render(); }
+function generarPDF() { 
+    const e = document.getElementById('pdf-area');
+    html2pdf().set({ margin: 0.2, filename: 'Cotizacion.pdf', html2canvas: { scale: 2 }, jsPDF: { unit: 'in', format: 'letter' }}).from(e).save();
 }
 
-function generarPDF() {
-    const element = document.getElementById('pdf-area');
-    const opt = {
-        margin: 0,
-        filename: `Cotizacion_${document.getElementById('cliente').value || 'Cliente'}.pdf`,
-        image: { type: 'jpeg', quality: 0.98 },
-        html2canvas: { scale: 2, useCORS: true },
-        jsPDF: { unit: 'in', format: 'letter', orientation: 'portrait' }
-    };
-    html2pdf().set(opt).from(element).save();
-}
-
-window.onload = () => {
-    listarHistorial();
-    render();
-};
+window.onload = () => { listarHistorial(); render(); };
 </script>
 </body>
 </html>
