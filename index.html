@@ -3,567 +3,372 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Custom Shadows | Sistema de Gestión Pro</title>
+    <title>Cotizador Pro - V24</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700;900&display=swap" rel="stylesheet">
-    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
-
-    <script>
-        const firebaseConfig = {
-            apiKey: "AIzaSyCwb6vK_hwvCCBXRAdtIFH0WLG4GbSygBA",
-            authDomain: "cotizador-shadows-e544b.firebaseapp.com",
-            projectId: "cotizador-shadows-e544b",
-            storageBucket: "cotizador-shadows-e544b.firebasestorage.app",
-            messagingSenderId: "174933464686",
-            appId: "1:174933464686:web:fe03d5369f2fd5bc6bb87f"
-        };
-        firebase.initializeApp(firebaseConfig);
-        const db = firebase.firestore();
-
-        tailwind.config = {
-            theme: { extend: { colors: { brand: { 500: '#0ea5e9', 600: '#0284c7', 900: '#0c4a6e' } }, fontFamily: { sans: ['Outfit', 'sans-serif'] } } }
-        }
-    </script>
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+    <script src="https://cdn.sheetjs.com/xlsx-0.20.1/package/dist/xlsx.full.min.js"></script>
     <style>
-        .modern-input { width: 100%; padding: 10px 14px; border: 2px solid #f1f5f9; border-radius: 10px; font-size: 0.85rem; outline: none; transition: 0.2s; font-weight: 500; }
-        .modern-input:focus { border-color: #0ea5e9; background: white; box-shadow: 0 0 0 4px rgba(14, 165, 233, 0.1); }
-        .tab-btn { padding: 12px 24px; font-weight: 700; font-size: 0.75rem; text-transform: uppercase; border-bottom: 3px solid transparent; transition: 0.3s; cursor: pointer; }
-        .tab-btn.active { border-color: #0ea5e9; color: #0ea5e9; background: rgba(14, 165, 233, 0.05); }
-        input[type=number]::-webkit-inner-spin-button, input[type=number]::-webkit-outer-spin-button { opacity: 1; cursor: pointer; }
-        @media print { .no-print { display: none !important; } }
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;700;900&display=swap');
+        body { font-family: 'Inter', sans-serif; }
+        @media print {
+            nav, button, .no-print, input[type="file"], .sticky { display: none !important; }
+            .bg-slate-50 { background-color: white !important; }
+            .shadow-lg, .shadow-sm { box-shadow: none !important; border: 1px solid #eee !important; }
+        }
     </style>
 </head>
-<body class="bg-[#f8fafc] text-slate-800">
+<body class="bg-slate-50 text-slate-800">
 
-    <nav class="no-print bg-slate-900 text-white p-4 sticky top-0 z-50 shadow-2xl">
-        <div class="max-w-7xl mx-auto flex justify-between items-center">
-            <div class="flex items-center gap-8">
-                <span class="font-black text-2xl tracking-tighter text-brand-500">CS<span class="text-white">PRO</span></span>
-                <div class="flex gap-1">
-                    <button onclick="switchTab('cotizador')" id="btn-tab-cotizador" class="tab-btn active text-white">Cotización</button>
-                    <button onclick="switchTab('historial')" id="btn-tab-historial" class="tab-btn text-slate-400">Cotizaciones</button>
-                    <button onclick="switchTab('admin')" id="btn-tab-admin" class="tab-btn text-slate-400">Backend</button>
-                </div>
-            </div>
-        </div>
+<div id="app" class="max-w-7xl mx-auto p-4">
+    <nav class="flex gap-2 mb-6 bg-white p-2 rounded-xl shadow-sm border no-print">
+        <button @click="currentTab = 'frontend'" :class="tabBtn('frontend')">Crear Cotización</button>
+        <button @click="currentTab = 'historial'" :class="tabBtn('historial')">Historial</button>
+        <button @click="currentTab = 'backend'" :class="tabBtn('backend')">⚙️ Configuración</button>
     </nav>
 
-    <main class="max-w-7xl mx-auto p-4 md:p-8">
-        
-        <div id="view-cotizador" class="grid grid-cols-1 lg:grid-cols-12 gap-8">
-            <div class="lg:col-span-4 space-y-5 no-print">
-                <div class="bg-white p-6 rounded-3xl shadow-sm border border-slate-200">
-                    <h3 class="text-[10px] font-black uppercase mb-5 text-slate-400 tracking-widest flex items-center gap-2">Datos del Cliente</h3>
-                    <div class="space-y-3">
-                        <input type="text" id="cliente" oninput="render()" placeholder="Nombre del Cliente" class="modern-input">
-                        <input type="text" id="tel-cliente" oninput="render()" placeholder="Teléfono" class="modern-input">
-                        <input type="text" id="direccion" oninput="render()" placeholder="Dirección" class="modern-input">
+    <div v-if="currentTab === 'frontend'" class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <div class="lg:col-span-2 space-y-6">
+            <header class="bg-white p-6 rounded-2xl shadow-sm border-b-4 border-blue-600 flex justify-between items-start">
+                <div class="flex items-center gap-4">
+                    <div class="w-20 h-20 bg-gray-50 rounded border overflow-hidden flex items-center justify-center">
+                        <img v-if="config.logo" :src="config.logo" class="max-w-full max-h-full object-contain">
+                    </div>
+                    <div>
+                        <h1 class="text-xl font-black text-blue-900 uppercase">{{ config.empresa || 'Mi Empresa' }}</h1>
+                        <p class="text-[10px] text-gray-500 font-bold uppercase">{{ config.asesor }} | {{ config.telefono }}</p>
+                        <p class="text-[9px] text-gray-400 uppercase max-w-xs">{{ config.direccionEmpresa }}</p>
+                    </div>
+                </div>
+                <div class="text-right">
+                    <p class="text-xs font-black text-blue-600 uppercase">Folio #{{ folio }}</p>
+                    <p class="text-[10px] text-gray-400">{{ fechaHoy }}</p>
+                </div>
+            </header>
+
+            <section class="bg-white p-4 rounded-2xl shadow-sm border grid grid-cols-1 md:grid-cols-3 gap-4">
+                <input v-model="cliente.nombre" placeholder="Nombre Cliente" class="border-b p-1 text-sm outline-none">
+                <input v-model="cliente.direccion" placeholder="Dirección de Entrega" class="border-b p-1 text-sm outline-none">
+                <input v-model="cliente.telefono" placeholder="WhatsApp / Tel" class="border-b p-1 text-sm outline-none">
+            </section>
+
+            <section class="bg-white p-6 rounded-2xl shadow-sm border border-blue-100 no-print">
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+                    <div>
+                        <label class="text-[10px] font-bold text-gray-400 uppercase">Categoría</label>
+                        <select v-model="form.catIdx" @change="resetCategoria" class="w-full border rounded-lg p-2 text-sm bg-gray-50">
+                            <option value="-1">Seleccionar...</option>
+                            <option v-for="(cat, idx) in categorias" :key="idx" :value="idx">{{ cat.nombre }}</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="text-[10px] font-bold text-gray-400 uppercase">Producto</label>
+                        <select v-model="form.prodIdx" @change="resetProducto" class="w-full border rounded-lg p-2 text-sm">
+                            <option value="-1">Seleccionar...</option>
+                            <option v-for="(p, idx) in currentProductos" :key="idx" :value="idx">{{ p.nombre }}</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="text-[10px] font-bold text-blue-600 uppercase">Color</label>
+                        <select v-if="coloresDisponibles.length" v-model="form.color" class="w-full border border-blue-200 rounded-lg p-2 text-sm bg-blue-50 font-bold">
+                            <option value="">Elegir...</option>
+                            <option v-for="c in coloresDisponibles" :value="c">{{ c }}</option>
+                        </select>
+                        <input v-else v-model="form.color" placeholder="Color manual" class="w-full border rounded-lg p-2 text-sm outline-none">
+                    </div>
+                    <div>
+                        <label class="text-[10px] font-bold text-gray-400 uppercase">Ambiente</label>
+                        <input v-model="form.ambiente" placeholder="Ej: Sala" class="w-full border rounded-lg p-2 text-sm">
                     </div>
                 </div>
 
-                <div class="bg-white p-6 rounded-3xl shadow-sm border border-slate-200">
-                    <h3 class="text-[10px] font-black uppercase mb-5 text-slate-400 tracking-widest">Configuración de Persianas</h3>
-                    <div class="space-y-3">
-                        <select id="categoria-select" onchange="actualizarModelos()" class="modern-input bg-slate-50 font-bold uppercase"></select>
-                        <select id="modelo-select" class="modern-input text-[11px] uppercase font-bold"></select>
-                        <div class="grid grid-cols-2 gap-2">
-                            <input type="text" id="ambiente" placeholder="Ambiente (Habitación)" class="modern-input">
-                            <input type="text" id="color" placeholder="Color de tela" class="modern-input">
-                        </div>
-                        <div class="grid grid-cols-2 gap-2">
-                            <div>
-                                <label class="text-[8px] font-bold text-slate-400 ml-1">ANCHO (M)</label>
-                                <input type="number" id="ancho" step="0.10" value="1.00" class="modern-input text-center font-bold">
-                            </div>
-                            <div>
-                                <label class="text-[8px] font-bold text-slate-400 ml-1">ALTO (M)</label>
-                                <input type="number" id="alto" step="0.10" value="1.00" class="modern-input text-center font-bold">
-                            </div>
-                        </div>
-                        
-                        <div class="flex items-center gap-3 p-2 bg-slate-50 rounded-xl border border-slate-200">
-                            <input type="checkbox" id="facia-toggle" class="w-5 h-5 accent-brand-500">
-                            <label for="facia-toggle" class="text-[11px] font-black text-slate-700 uppercase">Incluir Facia (+$280 ml)</label>
-                        </div>
-
-                        <div class="bg-slate-50 p-4 rounded-2xl border border-dashed border-slate-200 space-y-3">
-                            <input type="number" id="motor-precio" placeholder="Precio Motor $" class="modern-input">
-                            <div class="flex gap-2">
-                                <input type="text" id="extra-nombre" placeholder="Concepto Adicional" class="modern-input w-2/3">
-                                <input type="number" id="extra-precio" placeholder="$" class="modern-input w-1/3 text-center">
-                            </div>
-                        </div>
-                        <button onclick="agregarItem()" class="w-full bg-brand-600 text-white py-4 rounded-2xl font-black uppercase shadow-lg shadow-brand-500/20 transition-all active:scale-95">Agregar al Carrito</button>
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-4">
+                    <input v-model="form.ancho" type="number" placeholder="Ancho m" class="border p-2 rounded-lg text-sm">
+                    <input v-model="form.alto" type="number" placeholder="Alto m" class="border p-2 rounded-lg text-sm">
+                    <div class="flex items-center justify-center gap-2 border rounded-lg bg-slate-50">
+                        <label class="text-[10px] font-bold uppercase text-gray-500">Facia</label>
+                        <input v-model="form.tieneFacia" type="checkbox" class="w-4 h-4">
                     </div>
+                    <input v-model="form.motor" type="number" placeholder="Motor $" class="border p-2 rounded-lg text-sm">
                 </div>
 
-                <div class="bg-white p-6 rounded-3xl shadow-sm border border-slate-200">
-                    <div class="space-y-4">
-                        <div class="grid grid-cols-2 gap-3">
-                            <div>
-                                <label class="text-[9px] font-black text-slate-400 uppercase block ml-1">Instalación $</label>
-                                <input type="number" id="inst" oninput="render()" placeholder="0.00" class="modern-input font-bold">
-                            </div>
-                            <div>
-                                <label class="text-[9px] font-black text-slate-400 uppercase block ml-1">Descuento</label>
-                                <select id="desc-tipo" onchange="toggleCustomDesc(); render();" class="modern-input font-bold">
-                                    <option value="0">0%</option>
-                                    <option value="5">5%</option>
-                                    <option value="10">10%</option>
-                                    <option value="15">15%</option>
-                                    <option value="20">20%</option>
-                                    <option value="custom">Personalizado</option>
-                                </select>
-                            </div>
+                <div class="bg-slate-50 p-4 rounded-xl border mb-4">
+                    <div v-for="(ex, exIdx) in form.extras" :key="exIdx" class="flex gap-2 mb-2">
+                        <input v-model="ex.concepto" placeholder="Concepto Extra" class="flex-1 text-xs p-2 border rounded">
+                        <input v-model.number="ex.precio" type="number" placeholder="$" class="w-20 text-xs p-2 border rounded text-right">
+                        <button @click="form.extras.splice(exIdx, 1)" class="text-red-400">✖</button>
+                    </div>
+                    <button @click="form.extras.push({concepto:'', precio:''})" class="text-[10px] font-bold text-blue-600 uppercase">+ Añadir Extra</button>
+                </div>
+
+                <button @click="agregarAlCarrito" class="w-full bg-blue-600 text-white p-3 rounded-xl font-black shadow-lg uppercase">Agregar Partida</button>
+            </section>
+
+            <div v-if="carrito.length > 0" class="bg-white rounded-2xl shadow-sm border overflow-hidden">
+                <table class="w-full text-xs text-left">
+                    <thead class="bg-slate-800 text-white uppercase text-[9px]">
+                        <tr><th class="p-4">Producto / Detalles</th><th class="p-4 text-center">Medidas</th><th class="p-4 text-right">Monto</th><th class="p-4 no-print"></th></tr>
+                    </thead>
+                    <tbody class="divide-y">
+                        <tr v-for="(item, idx) in carrito" :key="idx">
+                            <td class="p-4 uppercase">
+                                <span class="font-bold text-blue-900">{{ item.prodNombre }}</span>
+                                <div class="text-[9px] text-gray-500">Color: {{item.color}} | Ambiente: {{item.ambiente}}</div>
+                                <div v-for="ex in item.extras" class="text-[8px] text-orange-600 font-bold italic">+ {{ex.concepto}}: ${{formatNum(ex.precio)}}</div>
+                            </td>
+                            <td class="p-4 text-center">{{ item.ancho }}x{{ item.alto }}m</td>
+                            <td class="p-4 text-right font-black">${{ formatNum(item.totalItem) }}</td>
+                            <td class="p-4 text-center no-print"><button @click="carrito.splice(idx, 1)" class="text-red-300">✖</button></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div class="space-y-6">
+            <div class="bg-white p-6 rounded-2xl shadow-lg border-t-4 border-blue-900 sticky top-4">
+                <h2 class="font-black text-lg mb-4 text-slate-700 uppercase italic text-center">Resumen de Venta</h2>
+                <div class="space-y-4">
+                    <div class="no-print">
+                        <label class="text-[10px] font-bold text-gray-400 uppercase">Instalación Global ($)</label>
+                        <input v-model.number="totales.instalacion" type="number" placeholder="Escribir monto..." class="w-full border rounded p-2 text-right font-bold text-blue-600 outline-none">
+                    </div>
+
+                    <div class="space-y-2 border-t pt-4 no-print">
+                        <label class="text-[10px] font-bold text-gray-400 uppercase">Descuento</label>
+                        <div class="grid grid-cols-4 gap-1 mb-2">
+                            <button v-for="pct in [5,10,15,20]" @click="setDesc(pct, 'pct')" :class="descBtnCls(pct, 'pct')">{{pct}}%</button>
                         </div>
-                        <div id="custom-desc-area" class="hidden flex gap-2">
-                            <input type="number" id="desc-custom-val" oninput="render()" placeholder="Valor" class="modern-input">
-                            <select id="desc-custom-tipo" onchange="render()" class="modern-input w-1/3">
-                                <option value="percent">%</option>
-                                <option value="money">$</option>
+                        <div class="flex gap-1">
+                            <select v-model="totales.descTipo" class="text-[10px] border rounded p-1 bg-slate-50 font-bold">
+                                <option value="pct">% Descuento</option>
+                                <option value="cash">$ Descuento</option>
                             </select>
-                        </div>
-                        <label class="flex items-center gap-3 text-[10px] font-black text-slate-600 uppercase cursor-pointer">
-                            <input type="checkbox" id="iva-toggle" onchange="render()" class="w-5 h-5 accent-brand-500"> IVA 16%
-                        </label>
-                    </div>
-                </div>
-            </div>
-
-            <div class="lg:col-span-8 space-y-4">
-                <div class="no-print flex gap-3">
-                    <button onclick="generarPDF()" class="flex-1 bg-slate-800 text-white p-4 rounded-2xl font-black text-[11px] uppercase shadow-xl hover:bg-slate-700 transition-all">Generar PDF</button>
-                    <button onclick="guardarCotizacion()" class="bg-emerald-600 text-white px-8 rounded-2xl font-black text-[11px] uppercase shadow-xl hover:bg-emerald-700 transition-all">Guardar Cotización</button>
-                </div>
-                
-                <div id="pdf-area" class="bg-white p-12 shadow-2xl min-h-[1050px] border border-slate-100 relative rounded-sm">
-                    <div class="flex justify-between items-start border-b-4 border-slate-900 pb-8 mb-10">
-                        <div class="flex gap-6">
-                            <img id="logo-preview" src="" class="h-20 w-20 object-contain">
-                            <div>
-                                <h1 id="negocio-nombre" class="text-3xl font-black text-slate-900 uppercase">Shadows</h1>
-                                <p id="asesor-nombre" class="text-sm font-bold text-brand-600 uppercase"></p>
-                                <div class="mt-2 text-[10px] font-bold text-slate-400 space-y-0.5 uppercase">
-                                    <p id="negocio-datos-1"></p>
-                                    <p id="negocio-datos-2"></p>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="text-right">
-                            <h2 class="text-4xl font-black text-slate-900">#<span id="folio">--</span></h2>
-                            <p id="fecha-pdf" class="text-[10px] font-black text-slate-400 uppercase mt-2"></p>
-                            <p id="vigencia-pdf" class="text-[10px] font-black text-red-500 uppercase"></p>
+                            <input v-model.number="totales.descValorManual" type="number" placeholder="Valor..." class="flex-1 border rounded p-1 text-xs outline-none">
                         </div>
                     </div>
 
-                    <div class="grid grid-cols-2 gap-8 mb-10">
-                        <div class="bg-slate-50 p-5 rounded-2xl border-l-4 border-brand-500">
-                            <p class="text-[9px] font-black text-slate-400 uppercase mb-1">Datos del Cliente</p>
-                            <p id="pdf-cliente" class="text-xl font-black text-slate-800 uppercase leading-tight">--</p>
-                            <p id="pdf-tel-display" class="text-[11px] text-slate-500 mt-2 font-bold"></p>
-                            <p id="pdf-direccion-display" class="text-[10px] text-slate-400 mt-1 uppercase font-bold"></p>
+                    <div class="flex items-center gap-2 py-2 border-t no-print">
+                        <input type="checkbox" v-model="totales.aplicaIVA" id="ivaCheck" class="w-4 h-4">
+                        <label for="ivaCheck" class="text-xs font-bold text-slate-600 uppercase">IVA (16%)</label>
+                    </div>
+
+                    <div class="bg-slate-50 p-4 rounded-xl space-y-2 border">
+                        <div class="flex justify-between text-lg font-black text-blue-900">
+                            <span>TOTAL:</span><span>${{ formatNum(totalFinal) }}</span>
+                        </div>
+                        <div class="flex justify-between items-center border-t pt-2 no-print">
+                            <label class="text-[9px] font-bold text-gray-400 uppercase">Anticipo (%)</label>
+                            <input v-model.number="totales.pctAnticipo" type="number" class="w-12 border text-center text-xs font-bold rounded">
+                        </div>
+                        <div class="flex justify-between text-[11px] font-bold text-green-600">
+                            <span>ANTICIPO:</span><span>${{ formatNum(montoAnticipo) }}</span>
+                        </div>
+                        <div class="flex justify-between text-[11px] font-bold text-red-500">
+                            <span>SALDO PENDIENTE:</span><span>${{ formatNum(totalFinal - montoAnticipo) }}</span>
                         </div>
                     </div>
 
-                    <table class="w-full mb-10">
-                        <thead class="bg-slate-900 text-white text-[10px] uppercase font-black">
-                            <tr>
-                                <th class="text-left p-4 rounded-l-xl">Ambiente / Tela</th>
-                                <th class="p-4 text-center">Medidas</th>
-                                <th class="text-right p-4 rounded-r-xl">Precio</th>
-                            </tr>
-                        </thead>
-                        <tbody id="lista-pdf" class="divide-y divide-slate-100 text-[11px]"></tbody>
-                    </table>
-
-                    <div class="grid grid-cols-5 gap-12 mt-20">
-                        <div class="col-span-3" id="terminos-pdf-area">
-                            <div class="bg-slate-50 p-6 rounded-3xl border border-slate-100 h-full">
-                                <h4 class="text-[10px] font-black text-slate-900 uppercase mb-3 border-b pb-1">Términos y Condiciones</h4>
-                                <div id="pdf-terminos" class="text-[9px] font-bold text-slate-500 uppercase leading-relaxed whitespace-pre-line"></div>
-                            </div>
-                        </div>
-                        <div class="col-span-2 space-y-3">
-                            <div class="flex justify-between text-[11px] font-bold text-slate-400 uppercase">
-                                <span>Subtotal</span> <span id="val-raw">$0.00</span>
-                            </div>
-                            <div id="pdf-desc-row" class="hidden flex justify-between text-[11px] font-black text-emerald-600 uppercase">
-                                <span>Descuento</span> <span id="val-desc-money">-$0.00</span>
-                            </div>
-                            <div id="pdf-inst-row" class="hidden flex justify-between text-[11px] font-bold text-slate-500 uppercase">
-                                <span>Instalación</span> <span id="val-inst-money">$0.00</span>
-                            </div>
-                            <div id="pdf-iva-row" class="hidden flex justify-between text-[11px] font-bold text-slate-500 uppercase">
-                                <span>IVA (16%)</span> <span id="val-iva-money">$0.00</span>
-                            </div>
-                            <div class="flex justify-between items-end border-t-4 border-slate-900 pt-5 mt-4">
-                                <span class="text-[14px] font-black uppercase">Total</span>
-                                <span id="val-total" class="text-4xl font-black text-slate-900">$0.00</span>
-                            </div>
-                            <div class="bg-slate-900 text-white p-4 rounded-2xl mt-4 space-y-1">
-                                <div class="flex justify-between text-[10px] font-bold uppercase opacity-70">
-                                    <span>50% Anticipo</span> <span id="val-anticipo">$0.00</span>
-                                </div>
-                                <div class="flex justify-between text-[10px] font-bold uppercase opacity-70">
-                                    <span>50% Saldo Final</span> <span id="val-saldo">$0.00</span>
-                                </div>
-                            </div>
-                        </div>
+                    <div class="mt-8 space-y-2 no-print">
+                        <button @click="guardarCotizacion" class="w-full bg-green-600 text-white p-3 rounded-xl font-black uppercase shadow">💾 Guardar Venta</button>
+                        <button @click="imprimirPDF" class="w-full bg-red-600 text-white p-3 rounded-xl font-black uppercase shadow">📄 Generar PDF</button>
                     </div>
                 </div>
             </div>
         </div>
+    </div>
 
-        <div id="view-historial" class="hidden space-y-4">
-            <h2 class="text-2xl font-black text-slate-900 uppercase">Cotizaciones Guardadas</h2>
-            <div id="lista-cotizaciones" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"></div>
+    <div v-if="currentTab === 'backend'" class="max-w-4xl mx-auto space-y-8 pb-20 no-print">
+        <div v-if="!autenticado" class="text-center p-10 bg-white rounded-2xl shadow border mt-10">
+            <input v-model="passInput" type="password" class="border p-3 rounded-lg mr-2" placeholder="Clave">
+            <button @click="login" class="bg-blue-900 text-white px-8 py-3 rounded-lg font-bold">ENTRAR</button>
         </div>
-
-        <div id="view-admin" class="hidden space-y-8 animate-in slide-in-from-bottom-5">
-            <div id="auth-admin" class="max-w-md mx-auto bg-white p-8 rounded-3xl shadow-xl border border-slate-200">
-                <h2 class="text-xl font-black text-slate-900 uppercase mb-4 text-center">Acceso Requerido</h2>
-                <input type="password" id="admin-pass" placeholder="Introducir Contraseña" class="modern-input mb-4 text-center">
-                <button onclick="checkAdmin()" class="w-full bg-slate-900 text-white py-3 rounded-xl font-black uppercase">Entrar</button>
+        
+        <div v-else class="space-y-8">
+            <div class="bg-white p-8 rounded-2xl shadow border space-y-6">
+                <h3 class="font-black border-b pb-2 uppercase text-slate-400 text-xs">Datos de la Empresa</h3>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <input v-model="config.empresa" placeholder="Nombre Comercial" class="border p-2 rounded text-sm">
+                    <input v-model="config.asesor" placeholder="Nombre Asesor" class="border p-2 rounded text-sm">
+                    <input v-model="config.telefono" placeholder="WhatsApp / Tel" class="border p-2 rounded text-sm">
+                    <input v-model="config.direccionEmpresa" placeholder="Dirección Física / Fiscal" class="border p-2 rounded text-sm">
+                </div>
+                <div class="flex items-center gap-4 bg-slate-50 p-4 rounded-xl border">
+                    <img v-if="config.logo" :src="config.logo" class="w-16 h-16 object-contain border bg-white">
+                    <div class="flex-1">
+                        <label class="text-[9px] font-bold text-gray-400 uppercase">Logo de Empresa</label>
+                        <input type="file" @change="subirLogo" class="block w-full text-xs">
+                    </div>
+                </div>
+                <textarea v-model="config.politicas" rows="4" class="w-full border p-3 rounded text-xs" placeholder="Términos, condiciones y garantías..."></textarea>
             </div>
 
-            <div id="admin-content" class="hidden space-y-8">
-                <div class="flex justify-between items-center bg-white p-8 rounded-3xl shadow-sm border border-slate-200">
-                    <h2 class="text-2xl font-black text-slate-900 uppercase">Backend Management</h2>
-                    <button onclick="guardarAjustes()" class="bg-emerald-600 text-white px-8 py-4 rounded-2xl font-black uppercase text-xs shadow-lg">Sincronizar Nube</button>
-                </div>
-
-                <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
-                    <div class="bg-white p-8 rounded-3xl shadow-sm border border-slate-200 h-fit">
-                        <h3 class="font-black text-slate-900 uppercase text-xs mb-6 border-b-2 border-brand-500 pb-2 inline-block">Configuración General</h3>
-                        <div class="space-y-4">
-                            <div><label class="text-[10px] font-bold text-slate-400 uppercase">Logo URL</label><input type="text" id="conf-logo" class="modern-input"></div>
-                            <div><label class="text-[10px] font-bold text-slate-400 uppercase">Empresa</label><input type="text" id="conf-nombre" class="modern-input"></div>
-                            <div><label class="text-[10px] font-bold text-slate-400 uppercase">Asesor</label><input type="text" id="conf-asesor" class="modern-input"></div>
-                            <div><label class="text-[10px] font-bold text-slate-400 uppercase">Tel / Email</label><input type="text" id="conf-datos1" class="modern-input"></div>
-                            <div><label class="text-[10px] font-bold text-slate-400 uppercase">Dirección</label><input type="text" id="conf-datos2" class="modern-input"></div>
-                            <div><label class="text-[10px] font-bold text-slate-400 uppercase">Nueva Contraseña</label><input type="password" id="conf-pass" class="modern-input"></div>
-                        </div>
+            <div class="bg-blue-900 p-8 rounded-2xl shadow-xl text-white space-y-6">
+                <h3 class="font-black border-b border-blue-700 pb-2 uppercase text-blue-300 text-xs">Ajustes del Sistema</h3>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                        <label class="text-[10px] font-bold block text-blue-300 uppercase mb-1">Costo Facia Sugerido ($)</label>
+                        <input v-model.number="config.precioFacia" type="number" class="w-full bg-blue-800 border border-blue-700 p-3 rounded-lg font-black text-xl outline-none">
                     </div>
-                    <div class="lg:col-span-2 bg-white p-8 rounded-3xl shadow-sm border border-slate-200">
-                        <div class="flex justify-between items-center mb-6">
-                            <h3 class="font-black text-slate-900 uppercase text-xs border-b-2 border-brand-500 pb-2 inline-block">Catálogo de Productos</h3>
-                            <button onclick="agregarNuevaCategoria()" class="text-[10px] bg-slate-900 text-white px-4 py-2 rounded-xl font-black uppercase">+ Nueva Categoría</button>
-                        </div>
-                        <div id="admin-productos" class="space-y-6"></div>
-                        <div class="mt-8 border-t pt-6">
-                            <h3 class="font-black text-slate-900 uppercase text-xs mb-4">Términos y Condiciones (Solo PDF)</h3>
-                            <textarea id="conf-terminos" rows="6" class="modern-input font-normal"></textarea>
-                        </div>
+                    <div>
+                        <label class="text-[10px] font-bold block text-blue-300 uppercase mb-1">Cambiar Clave de Acceso</label>
+                        <input v-model="config.pass" type="text" class="w-full bg-blue-800 border border-blue-700 p-3 rounded-lg font-bold text-lg outline-none" placeholder="Nueva Clave">
                     </div>
                 </div>
             </div>
+
+            <div class="bg-white p-8 rounded-2xl shadow border-l-8 border-green-500 flex justify-between items-center">
+                <div>
+                    <h3 class="font-black uppercase text-green-600 text-sm">Catálogo Externo</h3>
+                    <p class="text-[10px] text-gray-500">Carga masiva mediante archivo Excel.</p>
+                </div>
+                <input type="file" @change="importarExcel" class="text-xs">
+            </div>
+
+            <div class="bg-white p-8 rounded-2xl shadow border">
+                <div class="flex justify-between items-center mb-6">
+                    <h3 class="font-black uppercase text-slate-400 text-xs">Catálogo Manual</h3>
+                    <button @click="categorias.push({nombre:'Nueva Categoría', productos:[]})" class="bg-blue-900 text-white px-4 py-2 rounded-lg font-bold text-[10px]">+ Nueva Línea</button>
+                </div>
+                <div v-for="(cat, cIdx) in categorias" :key="cIdx" class="mb-8 p-6 border rounded-2xl bg-slate-50">
+                    <div class="flex justify-between items-center mb-4">
+                        <input v-model="cat.nombre" class="font-black text-blue-900 bg-transparent border-b-2 outline-none uppercase">
+                        <button @click="categorias.splice(cIdx, 1)" class="text-red-400 text-[10px] font-bold">ELIMINAR LÍNEA</button>
+                    </div>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div v-for="(prod, pIdx) in cat.productos" :key="pIdx" class="bg-white p-4 rounded-xl border">
+                            <input v-model="prod.nombre" class="font-bold text-sm border-b w-full mb-2 outline-none" placeholder="Producto">
+                            <input v-model.number="prod.precio" type="number" class="w-full text-xs mb-2 border-b font-bold text-blue-600" placeholder="Precio m2">
+                            <div class="flex flex-wrap gap-1">
+                                <div v-for="(col, colIdx) in prod.colores" :key="colIdx" class="bg-slate-100 px-2 py-1 rounded text-[9px] flex items-center gap-1">
+                                    <input v-model="prod.colores[colIdx]" class="bg-transparent w-12 outline-none">
+                                    <button @click="prod.colores.splice(colIdx, 1)" class="text-red-400">×</button>
+                                </div>
+                                <button @click="prod.colores.push('')" class="text-[9px] font-bold text-blue-500">+ Color</button>
+                            </div>
+                        </div>
+                        <button @click="cat.productos.push({nombre:'', precio:0, colores:[]})" class="border-2 border-dashed p-4 text-xs text-gray-300 font-bold hover:text-blue-400">+ Producto</button>
+                    </div>
+                </div>
+            </div>
         </div>
-    </main>
+    </div>
+
+    <div v-if="currentTab === 'historial'" class="bg-white p-8 rounded-2xl shadow border no-print">
+        <h2 class="text-xl font-black mb-6 uppercase">Bitácora de Cotizaciones</h2>
+        <table class="w-full text-left text-sm">
+            <thead class="bg-slate-50 text-[10px] font-bold text-gray-400 uppercase">
+                <tr><th class="p-4">Folio</th><th class="p-4">Cliente</th><th class="p-4 text-right">Monto Total</th><th class="p-4 text-center">Gestión</th></tr>
+            </thead>
+            <tbody class="divide-y">
+                <tr v-for="(cot, idx) in historial" :key="idx" class="hover:bg-slate-50">
+                    <td class="p-4 font-black text-blue-600">#{{ cot.folio }}</td>
+                    <td class="p-4 uppercase">{{ cot.cliente?.nombre || 'General' }}</td>
+                    <td class="p-4 text-right font-black">${{ formatNum(cot.total) }}</td>
+                    <td class="p-4 text-center space-x-3">
+                        <button @click="cargarCotizacion(cot)" class="text-blue-600 font-bold uppercase text-[10px]">Ver / Abrir</button>
+                        <button @click="borrarCotizacion(idx)" class="text-red-400 font-bold uppercase text-[10px]">Borrar</button>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
 
 <script>
-// --- DATOS Y LOGICA ---
-let configGlobal = {
-    pass: "1234",
-    negocio: "Shadows",
-    asesor: "Asesor Ventas",
-    logo: "",
-    datos1: "Tel: 000 000 0000 | email@empresa.com",
-    datos2: "Calle Ficticia #123, Mérida",
-    terminos: "1. Pago del 50% para iniciar.\n2. Saldo contra entrega.\n3. Tiempo de entrega 10 días.",
-    productos: [
-        { cat: "ENROLLABLES", telas: [{n: "Black Out Long Beach", p: 810.39}, {n: "Screen Basic", p: 810.39}] },
-        { cat: "SHEER ELEGANCE", telas: [{n: "Duoline Basic", p: 995.19}, {n: "Duo Dim Out Brave", p: 1973.09}] }
-    ]
-};
-
-let carrito = [];
-let currentFolio = 1;
-const fmt = new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' });
-
-async function init() {
-    try {
-        const doc = await db.collection("ajustes").doc("config").get();
-        if(doc.exists) configGlobal = doc.data();
-        
-        // Cargar el último folio
-        obtenerUltimoFolio();
-    } catch(e) { console.log("Offline mode"); }
-    aplicarConfig();
-    render();
-}
-
-async function obtenerUltimoFolio() {
-    const snap = await db.collection("cotizaciones").orderBy("fecha", "desc").limit(1).get();
-    if(!snap.empty) {
-        const ultima = snap.docs[0].data();
-        currentFolio = (ultima.numFolio || 0) + 1;
+const { createApp } = Vue;
+createApp({
+    data() {
+        return {
+            currentTab: 'frontend', autenticado: false, passInput: '',
+            folio: Math.floor(10000 + Math.random() * 90000),
+            fechaHoy: new Date().toLocaleDateString(),
+            config: JSON.parse(localStorage.getItem('cot_v24_conf')) || { empresa: '', asesor: '', logo: null, politicas: '', precioFacia: 250, pass: '1234', telefono: '', direccionEmpresa: '' },
+            categorias: JSON.parse(localStorage.getItem('cot_v24_cats')) || [],
+            historial: JSON.parse(localStorage.getItem('cot_v24_hist')) || [],
+            cliente: { nombre: '', direccion: '', telefono: '' },
+            form: { catIdx: -1, prodIdx: -1, ambiente: '', color: '', ancho: '', alto: '', tieneFacia: false, motor: '', extras: [] },
+            totales: { instalacion: null, descTipo: 'pct', descValorPreset: 0, descValorManual: 0, aplicaIVA: false, pctAnticipo: 50 },
+            carrito: [], coloresDisponibles: []
+        }
+    },
+    watch: {
+        config: { handler(v) { localStorage.setItem('cot_v24_conf', JSON.stringify(v)); }, deep: true },
+        categorias: { handler(v) { localStorage.setItem('cot_v24_cats', JSON.stringify(v)); }, deep: true },
+        historial: { handler(v) { localStorage.setItem('cot_v24_hist', JSON.stringify(v)); }, deep: true }
+    },
+    computed: {
+        currentProductos() { return (this.form.catIdx > -1) ? this.categorias[this.form.catIdx].productos : []; },
+        sumatoriaCarrito() { return this.carrito.reduce((acc, i) => acc + i.totalItem, 0); },
+        montoDescuento() {
+            const base = this.sumatoriaCarrito + (Number(this.totales.instalacion) || 0);
+            if (this.totales.descValorPreset > 0) return base * (this.totales.descValorPreset / 100);
+            const val = Number(this.totales.descValorManual) || 0;
+            return (this.totales.descTipo === 'pct') ? (base * (val / 100)) : val;
+        },
+        totalFinal() { 
+            const base = (this.sumatoriaCarrito + (Number(this.totales.instalacion) || 0)) - this.montoDescuento;
+            return base + (this.totales.aplicaIVA ? base * 0.16 : 0);
+        },
+        montoAnticipo() { return this.totalFinal * (this.totales.pctAnticipo / 100); }
+    },
+    methods: {
+        tabBtn(t) { return `px-6 py-2 rounded-lg text-sm font-bold transition ${this.currentTab === t ? 'bg-blue-600 text-white shadow-md' : 'text-slate-500 hover:bg-slate-100'}`; },
+        formatNum(n) { return Number(n).toLocaleString('en-US', { minimumFractionDigits: 2 }); },
+        login() { if (this.passInput === this.config.pass) this.autenticado = true; else alert("Clave Incorrecta"); },
+        subirLogo(e) {
+            const reader = new FileReader();
+            reader.onload = (f) => { this.config.logo = f.target.result; };
+            reader.readAsDataURL(e.target.files[0]);
+        },
+        resetCategoria() { this.form.prodIdx = -1; this.form.color = ''; this.coloresDisponibles = []; },
+        resetProducto() {
+            if (this.form.prodIdx > -1) {
+                const p = this.currentProductos[this.form.prodIdx];
+                this.coloresDisponibles = p.colores ? p.colores.filter(c => c.trim() !== '') : [];
+                this.form.color = '';
+            }
+        },
+        setDesc(val, tipo) { this.totales.descValorPreset = val; this.totales.descValorManual = 0; },
+        descBtnCls(pct, tipo) {
+            return `text-[10px] font-bold p-1 border rounded transition ${this.totales.descValorPreset === pct ? 'bg-blue-600 text-white shadow-md' : 'bg-white text-slate-500'}`;
+        },
+        agregarAlCarrito() {
+            if (this.form.prodIdx === -1) return alert("Seleccione producto");
+            const p = this.currentProductos[this.form.prodIdx];
+            const m2 = Math.max(Number(this.form.ancho) * Number(this.form.alto), 1);
+            const facia = this.form.tieneFacia ? Number(this.config.precioFacia) : 0;
+            const extras = this.form.extras.reduce((a, b) => a + (Number(b.precio) || 0), 0);
+            const totalItem = (m2 * p.precio) + facia + (Number(this.form.motor) || 0) + extras;
+            this.carrito.push({ ...JSON.parse(JSON.stringify(this.form)), prodNombre: p.nombre, totalItem });
+            this.form.ancho = ''; this.form.alto = ''; this.form.motor = ''; this.form.tieneFacia = false; this.form.extras = [];
+        },
+        importarExcel(e) {
+            const file = e.target.files[0];
+            const reader = new FileReader();
+            reader.onload = (evt) => {
+                const workbook = XLSX.read(evt.target.result, { type: 'binary' });
+                const rows = XLSX.utils.sheet_to_json(workbook.Sheets[workbook.SheetNames[0]]);
+                rows.forEach(row => {
+                    const catNombre = (row.Categoría || 'General').toString();
+                    const colores = row.Colores ? row.Colores.toString().split(',').map(c => c.trim()) : [];
+                    let cat = this.categorias.find(c => c.nombre.toLowerCase() === catNombre.toLowerCase());
+                    if(!cat) { cat = { nombre: catNombre, productos: [] }; this.categorias.push(cat); }
+                    cat.productos.push({ nombre: row.Producto, precio: Number(row.Precio || 0), colores });
+                });
+                alert("Importado");
+            };
+            reader.readAsBinaryString(file);
+        },
+        guardarCotizacion() {
+            this.historial.push({ folio: this.folio, total: this.totalFinal, cliente: {...this.cliente}, carrito: [...this.carrito], totales: {...this.totales} });
+            alert("Venta Guardada");
+        },
+        borrarCotizacion(idx) { if(confirm("¿Eliminar?")) this.historial.splice(idx, 1); },
+        cargarCotizacion(cot) { this.cliente = {...cot.cliente}; this.carrito = [...cot.carrito]; this.totales = {...cot.totales}; this.folio = cot.folio; this.currentTab = 'frontend'; },
+        imprimirPDF() { window.print(); }
     }
-    document.getElementById('folio').innerText = currentFolio;
-}
-
-function aplicarConfig() {
-    document.getElementById('negocio-nombre').innerText = configGlobal.negocio;
-    document.getElementById('asesor-nombre').innerText = configGlobal.asesor;
-    document.getElementById('logo-preview').src = configGlobal.logo;
-    document.getElementById('negocio-datos-1').innerText = configGlobal.datos1;
-    document.getElementById('negocio-datos-2').innerText = configGlobal.datos2;
-    document.getElementById('pdf-terminos').innerText = configGlobal.terminos;
-    
-    // Admin inputs
-    document.getElementById('conf-nombre').value = configGlobal.negocio;
-    document.getElementById('conf-asesor').value = configGlobal.asesor;
-    document.getElementById('conf-logo').value = configGlobal.logo;
-    document.getElementById('conf-datos1').value = configGlobal.datos1;
-    document.getElementById('conf-datos2').value = configGlobal.datos2;
-    document.getElementById('conf-terminos').value = configGlobal.terminos;
-
-    const catSel = document.getElementById('categoria-select');
-    catSel.innerHTML = configGlobal.productos.map(p => `<option value="${p.cat}">${p.cat}</option>`).join('');
-    actualizarModelos();
-}
-
-function actualizarModelos() {
-    const cat = document.getElementById('categoria-select').value;
-    const modSel = document.getElementById('modelo-select');
-    const data = configGlobal.productos.find(p => p.cat === cat);
-    if(data) {
-        modSel.innerHTML = data.telas.map(t => `<option value="${t.p}" data-name="${t.n}">${t.n} — ${fmt.format(t.p)}</option>`).join('');
-    }
-}
-
-function agregarItem() {
-    const mod = document.getElementById('modelo-select');
-    if(!mod.value) return;
-    const an = parseFloat(document.getElementById('ancho').value) || 0;
-    const al = parseFloat(document.getElementById('alto').value) || 0;
-    const mot = parseFloat(document.getElementById('motor-precio').value) || 0;
-    const extraP = parseFloat(document.getElementById('extra-precio').value) || 0;
-    const extraN = document.getElementById('extra-nombre').value;
-    const faciaCheck = document.getElementById('facia-toggle').checked;
-    
-    // Regla de Oro: Menos de 1 metro se toma como metro completo
-    const anCalc = an < 1 ? 1 : an;
-    const alCalc = al < 1 ? 1 : al;
-    const m2 = anCalc * alCalc;
-    
-    // Cálculo de Facia ($280 por metro lineal basado en el ancho)
-    const precioFacia = faciaCheck ? (anCalc * 280) : 0;
-
-    const sub = (m2 * parseFloat(mod.value)) + mot + extraP + precioFacia;
-
-    carrito.push({
-        amb: document.getElementById('ambiente').value || "General",
-        tela: mod.options[mod.selectedIndex].getAttribute('data-name'),
-        col: document.getElementById('color').value || "-",
-        med: `${an.toFixed(2)}x${al.toFixed(2)}`,
-        sub: sub,
-        desc: `${mot > 0 ? '+MOTOR ' : ''}${faciaCheck ? '+FACIA ' : ''}${extraN ? '+'+extraN.toUpperCase() : ''}`
-    });
-    
-    // Reset Facia check para el siguiente item
-    document.getElementById('facia-toggle').checked = false;
-    render();
-}
-
-function render() {
-    const lista = document.getElementById('lista-pdf');
-    lista.innerHTML = ''; let sumRaw = 0;
-    
-    carrito.forEach((it, i) => {
-        sumRaw += it.sub;
-        lista.innerHTML += `
-            <tr class="border-b border-slate-50">
-                <td class="p-4">
-                    <div class="font-black uppercase text-[10px] text-slate-900">${it.amb}</div>
-                    <div class="text-[9px] text-slate-400 font-bold uppercase">${it.tela} / ${it.col} <span class="text-brand-500">${it.desc}</span></div>
-                </td>
-                <td class="text-center font-bold text-slate-600">${it.med}</td>
-                <td class="text-right p-4 font-black text-slate-900">
-                    ${fmt.format(it.sub)} 
-                    <button onclick="eliminarItem(${i})" class="no-print ml-3 text-red-200 hover:text-red-500">✕</button>
-                </td>
-            </tr>`;
-    });
-
-    // Descuentos
-    let valDesc = 0;
-    const dTipo = document.getElementById('desc-tipo').value;
-    if(dTipo === 'custom') {
-        const cVal = parseFloat(document.getElementById('desc-custom-val').value) || 0;
-        const cTipo = document.getElementById('desc-custom-tipo').value;
-        valDesc = cTipo === 'percent' ? (sumRaw * (cVal/100)) : cVal;
-    } else {
-        valDesc = sumRaw * (parseFloat(dTipo) / 100);
-    }
-
-    const inst = parseFloat(document.getElementById('inst').value) || 0;
-    const subTotalCalculado = sumRaw - valDesc + inst;
-    const iva = document.getElementById('iva-toggle').checked ? subTotalCalculado * 0.16 : 0;
-    const total = subTotalCalculado + iva;
-
-    // Actualizar UI Totales
-    document.getElementById('val-raw').innerText = fmt.format(sumRaw);
-    document.getElementById('val-desc-money').innerText = `-${fmt.format(valDesc)}`;
-    document.getElementById('pdf-desc-row').classList.toggle('hidden', valDesc <= 0);
-    document.getElementById('val-inst-money').innerText = fmt.format(inst);
-    document.getElementById('pdf-inst-row').classList.toggle('hidden', inst <= 0);
-    document.getElementById('val-iva-money').innerText = fmt.format(iva);
-    document.getElementById('pdf-iva-row').classList.toggle('hidden', iva <= 0);
-    document.getElementById('val-total').innerText = fmt.format(total);
-    document.getElementById('val-anticipo').innerText = fmt.format(total / 2);
-    document.getElementById('val-saldo').innerText = fmt.format(total / 2);
-
-    // PDF Info y Vigencia
-    const hoy = new Date();
-    const vencimiento = new Date();
-    vencimiento.setDate(hoy.getDate() + 15);
-
-    document.getElementById('pdf-cliente').innerText = document.getElementById('cliente').value || "PÚBLICO GENERAL";
-    document.getElementById('pdf-tel-display').innerText = document.getElementById('tel-cliente').value;
-    document.getElementById('pdf-direccion-display').innerText = document.getElementById('direccion').value;
-    
-    document.getElementById('fecha-pdf').innerText = hoy.toLocaleDateString('es-MX', { day:'numeric', month:'long', year:'numeric' });
-    document.getElementById('vigencia-pdf').innerText = "Vencimiento: " + vencimiento.toLocaleDateString('es-MX', { day:'numeric', month:'long', year:'numeric' });
-}
-
-function toggleCustomDesc() {
-    document.getElementById('custom-desc-area').classList.toggle('hidden', document.getElementById('desc-tipo').value !== 'custom');
-}
-
-function eliminarItem(i) { carrito.splice(i, 1); render(); }
-
-// --- PERSISTENCIA ---
-async function guardarCotizacion() {
-    const cot = {
-        numFolio: currentFolio,
-        cliente: document.getElementById('cliente').value || "S/N",
-        telefono: document.getElementById('tel-cliente').value || "",
-        direccion: document.getElementById('direccion').value || "",
-        total: document.getElementById('val-total').innerText,
-        fecha: new Date().toISOString(),
-        items: carrito
-    };
-    await db.collection("cotizaciones").add(cot);
-    alert("Cotización #" + currentFolio + " Guardada");
-    obtenerUltimoFolio(); // Actualizar el folio para la siguiente
-}
-
-function checkAdmin() {
-    if(document.getElementById('admin-pass').value === configGlobal.pass) {
-        document.getElementById('auth-admin').classList.add('hidden');
-        document.getElementById('admin-content').classList.remove('hidden');
-        renderAdminProducts();
-    } else { alert("Pass incorrecto"); }
-}
-
-function renderAdminProducts() {
-    const container = document.getElementById('admin-productos');
-    container.innerHTML = configGlobal.productos.map((c, i) => `
-        <div class="bg-slate-50 p-6 rounded-3xl border border-slate-200">
-            <div class="flex justify-between items-center mb-4 border-b pb-2">
-                <input type="text" value="${c.cat}" onchange="configGlobal.productos[${i}].cat = this.value.toUpperCase()" class="font-black bg-transparent">
-                <button onclick="eliminarCat(${i})" class="text-red-500 text-[10px] font-bold">BORRAR CAT</button>
-            </div>
-            ${c.telas.map((t, ti) => `
-                <div class="flex gap-2 mb-2">
-                    <input type="text" value="${t.n}" onchange="configGlobal.productos[${i}].telas[${ti}].n = this.value" class="modern-input py-1 text-[11px] w-2/3">
-                    <input type="number" value="${t.p}" onchange="configGlobal.productos[${i}].telas[${ti}].p = parseFloat(this.value)" class="modern-input py-1 text-[11px] w-1/3">
-                    <button onclick="configGlobal.productos[${i}].telas.splice(${ti},1); renderAdminProducts()">✕</button>
-                </div>
-            `).join('')}
-            <button onclick="configGlobal.productos[${i}].telas.push({n:'Nueva', p:0}); renderAdminProducts()" class="text-[9px] font-black mt-2">+ AGREGAR TELA</button>
-        </div>
-    `).join('');
-}
-
-async function guardarAjustes() {
-    configGlobal.negocio = document.getElementById('conf-nombre').value;
-    configGlobal.asesor = document.getElementById('conf-asesor').value;
-    configGlobal.logo = document.getElementById('conf-logo').value;
-    configGlobal.datos1 = document.getElementById('conf-datos1').value;
-    configGlobal.datos2 = document.getElementById('conf-datos2').value;
-    configGlobal.terminos = document.getElementById('conf-terminos').value;
-    if(document.getElementById('conf-pass').value) configGlobal.pass = document.getElementById('conf-pass').value;
-    
-    await db.collection("ajustes").doc("config").set(configGlobal);
-    alert("Configuración Sincronizada");
-    location.reload();
-}
-
-function switchTab(tab) {
-    document.querySelectorAll('main > div').forEach(d => d.classList.add('hidden'));
-    document.getElementById('view-' + tab).classList.remove('hidden');
-
-    document.querySelectorAll('.tab-btn').forEach(b => {
-        b.classList.remove('active', 'text-white');
-        b.classList.add('text-slate-400');
-    });
-    document.getElementById('btn-tab-' + tab).classList.add('active', 'text-white');
-    
-    if(tab === 'historial') cargarHistorial();
-}
-
-async function cargarHistorial() {
-    const container = document.getElementById('lista-cotizaciones');
-    container.innerHTML = '<p class="col-span-full text-center py-10 opacity-50">Cargando cotizaciones...</p>';
-    const snap = await db.collection("cotizaciones").orderBy("fecha", "desc").get();
-    container.innerHTML = '';
-    snap.forEach(doc => {
-        const d = doc.data();
-        container.innerHTML += `
-            <div class="bg-white p-6 rounded-3xl shadow-sm border border-slate-100 flex justify-between items-center">
-                <div>
-                    <span class="text-[9px] bg-slate-100 px-2 py-0.5 rounded font-bold text-slate-500">FOLIO #${d.numFolio || 'S/F'}</span>
-                    <h4 class="font-black text-slate-900 uppercase mt-1">${d.cliente}</h4>
-                    <p class="text-[10px] text-slate-400 font-bold">${new Date(d.fecha).toLocaleDateString()}</p>
-                    <p class="text-brand-600 font-black text-xl mt-1">${d.total}</p>
-                </div>
-                <div class="flex flex-col gap-2">
-                    <button onclick="cargarParaEditar('${doc.id}')" class="bg-brand-500 text-white px-4 py-2 rounded-xl font-bold text-[10px] uppercase">Editar</button>
-                    <button onclick="eliminarCotizacion('${doc.id}')" class="text-red-300 hover:text-red-600 font-bold text-[10px] uppercase">Eliminar</button>
-                </div>
-            </div>`;
-    });
-}
-
-async function cargarParaEditar(id) {
-    try {
-        const doc = await db.collection("cotizaciones").doc(id).get();
-        if (!doc.exists) return alert("No se encontró el registro");
-        const data = doc.data();
-        
-        currentFolio = data.numFolio || currentFolio;
-        document.getElementById('folio').innerText = currentFolio;
-        document.getElementById('cliente').value = data.cliente || "";
-        document.getElementById('tel-cliente').value = data.telefono || "";
-        document.getElementById('direccion').value = data.direccion || "";
-        carrito = data.items || [];
-        switchTab('cotizador');
-        render();
-    } catch (e) { alert("Error al cargar"); }
-}
-
-async function eliminarCotizacion(id) {
-    if(confirm("¿Borrar definitivamente?")) {
-        await db.collection("cotizaciones").doc(id).delete();
-        cargarHistorial();
-    }
-}
-
-function generarPDF() {
-    const e = document.getElementById('pdf-area');
-    html2pdf().set({
-        margin: 0,
-        filename: `Cotizacion_${currentFolio}_${document.getElementById('cliente').value || 'CS'}.pdf`,
-        image: { type: 'jpeg', quality: 0.98 },
-        html2canvas: { scale: 3, useCORS: true },
-        jsPDF: { unit: 'in', format: 'letter', orientation: 'portrait' }
-    }).from(e).save();
-}
-
-window.onload = init;
+}).mount('#app');
 </script>
 </body>
 </html>
+
